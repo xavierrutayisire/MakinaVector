@@ -32,9 +32,8 @@
 
 ##### 4 - Generate tiles:
 
-- Edit pbf-dl.py and change the « setup user »
-- Generate all the tiles of a delimited zone with the pbf-dl.py script
-    - Run « `sudo %%%/utilery-virtualenv/bin/python ./utilery/pbf-dl.py` » and change %%% with the right directory
+- Edit generate-tiles.py and change the « setup user »
+- Run « `sudo %%%/utilery-virtualenv/bin/python generate-tiles.py` » and change %%% with the right directory
 
 ---
 
