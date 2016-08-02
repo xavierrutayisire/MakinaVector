@@ -1,4 +1,4 @@
-## ServeVectorTilesFromAtoZ
+## serveVectorTilesFromAtoZ
 
 ! Dont remove any file from the repository !
 
