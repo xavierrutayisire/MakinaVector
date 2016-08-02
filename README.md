@@ -71,6 +71,8 @@
 
 - Open you browser and open « `%%%:%%%` » and change %%% with the host and the port you used for the django server
 
+![alt tag](http://img4.hostingpics.net/pics/220631Screenshotfrom20160802170649.png)
+
 ---
 
 ##### Info:

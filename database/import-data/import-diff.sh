@@ -32,7 +32,7 @@ cp $working_dir_imposm3/imposm3/osmosis/state.txt $working_dir_imposm3/imposm3/o
 imposm3 diff -config $working_dir_imposm3/imposm3/config/config.json $working_dir_imposm3/imposm3/osmosis/changes.osc.gz
 
 #  update minutly the PostGIS database
-cp ./import-data/majdb.sh $working_dir_imposm3/imposm3/cron
+cp ./database/import-data/majdb.sh $working_dir_imposm3/imposm3/cron
 
 #  Set execute permission on the script
 chmod +x $working_dir_imposm3/imposm3/cron/majdb.sh
