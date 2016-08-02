@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>{{ title }}</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel='stylesheet' />
+    <link href="{% static "map/map.css" %}" rel='stylesheet' />
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.21.0/mapbox-gl.css' rel='stylesheet' />
+</head>
+<body>
+    <div id='map'></div>
+
+    <div id="o-wrapper" class="o-wrapper">
+      <div class="c-buttons">
+        <button id="c-button--slide-right" class="c-button">Custom map</button>
+      </div>
+    </div>
+
+    <nav id="c-menu--slide-right" class="c-menu c-menu--slide-right">
+      <button class="c-menu__close">&larr; Close Menu</button>
+      <ul class="c-menu__items">
+        <li class="c-menu__item">
+            <input id='all' type='checkbox' name='rtoggle' value='all' checked='checked'>
+            <label for='all'>all</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='landuse' type='checkbox' name='rtoggle' value='landuse' checked='checked'>
+            <label for='landuse'>landuse</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='waterway' type='checkbox' name='rtoggle' value='waterway' checked='checked'>
+            <label for='waterway'>waterway</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='water' type='checkbox' name='rtoggle' value='water' checked='checked'>
+            <label for='water'>water</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='aeroway' type='checkbox' name='rtoggle' value='aeroway' checked='checked'>
+            <label for='aeroway'>aeroway</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='barrier_line' type='checkbox' name='rtoggle' value='barrier_line' checked='checked'>
+            <label for='barrier_line'>barrier_line</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='building' type='checkbox' name='rtoggle' value='building' checked='checked'>
+            <label for='building'>building</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='landuse_overlay' type='checkbox' name='rtoggle' value='landuse_overlay' checked='checked'>
+            <label for='landuse_overlay'>landuse_overlay</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='road' type='checkbox' name='rtoggle' value='road' checked='checked'>
+            <label for='road'>road</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='admin' type='checkbox' name='rtoggle' value='admin' checked='checked'>
+            <label for='admin'>admin</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='country_label' type='checkbox' name='rtoggle' value='country_label' checked='checked'>
+            <label for='country_label'>country_label</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='marine_label' type='checkbox' name='rtoggle' value='marine_label' checked='checked'>
+            <label for='marine_label'>marine_label</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='state_label' type='checkbox' name='rtoggle' value='state_label' checked='checked'>
+            <label for='state_label'>state_label</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='place_label' type='checkbox' name='rtoggle' value='place_label' checked='checked'>
+            <label for='place_label'>place_label</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='water_label' type='checkbox' name='rtoggle' value='water_label' checked='checked'>
+            <label for='water_label'>water_label</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='poi_label' type='checkbox' name='rtoggle' value='poi_label' checked='checked'>
+            <label for='poi_label'>poi_label</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='road_label' type='checkbox' name='rtoggle' value='road_label' checked='checked'>
+            <label for='road_label'>road_label</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='motorway_junction' type='checkbox' name='rtoggle' value='motorway_junction' checked='checked'>
+            <label for='motorway_junction'>motorway_junction</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='waterway_label' type='checkbox' name='rtoggle' value='waterway_label' checked='checked'>
+            <label for='waterway_label'>waterway_label</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='airport_label' type='checkbox' name='rtoggle' value='airport_label' checked='checked'>
+            <label for='airport_label'>airport_label</label>
+        </li>
+        <li class="c-menu__item">
+            <input id='rail_station_label' type='checkbox' name='rtoggle' value='rail_station_label' checked='checked'>
+            <label for='rail_station_label'>rail_station_label</label>
+        </li>
+        <!--<li class="c-menu__item">
+            <input id='mountain_peak_label' type='checkbox' name='rtoggle' value='mountain_peak_label' checked='checked'>
+            <label for='mountain_peak_label'>mountain_peak_label</label>
+        </li>-->
+        <li class="c-menu__item">
+            <input id='housenum_label' type='checkbox' name='rtoggle' value='housenum_label' checked='checked'>
+            <label for='housenum_label'>housenum_label</label>
+        </li>
+      </ul>
+    </nav>
+
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.21.0/mapbox-gl.js'></script>
+    <script>
+        mapboxgl.accessToken = '{{ mapboxAccessToken }}';
+        var map = new mapboxgl.Map({
+            container: 'map', // container id
+            style: 'style',
+            center: {{ startingPosition }}, // starting position
+            zoom: {{ startingZoom }} // starting zoom
+        });
+        map.addControl(new mapboxgl.Navigation({position: 'top-left'}));
+
+        var jsonStyle;
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'http://{{ django_host }}:{{ django_port }}/style');
+        xhr.send(null);
+        xhr.onreadystatechange = function () {
+          var DONE = 4;
+          var OK = 200;
+          if (xhr.readyState === DONE) {
+            if (xhr.status === OK) {
+              jsonStyle = JSON.parse(xhr.responseText);
+
+              var layerList = document.getElementById('c-menu--slide-right');
+              var inputs = layerList.getElementsByTagName('input');
+
+              allLayers = jsonStyle.layers;
+              allLayersId = [];
+              allLayersSources = [];
+              for (var i = 1; i < allLayers.length; i++) {
+                  allLayersId[i] = allLayers[i]['id'];
+                  allLayersSources[i] = allLayers[i]['source-layer'];
+              }
+              allLayersSourcesAndId = [[]];
+              nameLayersSources = [];
+              for (var i = 0; i < allLayersId.length; i++) {
+                  if (typeof allLayersSourcesAndId[allLayersSources[i]] == 'undefined') {
+                      nameLayersSources.push(allLayersSources[i]);
+                      allLayersSourcesAndId[allLayersSources[i]] = [allLayersId[i]];
+                  }
+                  else {
+                      allLayersSourcesAndId[allLayersSources[i]].push(allLayersId[i]);
+                  }
+              }
+
+              var xhrMultipleStyle = new XMLHttpRequest();
+              xhrMultipleStyle.open('GET', 'http://{{ django_host }}:{{ django_port }}/multiple-style');
+              xhrMultipleStyle.send(null);
+              xhrMultipleStyle.onreadystatechange = function () {
+                var DONEMultipleStyle = 4;
+                var OKMultipleStyle = 200;
+                if (xhrMultipleStyle.readyState === DONEMultipleStyle) {
+                  if (xhrMultipleStyle.status === OKMultipleStyle) {
+                      jsonMultipleStyle = JSON.parse(xhrMultipleStyle.responseText);
+
+                      map.on('load', function () {
+                        for (var i = 0; i < Object.keys(jsonMultipleStyle.sources[0]).length; i++) {
+                            map.addSource(Object.keys(jsonMultipleStyle.sources[0])[i], {
+                                type: jsonMultipleStyle.sources[0][Object.keys(jsonMultipleStyle.sources[0])[i]]["type"],
+                                tiles: jsonMultipleStyle.sources[0][Object.keys(jsonMultipleStyle.sources[0])[i]]["tiles"],
+                                maxzoom: jsonMultipleStyle.sources[0][Object.keys(jsonMultipleStyle.sources[0])[i]]["maxzoom"],
+                                minzoom: jsonMultipleStyle.sources[0][Object.keys(jsonMultipleStyle.sources[0])[i]]["minzoom"]
+                            });
+                        }
+                        for (i of jsonMultipleStyle.layers) {
+
+                            if (typeof i['source-layer'] == 'undefined') {
+                                map.addLayer({
+                                    'id': i['id'],
+                                    'ref': i['ref'],
+                                    'paint': i['paint']
+                                }, i['before']);
+                            } else {
+                                map.addLayer({
+                                    'id': i['id'],
+                                    'type': i['type'],
+                                    'source': i['source'],
+                                    'layout': i['layout'],
+                                    'paint': i['paint'],
+                                    'source-layer': i['source-layer']
+                                }, i['before']);
+                            }
+
+                            if (typeof i['source-layer'] != 'undefined') {
+                                if (typeof allLayersSourcesAndId[i['source-layer']] == 'undefined') {
+                                    nameLayersSources.push(i['source-layer']);
+                                    allLayersSourcesAndId[i['source-layer']] = [i['id']];
+                                }
+                                else {
+                                    allLayersSourcesAndId[i['source-layer']].push(i['id']);
+                                }
+                            }
+                        }
+                    });
+                  }
+                }
+              }
+
+              for (var i = 0; i < inputs.length; i++) {
+                  inputs[i].onclick = function (e) {
+                      var id = e.path[0].id;
+                      idList = [];
+
+                      if (id != 'all') {
+                          idList = allLayersSourcesAndId[id];
+                          if (inputs[0].checked == true) {
+                              inputs[0].checked = false;
+                          }
+                          nbInputChecked = 0;
+                          for (var w = 1; w < nameLayersSources.length; w++) {
+                              if (inputs[w].checked == true){
+                                  nbInputChecked++;
+                              }
+                          }
+                          if (nbInputChecked == nameLayersSources.length - 1) {
+                              inputs[0].checked = true;
+                          }
+                      } else {
+                          for (var y = 1; y < nameLayersSources.length; y++) {
+                              for (var z = 0; z < allLayersSourcesAndId[nameLayersSources[y]].length; z++) {
+                                  idList.push(allLayersSourcesAndId[nameLayersSources[y]][z]);
+                              }
+                              if (inputs[0].checked == false) {
+                                  inputs[y].checked = false;
+                              } else {
+                                  inputs[y].checked = true;
+                              }
+                          }
+                      }
+
+                      e.stopPropagation();
+
+                      idList.forEach(function(id2) {
+                          var visibility = map.getLayoutProperty(id2, 'visibility');
+
+                          if (id != 'all') {
+                              if (visibility === 'none') {
+                                  this.className = 'active';
+                                  map.setLayoutProperty(id2, 'visibility', 'visible');
+                              }
+                              else {
+                                  map.setLayoutProperty(id2, 'visibility', 'none');
+                                  this.className = '';
+                              }
+                          } else {
+                            if (inputs[0].checked == false) {
+                                map.setLayoutProperty(id2, 'visibility', 'none');
+                                this.className = '';
+                            } else {
+                                this.className = 'active';
+                                map.setLayoutProperty(id2, 'visibility', 'visible');
+                            }
+                          }
+
+                      });
+                  };
+              }
+            }
+          }
+        };
+    </script>
+    <script type="text/javascript" src="{% static "map/menu.js" %}"></script>
+</body>
+</html>

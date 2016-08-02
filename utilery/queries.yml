@@ -1,0 +1,2012 @@
+srid: 3857
+layers:
+- name: landuse
+  buffer: 4
+  queries:
+    - minzoom: 5
+      maxzoom: 6
+      sql: |-
+        SELECT
+            osm_ids2mbid(MAX(id), true) AS osm_id, ST_CollectionExtract(ST_Collect(geometry), 3) AS way, landuse_class(type) AS class, type
+        FROM
+            osm_landuse_polygon_subdivided_gen0
+        WHERE
+            type = 'wood'
+        AND
+            geometry && !bbox!
+        GROUP BY
+            type
+    - minzoom: 7
+      maxzoom: 8
+      sql: |-
+        SELECT
+            osm_ids2mbid(MAX(id), true) AS osm_id, ST_CollectionExtract(ST_Collect(geometry), 3) AS way, landuse_class(type) AS class, type
+        FROM
+            osm_landuse_polygon_subdivided_gen0
+        WHERE
+            type IN ('wood', 'residential')
+        AND
+            area > 1000000
+        AND
+            geometry && !bbox!
+        GROUP BY
+            type
+    - minzoom: 9
+      maxzoom: 9
+      sql: |-
+        SELECT
+            osm_ids2mbid(MAX(id), true) AS osm_id, ST_CollectionExtract(ST_Collect(geometry), 3) AS way, landuse_class(type) AS class, type
+        FROM
+            osm_landuse_polygon_subdivided_gen0
+        WHERE
+            type IN ('wood', 'residential', 'grass', 'cemetery', 'park', 'school')
+        AND
+            geometry && !bbox!
+        GROUP BY
+            type, id
+    - minzoom: 10
+      maxzoom: 10
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id, geometry AS way, landuse_class(type) AS class, type
+        FROM
+            osm_landuse_polygon_subdivided_gen0
+        WHERE
+            type IN ('wood', 'residential', 'commercial', 'retail', 'railway', 'industrial', 'grass', 'cemetery', 'park', 'school')
+        AND
+            area >  99000
+        AND
+            geometry && !bbox!
+    - minzoom: 11
+      maxzoom: 11
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id, geometry AS way, landuse_class(type) AS class, type
+        FROM
+            osm_landuse_polygon_subdivided_gen1
+        WHERE
+            type IN ('wood', 'residential','commercial', 'retail', 'railway', 'industrial', 'military', 'grass', 'cemetery', 'park', 'school', 'hospital')
+        AND
+            geometry && !bbox!
+    - minzoom: 12
+      maxzoom: 12
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id, geometry AS way, landuse_class(type) AS class, type
+        FROM
+            osm_landuse_polygon_subdivided
+        WHERE
+            type IN ('wood', 'residential', 'grass','retail', 'railway', 'industrial', 'military', 'cemetery', 'park', 'school', 'hospital')
+        AND
+            area > 10000
+        AND
+            geometry && !bbox!
+    - minzoom: 13
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id, geometry AS way, landuse_class(type) AS class, type
+        FROM
+            osm_landuse_polygon_subdivided
+        WHERE
+            type NOT IN ('wetland', 'marsh', 'swamp', 'bog', 'mud', 'tidalflat', 'national_park', 'nature_reserve', 'protected_area')
+        AND
+            geometry && !bbox!
+- name: waterway
+  buffer: 4
+  queries:
+    - minzoom: 7
+      maxzoom: 9
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, false) AS osm_id, name, name_fr, name_en, name_de, name_es, name_ru, name_zh, type, type AS class, geometry as way
+        FROM
+            osm_water_linestring
+        WHERE
+            type = 'river'
+        AND
+            geometry && !bbox!
+    - minzoom: 10
+      maxzoom: 12
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, false) AS osm_id, name, name_fr, name_en, name_de, name_es, name_ru, name_zh, type, type AS class, geometry as way
+        FROM
+            osm_water_linestring
+        WHERE
+            type IN ('river', 'canal')
+        AND
+            geometry && !bbox!
+    - minzoom: 13
+      maxzoom: 13
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, false) AS osm_id, name, name_fr, name_en, name_de, name_es, name_ru, name_zh, type, type AS class, geometry as way
+        FROM
+            osm_water_linestring
+        WHERE
+            type IN ('river', 'canal', 'stream', 'drain')
+        AND
+            geometry && !bbox!
+    - minzoom: 14
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, false) AS osm_id, name, name_fr, name_en, name_de, name_es, name_ru, name_zh, type, type AS class, geometry as way
+        FROM
+            osm_water_linestring
+        WHERE
+            geometry && !bbox!
+- name: water
+  buffer: 8
+  queries:
+    - minzoom: 0
+      maxzoom: 0
+      sql: |-
+        SELECT
+            osm_ids2mbid(0, true) AS osm_id, geom AS way
+        FROM
+            ne_110m_ocean_subdivided
+        WHERE
+            geom && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(0, true) AS osm_id, geom AS way
+        FROM
+            ne_110m_lakes
+        WHERE
+            geom && !bbox!
+    - minzoom: 1
+      maxzoom: 1
+      sql: |-
+        SELECT
+            osm_ids2mbid(0, true) AS osm_id, geom AS way
+        FROM
+            ne_50m_ocean_subdivided
+        WHERE
+            geom && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(0, true) AS osm_id, geom AS way
+        FROM
+            ne_110m_lakes
+        WHERE
+            geom && !bbox!
+    - minzoom: 2
+      maxzoom: 3
+      sql: |-
+        SELECT
+            osm_ids2mbid(0, true) AS osm_id, geom AS way
+        FROM
+            ne_10m_ocean_subdivided
+        WHERE
+            geom && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(0, true) AS osm_id, geom AS way
+        FROM
+            ne_50m_lakes
+        WHERE
+            geom && !bbox!
+    - minzoom: 4
+      maxzoom: 4
+      sql: |-
+        SELECT
+            osm_ids2mbid(0, true) AS osm_id, geometry AS way
+        FROM
+            osm_ocean_polygon_subdivided_gen0
+        WHERE
+            geometry && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(0, true) AS osm_id, geom AS way
+        FROM
+            ne_10m_lakes
+        WHERE
+            geom && !bbox!
+    - minzoom: 5
+      maxzoom: 7
+      sql: |-
+        SELECT
+            osm_ids2mbid(0, true) AS osm_id, geometry AS way
+        FROM
+            osm_ocean_polygon_subdivided_gen0
+        WHERE
+            geometry && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            CASE WHEN ST_Area(geometry) > 10000000 AND id <> 0
+                 THEN ST_Intersection(ST_MakeValid(geometry), !bbox!)
+                 ELSE geometry
+            END AS way
+        FROM
+            osm_water_polygon_gen1
+        WHERE
+            geometry && !bbox!
+    - minzoom: 8
+      maxzoom: 10
+      sql: |-
+        SELECT
+            osm_ids2mbid(0, true) AS osm_id, geometry AS way
+        FROM
+            osm_ocean_polygon_subdivided
+        WHERE
+            geometry && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            CASE WHEN ST_Area(geometry) > 10000000 AND id <> 0
+                 THEN ST_Intersection(ST_MakeValid(geometry), !bbox!)
+                 ELSE geometry
+            END AS way
+        FROM
+            osm_water_polygon_gen1
+        WHERE
+            geometry && !bbox!
+    - minzoom: 11
+      maxzoom: 12
+      sql: |-
+        SELECT
+            osm_ids2mbid(0, true) AS osm_id, geometry AS way, 0 AS area
+        FROM
+            osm_ocean_polygon_subdivided
+        WHERE
+            geometry && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            CASE WHEN ST_Area(geometry) > 10000000 AND id <> 0
+                 THEN ST_Intersection(ST_MakeValid(geometry), !bbox!)
+                 ELSE geometry
+            END AS way,
+            area
+        FROM
+            osm_water_polygon
+        WHERE
+            geometry && !bbox!
+        AND
+            area >= 15000
+    - minzoom: 13
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(0, true) AS osm_id, geometry AS way
+        FROM
+            osm_ocean_polygon_subdivided
+        WHERE
+            geometry && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            CASE WHEN ST_Area(geometry) > 10000000 AND id <> 0
+                 THEN ST_Intersection(ST_MakeValid(geometry), !bbox!)
+                 ELSE geometry
+            END AS way
+        FROM
+            osm_water_polygon
+        WHERE
+            geometry && !bbox!
+- name: aeroway
+  buffer: 4
+  queries:
+    - minzoom: 9
+      maxzoom: 9
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, is_polygon(geometry)) AS osm_id, geometry AS way, type
+        FROM
+            osm_aero_linestring
+        WHERE
+            type = 'runway'
+        AND
+            geometry && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(id, is_polygon(geometry)) AS osm_id, geometry AS way, type
+        FROM
+            osm_aero_polygon
+        WHERE
+            type = 'runway'
+        AND
+            geometry && !bbox!
+    - minzoom: 10
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, is_polygon(geometry)) AS osm_id, geometry AS way, type
+        FROM
+            osm_aero_linestring
+        WHERE
+            geometry && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(id, is_polygon(geometry)) AS osm_id, geometry AS way, type
+        FROM
+            osm_aero_polygon
+        WHERE
+            geometry && !bbox!
+- name: barrier_line
+  buffer: 4
+  queries:
+    - minzoom: 14
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, is_polygon(geometry)) AS osm_id, geometry AS way, barrier_line_class(type) AS class
+        FROM
+            osm_barrier_linestring
+        WHERE
+            geometry && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(id, is_polygon(geometry)) AS osm_id, geometry AS way, barrier_line_class(type) AS class
+        FROM
+            osm_barrier_polygon
+        WHERE
+            geometry && !bbox!
+- name: building
+  buffer: 2
+  queries:
+    - minzoom: 13
+      maxzoom: 13
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id, building_is_underground(underground) AS underground, geometry AS way
+        FROM
+            osm_building_polygon_gen0
+        WHERE
+            geometry && !bbox!
+        ORDER BY
+            ST_YMin(ST_Envelope(geometry)) DESC
+    - minzoom: 14
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id, building_is_underground(underground) AS underground, geometry AS way
+        FROM
+            osm_building_polygon
+        WHERE
+            geometry && !bbox!
+        ORDER BY
+            ST_YMin(ST_Envelope(geometry)) DESC
+- name: landuse_overlay
+  buffer: 8
+  queries:
+    - minzoom: 5
+      maxzoom: 5
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id, ST_Intersection(ST_MakeValid(geometry), !bbox!) AS way, landuse_overlay_class(type) AS class, type
+        FROM
+            osm_landuse_polygon_subdivided_gen0
+        WHERE
+            area > 300000000
+        AND
+            is_landuse_overlay(type)
+        AND
+            geometry && !bbox!
+    - minzoom: 6
+      maxzoom: 6
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id, ST_Intersection(ST_MakeValid(geometry), !bbox!) AS way, landuse_overlay_class(type) AS class, type
+        FROM
+            osm_landuse_polygon_subdivided_gen0
+        WHERE
+            area > 100000000
+        AND
+            is_landuse_overlay(type)
+        AND
+            geometry && !bbox!
+    - minzoom: 7
+      maxzoom: 7
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id, ST_Intersection(ST_MakeValid(geometry), !bbox!) AS way, landuse_overlay_class(type) AS class, type
+        FROM
+            osm_landuse_polygon_subdivided_gen0
+        WHERE
+            area > 20000000
+        AND
+            is_landuse_overlay(type)
+        AND
+            geometry && !bbox!
+    - minzoom: 8
+      maxzoom: 8
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            CASE WHEN ST_Area(geometry) > 10000000
+                 THEN ST_Intersection(ST_MakeValid(geometry), !bbox!)
+                 ELSE geometry
+            END AS way,
+            landuse_overlay_class(type) AS class,
+            type
+        FROM
+            osm_landuse_polygon_subdivided_gen0
+        WHERE
+            area > 6000000
+        AND
+            is_landuse_overlay(type)
+        AND
+            geometry && !bbox!
+    - minzoom: 9
+      maxzoom: 9
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            CASE WHEN ST_Area(geometry) > 10000000
+                 THEN ST_Intersection(ST_MakeValid(geometry), !bbox!)
+                 ELSE geometry
+            END AS way,
+            landuse_overlay_class(type) AS class,
+            type
+        FROM
+            osm_landuse_polygon_subdivided_gen0
+        WHERE
+            area > 2000000
+        AND
+            is_landuse_overlay(type)
+        AND
+            geometry && !bbox!
+    - minzoom: 10
+      maxzoom: 10
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            CASE WHEN ST_Area(geometry) > 10000000
+                 THEN ST_Intersection(ST_MakeValid(geometry), !bbox!)
+                 ELSE geometry
+            END AS way,
+            landuse_overlay_class(type) AS class,
+            type
+        FROM
+            osm_landuse_polygon_subdivided_gen0
+        WHERE
+            area > 500000
+        AND
+            is_landuse_overlay(type)
+        AND
+            geometry && !bbox!
+    - minzoom: 11
+      maxzoom: 12
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            CASE WHEN ST_Area(geometry) > 10000000
+                 THEN ST_Intersection(ST_MakeValid(geometry), !bbox!)
+                 ELSE geometry
+            END AS way,
+            landuse_overlay_class(type) AS class,
+            type
+        FROM
+            osm_landuse_polygon_subdivided_gen1
+        WHERE
+            is_landuse_overlay(type)
+        AND
+            geometry && !bbox!
+    - minzoom: 13
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            CASE WHEN ST_Area(geometry) > 10000000
+                 THEN ST_Intersection(ST_MakeValid(geometry), !bbox!)
+                 ELSE geometry
+            END AS way,
+            landuse_overlay_class(type) AS class,
+            type
+        FROM
+            osm_landuse_polygon_subdivided
+        WHERE
+            is_landuse_overlay(type)
+        AND
+            geometry && !bbox!
+- name: road
+  buffer: 4
+  queries:
+    - minzoom: 5
+      maxzoom: 5
+      sql: |-
+        SELECT
+            osm_ids2mbid(MAX(id), false) AS osm_id,
+            ST_CollectionExtract(ST_Collect(geometry), 2) AS way,
+            road_type(road_class(type, NULL, NULL), type, NULL, NULL, NULL) AS type,
+            road_class(type, NULL, NULL) AS class,
+            road_oneway(0) AS oneway,
+            'none' AS structure,
+            NULL AS z_order
+        FROM
+            osm_road_geometry
+        WHERE
+            road_class(type, service, access) IN ('motorway', 'trunk')
+        AND
+            geometry && !bbox!
+        GROUP BY
+            type
+    - minzoom: 6
+      maxzoom: 7
+      sql: |-
+        SELECT
+            osm_ids2mbid(MAX(id), false) AS osm_id,
+            ST_CollectionExtract(ST_Collect(geometry), 2) AS way,
+            road_type(road_class(type, NULL, NULL), type, NULL, NULL, NULL) AS type,
+            road_class(type, NULL, NULL) AS class,
+            road_oneway(0) AS oneway,
+            'none' AS structure,
+            NULL AS z_order
+        FROM
+            osm_road_geometry
+        WHERE
+            road_class(type, service, access) IN ('motorway', 'trunk', 'primary')
+        AND
+            geometry && !bbox!
+        GROUP BY
+            type
+    - minzoom: 8
+      maxzoom: 9
+      sql: |-
+        SELECT
+            osm_ids2mbid(MAX(id), false) AS osm_id,
+            ST_CollectionExtract(ST_Collect(geometry), 2) AS way,
+            road_type(road_class(type, NULL, NULL), type, NULL, NULL, NULL) AS type,
+            road_class(type, NULL, NULL) AS class,
+            road_oneway(0) AS oneway,
+            'none' AS structure,
+            NULL AS z_order
+        FROM
+            osm_road_geometry
+        WHERE
+            road_class(type, service, access) IN ('motorway', 'motorway_link', 'trunk', 'primary', 'secondary', 'major_rail')
+        AND
+            geometry && !bbox!
+        GROUP BY
+            type
+    - minzoom: 10
+      maxzoom: 10
+      sql: |-
+        SELECT
+            osm_ids2mbid(MAX(id), false) AS osm_id,
+            ST_CollectionExtract(ST_Collect(geometry), 2) AS way,
+            road_type(road_class(type, NULL, NULL), type, NULL, NULL, NULL) AS type,
+            road_class(type, NULL, NULL) AS class,
+            road_oneway(0) AS oneway,
+            'none' AS structure,
+            NULL AS z_order
+        FROM
+            osm_road_geometry
+        WHERE
+            road_class(type, service, access) IN ('motorway', 'motorway_link', 'trunk', 'primary', 'secondary', 'tertiary', 'major_rail')
+        AND
+            geometry && !bbox!
+        GROUP BY
+            type
+    - minzoom: 11
+      maxzoom: 11
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, is_polygon(geometry)) AS osm_id,
+            geometry AS way,
+            road_type(road_class(type, service, access), type, construction, tracktype, service) AS type,
+            road_class(type, service, access) AS class,
+            road_oneway(oneway) AS oneway,
+            'none'::varchar(4) AS structure,
+            z_order
+        FROM
+            osm_road_geometry
+        WHERE
+            road_class(type, service, access) IN ('motorway', 'motorway_link', 'trunk', 'primary', 'secondary', 'tertiary', 'major_rail', 'street', 'ferry')
+        AND
+            geometry && !bbox!
+        ORDER BY
+            z_order ASC
+    - minzoom: 12
+      maxzoom: 12
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, is_polygon(geometry)) AS osm_id,
+            geometry AS way,
+            road_type(road_class(type, service, access), type, construction, tracktype, service) AS type,
+            road_class(type, service, access) AS class,
+            road_oneway(oneway) AS oneway,
+            'none'::varchar(4) AS structure,
+            z_order
+        FROM
+            osm_road_geometry
+        WHERE
+            road_type_class(type) IN ('motorway', 'motorway_link', 'trunk', 'primary', 'secondary', 'tertiary', 'major_rail', 'street', 'ferry', 'pedestrian', 'service', 'link', 'construction', 'street_limited', 'aerialway')
+        AND
+            geometry && !bbox!
+        ORDER BY
+            z_order ASC
+    - minzoom: 13
+      maxzoom: 13
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, is_polygon(geometry)) AS osm_id,
+            geometry AS way,
+            road_type(road_class(type, service, access), type, construction, tracktype, service) AS type,
+            road_class(type, service, access) AS class,
+            road_oneway(oneway) AS oneway,
+            road_structure(is_tunnel, is_bridge, is_ford) AS structure,
+            z_order
+        FROM
+            osm_road_geometry
+        WHERE
+            road_type_class(type) IN ('motorway', 'motorway_link', 'trunk', 'primary', 'secondary', 'tertiary', 'major_rail', 'street', 'ferry', 'pedestrian', 'service', 'link', 'construction', 'street_limited', 'aerialway', 'track')
+        AND
+            geometry && !bbox!
+         ORDER BY
+            z_order ASC
+    - minzoom: 14
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, is_polygon(geometry)) AS osm_id,
+            geometry AS way,
+            road_type(road_class(type, service, access), type, construction, tracktype, service) AS type,
+            road_class(type, service, access) AS class,
+            road_oneway(oneway) AS oneway,
+            road_structure(is_tunnel, is_bridge, is_ford) AS structure,
+            z_order
+        FROM
+            osm_road_geometry
+        WHERE
+            geometry && !bbox!
+        ORDER BY
+            z_order ASC
+- name: admin
+  buffer: 4
+  queries:
+    - minzoom: 0
+      maxzoom: 0
+      sql: |-
+        SELECT
+            osm_ids2mbid(0, false) AS osm_id, geom as way, 2 AS admin_level, 0 AS disputed, 0 AS maritime
+        FROM
+            ne_110m_admin_0_boundary_lines_land
+        WHERE
+            geom && !bbox!
+    - minzoom: 1
+      maxzoom: 1
+      sql: |-
+        SELECT
+            osm_ids2mbid(0, false) AS osm_id, geom as way, 2 AS admin_level, 0 AS disputed, 0 AS maritime
+        FROM
+            ne_110m_admin_0_boundary_lines_land
+        WHERE
+            geom && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(0, false) AS osm_id, geom as way, 4 AS admin_level, 0 AS disputed, 0 AS maritime
+        FROM
+            ne_50m_admin_1_states_provinces_lines
+        WHERE
+            scalerank = 2
+        AND
+            geom && !bbox!
+    - minzoom: 2
+      maxzoom: 2
+      sql: |-
+        SELECT
+            osm_ids2mbid(0, false) AS osm_id, geom as way, 2 AS admin_level, 0 AS disputed, 0 AS maritime
+        FROM
+            ne_110m_admin_0_boundary_lines_land
+        WHERE
+            geom && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(0, false) AS osm_id, geom as way, 4 AS admin_level, 0 AS disputed, 0 AS maritime
+        FROM
+            ne_10m_admin_1_states_provinces_lines_shp
+        WHERE
+            scalerank = 2
+        AND
+            geom && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(id, false) AS osm_id, geometry as way, admin_level, maritime, 0 AS disputed
+        FROM
+            osm_admin_linestring
+        WHERE
+            (maritime = 1
+        OR
+            admin_level = 2)
+        AND
+            geometry && !bbox!
+    - minzoom: 3
+      maxzoom: 3
+      sql: |-
+        SELECT
+            osm_ids2mbid(0, false) AS osm_id, geom as way, 2 AS admin_level, 0 AS disputed, 0 AS maritime
+        FROM
+            ne_50m_admin_0_boundary_lines_land
+        WHERE
+            geom && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(0, false) AS osm_id, geom as way, 4 AS admin_level, 0 AS disputed, 0 AS maritime
+        FROM
+            ne_10m_admin_1_states_provinces_lines_shp
+        WHERE
+            scalerank = 2
+        AND
+            geom && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(id, false) AS osm_id, geometry as way, admin_level, maritime, 0 AS disputed
+        FROM
+            osm_admin_linestring
+        WHERE
+            (maritime = 1
+        OR
+            admin_level = 2)
+        AND
+            geometry && !bbox!
+    - minzoom: 4
+      maxzoom: 5
+      sql: |-
+        SELECT
+            osm_ids2mbid(0, false) AS osm_id, geom as way, 2 AS admin_level, 0 AS disputed, 0 AS maritime
+        FROM
+            ne_10m_admin_0_boundary_lines_land
+        WHERE
+            geom && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(0, false) AS osm_id, geom as way, 4 AS admin_level, 0 AS disputed, 0 AS maritime
+        FROM
+            ne_10m_admin_1_states_provinces_lines_shp
+        WHERE
+            scalerank BETWEEN 2 AND 6
+        AND
+            geom && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(id, false) AS osm_id, geometry as way, admin_level, maritime, 0 AS disputed
+        FROM
+            osm_admin_linestring
+        WHERE
+            (maritime = 1
+        OR
+            admin_level = 2)
+        AND
+            geometry && !bbox!
+    - minzoom: 6
+      maxzoom: 6
+      sql: |-
+        SELECT
+            osm_ids2mbid(0, false) AS osm_id, geom as way, 2 AS admin_level, 0 AS disputed, 0 AS maritime
+        FROM
+            ne_10m_admin_0_boundary_lines_land
+        WHERE
+            geom && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(0, false) AS osm_id, geom as way, 4 AS admin_level, 0 AS disputed, 0 AS maritime
+        FROM
+            ne_10m_admin_1_states_provinces_lines_shp
+        WHERE
+            scalerank BETWEEN 2 AND 9
+        AND
+            geom && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(id, false) AS osm_id, geometry as way, admin_level, maritime, 0 AS disputed
+        FROM
+            osm_admin_linestring
+        WHERE
+            (maritime = 1
+        OR
+            admin_level = 2)
+        AND
+            geometry && !bbox!
+    - minzoom: 7
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(0, false) AS osm_id, geom as way, 2 AS admin_level, 0 AS maritime, 1 AS disputed
+        FROM
+            ne_10m_admin_0_boundary_lines_disputed_areas
+        WHERE
+            geom && !bbox!
+        UNION ALL
+        SELECT
+            osm_ids2mbid(id, false) AS osm_id, geometry as way, admin_level, maritime, 0 AS disputed
+        FROM
+            osm_admin_linestring
+        WHERE
+            (admin_level = 2
+        OR
+            admin_level = 4)
+        AND
+            geometry && !bbox!
+- name: country_label
+  buffer: 256
+  queries:
+    - minzoom: 1
+      maxzoom: 1
+      sql: |-
+        SELECT
+            osm_ids2mbid(CAST(osm_id as bigint), true) AS osm_id,
+            wkb_geometry as way,
+            iso3166_1_alpha_2 AS code,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            rank AS scalerank
+        FROM
+            custom_countries
+        WHERE
+            rank <= 1
+        AND
+            wkb_geometry && !bbox!
+    - minzoom: 2
+      maxzoom: 2
+      sql: |-
+        SELECT
+            osm_ids2mbid(CAST(osm_id as bigint), true) AS osm_id,
+            wkb_geometry as way,
+            iso3166_1_alpha_2 AS code,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            rank AS scalerank
+        FROM
+            custom_countries
+        WHERE
+            rank <= 2
+        AND
+            wkb_geometry && !bbox!
+    - minzoom: 3
+      maxzoom: 3
+      sql: |-
+        SELECT
+            osm_ids2mbid(CAST(osm_id as bigint), true) AS osm_id,
+            wkb_geometry as way,
+            iso3166_1_alpha_2 AS code,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            rank AS scalerank
+        FROM
+            custom_countries
+        WHERE
+            rank <= 4
+        AND
+            wkb_geometry && !bbox!
+    - minzoom: 4
+      maxzoom: 4
+      sql: |-
+        SELECT
+            osm_ids2mbid(CAST(osm_id as bigint), true) AS osm_id,
+            wkb_geometry as way,
+            iso3166_1_alpha_2 AS code,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            rank AS scalerank
+        FROM
+            custom_countries
+        WHERE
+            rank <= 5
+        AND
+            wkb_geometry && !bbox!
+    - minzoom: 5
+      maxzoom: 5
+      sql: |-
+        SELECT
+            osm_ids2mbid(CAST(osm_id as bigint), true) AS osm_id,
+            wkb_geometry as way,
+            iso3166_1_alpha_2 AS code,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            rank AS scalerank
+        FROM
+            custom_countries
+        WHERE
+            rank <= 6
+        AND
+            wkb_geometry && !bbox!
+    - minzoom: 6
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(CAST(osm_id as bigint), true) AS osm_id,
+            wkb_geometry as way,
+            iso3166_1_alpha_2 AS code,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            rank AS scalerank
+        FROM
+            custom_countries
+        WHERE
+            rank >= 7
+        AND
+            wkb_geometry && !bbox!
+- name: marine_label
+  buffer: 256
+  queries:
+    - minzoom: 1
+      maxzoom: 1
+      sql: |-
+        SELECT
+            osm_ids2mbid(CAST(osm_id as bigint), true) AS osm_id,
+            wkb_geometry as way,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            case when ST_GeometryType(wkb_geometry) = 'ST_LineString' then 'line'
+                 else 'point' end AS placement,
+            CAST(rank as int) AS labelrank
+        FROM
+            custom_seas
+        WHERE
+            CAST(rank as int) = 1
+        AND
+            wkb_geometry && !bbox!
+    - minzoom: 2
+      maxzoom: 2
+      sql: |-
+        SELECT
+            osm_ids2mbid(CAST(osm_id as bigint), true) AS osm_id,
+            wkb_geometry as way,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            case when ST_GeometryType(wkb_geometry) = 'ST_LineString' then 'line'
+                 else 'point' end AS placement,
+            CAST(rank as int) AS labelrank
+        FROM
+            custom_seas
+        WHERE
+            CAST(rank as int) <= 2
+        AND
+            wkb_geometry && !bbox!
+    - minzoom: 3
+      maxzoom: 3
+      sql: |-
+        SELECT
+            osm_ids2mbid(CAST(osm_id as bigint), true) AS osm_id,
+            wkb_geometry as way,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            case when ST_GeometryType(wkb_geometry) = 'ST_LineString' then 'line'
+                 else 'point' end AS placement,
+            CAST(rank as int) AS labelrank
+        FROM
+            custom_seas
+        WHERE
+            CAST(rank as int) <= 3
+        AND
+            wkb_geometry && !bbox!
+    - minzoom: 4
+      maxzoom: 4
+      sql: |-
+        SELECT
+            osm_ids2mbid(CAST(osm_id as bigint), true) AS osm_id,
+            wkb_geometry as way,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            case when ST_GeometryType(wkb_geometry) = 'ST_LineString' then 'line'
+                 else 'point' end AS placement,
+            CAST(rank as int) AS labelrank
+        FROM
+            custom_seas
+        WHERE
+            CAST(rank as int) <= 4
+        AND
+            wkb_geometry && !bbox!
+    - minzoom: 5
+      maxzoom: 5
+      sql: |-
+        SELECT
+            osm_ids2mbid(CAST(osm_id as bigint), true) AS osm_id,
+            wkb_geometry as way,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            case when ST_GeometryType(wkb_geometry) = 'ST_LineString' then 'line'
+                 else 'point' end AS placement,
+            CAST(rank as int) AS labelrank
+        FROM
+            custom_seas
+        WHERE
+            CAST(rank as int) <= 5
+        AND
+            wkb_geometry && !bbox!
+    - minzoom: 6
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(CAST(osm_id as bigint), true) AS osm_id,
+            wkb_geometry as way,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            case when ST_GeometryType(wkb_geometry) = 'ST_LineString' then 'line'
+                 else 'point' end AS placement,
+            CAST(rank as int) AS labelrank
+        FROM
+            custom_seas
+        WHERE
+            CAST(rank as int) <= 6
+        AND
+            wkb_geometry && !bbox!
+- name: state_label
+  buffer: 256
+  queries:
+    - minzoom: 4
+      maxzoom: 4
+      sql: |-
+        SELECT
+            osm_ids2mbid(CAST(osm_id as bigint), true) AS osm_id,
+            wkb_geometry AS way,
+            abbr,
+            area_sqkm AS area,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh
+        FROM
+            custom_states
+        WHERE
+            area_sqkm > 90000
+        AND
+            wkb_geometry && !bbox!
+    - minzoom: 5
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(CAST(osm_id as bigint), true) AS osm_id,
+            wkb_geometry AS way,
+            abbr,
+            area_sqkm AS area,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh
+        FROM
+            custom_states
+        WHERE
+            wkb_geometry && !bbox!
+- name: place_label
+  buffer: 128
+  queries:
+    - minzoom: 3
+      maxzoom: 3
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) as osm_id,
+            topoint(geometry) AS way,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            type,
+            CASE WHEN is_capital THEN 2 ELSE capital END AS capital,
+            'S' AS ldir,
+            normalize_scalerank(scalerank) AS scalerank,
+            row_number() OVER (PARTITION BY LabelGrid(geometry, 85 * !pixel_width!)
+                         ORDER BY scalerank ASC NULLS LAST,
+                                  population DESC NULLS LAST
+            ) AS localrank
+        FROM
+            osm_place_point
+        WHERE
+            name <> ''
+        AND
+            scalerank IS NOT NULL
+        AND
+            scalerank BETWEEN 0 AND 2
+        AND
+            type = 'city'
+        AND
+            geometry && !bbox!
+    - minzoom: 4
+      maxzoom: 4
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) as osm_id,
+            topoint(geometry) AS way,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            type,
+            CASE WHEN is_capital THEN 2 ELSE capital END AS capital,
+            'S' AS ldir,
+            normalize_scalerank(scalerank) AS scalerank,
+            row_number() OVER (PARTITION BY LabelGrid(geometry, 85 * !pixel_width!)
+                         ORDER BY scalerank ASC NULLS LAST,
+                                  population DESC NULLS LAST
+            ) AS localrank
+        FROM
+            osm_place_point
+        WHERE
+            name <> ''
+        AND
+            scalerank IS NOT NULL
+        AND
+            scalerank BETWEEN 0 AND 4
+        AND
+            type = 'city'
+        AND
+            geometry && !bbox!
+    - minzoom: 5
+      maxzoom: 5
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) as osm_id,
+            topoint(geometry) AS way,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            type,
+            CASE WHEN is_capital THEN 2 ELSE capital END AS capital,
+            'S' AS ldir,
+            normalize_scalerank(scalerank) AS scalerank,
+            row_number() OVER (PARTITION BY LabelGrid(geometry, 85 * !pixel_width!)
+                         ORDER BY scalerank ASC NULLS LAST,
+                                  population DESC NULLS LAST
+            ) AS localrank
+        FROM
+            osm_place_point
+        WHERE
+            name <> ''
+        AND
+            scalerank IS NOT NULL
+        AND
+            scalerank BETWEEN 0 AND 7
+        AND
+            type = 'city'
+        AND
+            geometry && !bbox!
+    - minzoom: 6
+      maxzoom: 6
+      sql: |-
+        SELECT * FROM (
+          SELECT
+              osm_ids2mbid(id, true) as osm_id,
+              topoint(geometry) AS way,
+              name,
+              coalesce(NULLIF(name_en, ''), name) AS name_en,
+              coalesce(NULLIF(name_es, ''), name) AS name_es,
+              coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+              coalesce(NULLIF(name_de, ''), name) AS name_de,
+              coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+              coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+              type,
+              CASE WHEN is_capital THEN 2 ELSE capital END AS capital,
+              'S' AS ldir,
+              normalize_scalerank(scalerank) AS scalerank,
+              row_number() OVER (PARTITION BY LabelGrid(geometry, 85 * !pixel_width!)
+                           ORDER BY scalerank ASC NULLS LAST,
+                                    population DESC NULLS LAST
+              ) AS localrank
+          FROM
+              osm_place_point
+          WHERE
+              name <> ''
+          AND
+              type IN ('city', 'town')
+          AND
+              geometry && !bbox!
+        ) AS t
+        WHERE
+            localrank < 8
+    - minzoom: 7
+      maxzoom: 8
+      sql: |-
+        SELECT * FROM (
+          SELECT
+              osm_ids2mbid(id, true) as osm_id,
+              topoint(geometry) AS way,
+              name,
+              coalesce(NULLIF(name_en, ''), name) AS name_en,
+              coalesce(NULLIF(name_es, ''), name) AS name_es,
+              coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+              coalesce(NULLIF(name_de, ''), name) AS name_de,
+              coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+              coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+              type,
+              CASE WHEN is_capital THEN 2 ELSE capital END AS capital,
+              'S' AS ldir,
+              normalize_scalerank(scalerank) AS scalerank,
+              row_number() OVER (PARTITION BY LabelGrid(geometry, 85 * !pixel_width!)
+                           ORDER BY scalerank ASC NULLS LAST,
+                                    population DESC NULLS LAST
+              ) AS localrank
+          FROM
+              osm_place_point
+          WHERE
+              name <> ''
+          AND
+              type IN ('city', 'town')
+          AND
+              geometry && !bbox!
+        ) AS t
+        WHERE
+            localrank < 12
+    - minzoom: 9
+      maxzoom: 9
+      sql: |-
+        SELECT * FROM (
+          SELECT
+              osm_ids2mbid(id, true) as osm_id,
+              topoint(geometry) AS way,
+              name,
+              coalesce(NULLIF(name_en, ''), name) AS name_en,
+              coalesce(NULLIF(name_es, ''), name) AS name_es,
+              coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+              coalesce(NULLIF(name_de, ''), name) AS name_de,
+              coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+              coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+              type,
+              CASE WHEN is_capital THEN 2 ELSE capital END AS capital,
+              'S' AS ldir,
+              normalize_scalerank(scalerank) AS scalerank,
+              row_number() OVER (PARTITION BY LabelGrid(geometry, 85 * !pixel_width!)
+                           ORDER BY scalerank ASC NULLS LAST,
+                                    population DESC NULLS LAST
+              ) AS localrank
+          FROM
+              osm_place_point
+          WHERE
+              name <> ''
+          AND
+              type IN ('island', 'aboriginal_lands', 'city', 'town', 'village')
+          AND
+              geometry && !bbox!
+        ) AS t
+        WHERE
+            localrank < 8
+    - minzoom: 10
+      maxzoom: 10
+      sql: |-
+        SELECT * FROM (
+          SELECT
+              osm_ids2mbid(id, true) as osm_id,
+              topoint(geometry) AS way,
+              name,
+              coalesce(NULLIF(name_en, ''), name) AS name_en,
+              coalesce(NULLIF(name_es, ''), name) AS name_es,
+              coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+              coalesce(NULLIF(name_de, ''), name) AS name_de,
+              coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+              coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+              type,
+              CASE WHEN is_capital THEN 2 ELSE capital END AS capital,
+              'S' AS ldir,
+              normalize_scalerank(scalerank) AS scalerank,
+              row_number() OVER (PARTITION BY LabelGrid(geometry, 85 * !pixel_width!)
+                           ORDER BY scalerank ASC NULLS LAST,
+                                    population DESC NULLS LAST
+              ) AS localrank
+          FROM
+              osm_place_point
+          WHERE
+              name <> ''
+          AND
+              type IN ('island', 'aboriginal_lands', 'city', 'town', 'village', 'suburb')
+          AND
+              geometry && !bbox!
+        ) AS t
+        WHERE
+            localrank < 6
+    - minzoom: 11
+      maxzoom: 12
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) as osm_id,
+            topoint(geometry) AS way,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            type,
+            CASE WHEN is_capital THEN 2 ELSE capital END AS capital,
+            'S' AS ldir,
+            normalize_scalerank(scalerank) AS scalerank,
+            row_number() OVER (PARTITION BY LabelGrid(geometry, 85 * !pixel_width!)
+                         ORDER BY scalerank ASC NULLS LAST,
+                                  population DESC NULLS LAST
+            ) AS localrank
+        FROM
+            osm_place_point
+        WHERE
+            name <> ''
+        AND
+            type IN ('island', 'aboriginal_lands', 'city', 'town', 'village', 'suburb')
+        AND
+            geometry && !bbox!
+    - minzoom: 13
+      maxzoom: 13
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) as osm_id,
+            topoint(geometry) AS way,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            type,
+            CASE WHEN is_capital THEN 2 ELSE capital END AS capital,
+            'S' AS ldir,
+            normalize_scalerank(scalerank) AS scalerank,
+            row_number() OVER (PARTITION BY LabelGrid(geometry, 85 * !pixel_width!)
+                         ORDER BY scalerank ASC NULLS LAST,
+                                  population DESC NULLS LAST
+            ) AS localrank
+        FROM
+            osm_place_point
+        WHERE
+            name <> ''
+        AND
+            type IN ('island', 'islet', 'aboriginal_lands', 'city', 'town', 'village', 'suburb', 'hamlet')
+        AND
+            geometry && !bbox!
+    - minzoom: 14
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) as osm_id,
+            topoint(geometry) AS way,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            type,
+            CASE WHEN is_capital THEN 2 ELSE capital END AS capital,
+            'S' AS ldir,
+            normalize_scalerank(scalerank) AS scalerank,
+            row_number() OVER (PARTITION BY LabelGrid(geometry, 85 * !pixel_width!)
+                         ORDER BY scalerank ASC NULLS LAST,
+                                  population DESC NULLS LAST
+            ) AS localrank
+        FROM
+            osm_place_point
+        WHERE
+            name <> ''
+        AND
+            geometry && !bbox!
+- name: water_label
+  buffer: 64
+  queries:
+    - minzoom: 10
+      maxzoom: 10
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            geometry AS way,
+            name,
+            area,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh
+        FROM
+            osm_water_point
+        WHERE
+            area >= 100000000
+        AND
+            geometry && !bbox!
+    - minzoom: 11
+      maxzoom: 11
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            geometry AS way,
+            name,
+            area,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh
+        FROM
+            osm_water_point
+        WHERE
+            area >= 40000000
+        AND
+            geometry && !bbox!
+    - minzoom: 12
+      maxzoom: 12
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            geometry AS way,
+            name,
+            area,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh
+        FROM
+            osm_water_point
+        WHERE
+            area >= 20000000
+        AND
+            geometry && !bbox!
+    - minzoom: 13
+      maxzoom: 13
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            geometry AS way,
+            name,
+            area,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh
+        FROM
+            osm_water_point
+        WHERE
+            area >= 10000000
+        AND
+            geometry && !bbox!
+    - minzoom: 14
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            geometry AS way,
+            name,
+            area,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh
+        FROM
+            osm_water_point
+        WHERE
+            geometry && !bbox!
+- name: poi_label
+  buffer: 64
+  queries:
+    - minzoom: 14
+      maxzoom: 14
+      sql: |-
+        WITH poi_geoms AS (
+            SELECT
+                geometry, id, ref, name, name_en, name_es, name_fr, name_de, name_ru, name_zh, type, 0 AS area
+            FROM
+                osm_poi_point
+            UNION ALL
+            SELECT
+                geometry, id, ref, name, name_en, name_es, name_fr, name_de, name_ru, name_zh, type, area
+            FROM
+                osm_poi_polygon
+        )
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            topoint(geometry) AS way,
+            ref,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            format_type(type) AS type,
+            CASE WHEN name = '' THEN NULL
+                 ELSE poi_label_scalerank(type, area)
+            END AS scalerank,
+            coalesce(NULLIF(maki_label_class(type), ''), 'marker') AS maki,
+            rank() OVER (PARTITION BY LabelGrid(geometry, 128 * !pixel_width!)
+                         ORDER BY poi_label_localrank(type, name) ASC) AS localrank
+        FROM
+            poi_geoms
+        WHERE
+            (maki_label_class(type) <> '' OR name <> '')
+        AND
+            geometry && !bbox!
+- name: road_label
+  buffer: 8
+  queries:
+    - minzoom: 8
+      maxzoom: 10
+      sql: |-
+        SELECT * FROM (
+          SELECT
+              osm_ids2mbid(id, false) AS osm_id,
+              st_startpoint(geometry) AS way,
+              name,
+              type,
+              oneway,
+              layer,
+              z_order,
+              is_tunnel,
+              is_bridge,
+              is_ford,
+              construction,
+              tracktype,
+              service,
+              access,
+              coalesce(NULLIF(name_en, ''), name) AS name_en,
+              coalesce(NULLIF(name_es, ''), name) AS name_es,
+              coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+              coalesce(NULLIF(name_de, ''), name) AS name_de,
+              coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+              coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+              nullif(ref, '') AS ref,
+              nullif(char_length(ref), 0) AS reflen,
+              round(MercLength(geometry)) AS len,
+              road_class(type, service, access) AS class,
+              'default' AS shield,
+              rank() OVER (
+                  PARTITION BY LabelGrid(geometry, 200 * !pixel_width!)
+                  ORDER BY road_localrank(type) ASC, round(MercLength(geometry)) DESC
+              ) AS localrank
+          FROM
+              osm_road_geometry
+          WHERE
+              type IN ('motorway')
+          AND
+              ref <> ''
+          AND
+              ST_GeometryType(geometry) = 'ST_LineString'
+          AND
+              geometry && !bbox!
+        ) as t
+        WHERE
+            localrank < 2
+    - minzoom: 11
+      maxzoom: 11
+      sql: |-
+        SELECT * FROM (
+          SELECT
+              osm_ids2mbid(id, false) AS osm_id,
+              geometry AS way,
+              name,
+              type,
+              oneway,
+              layer,
+              z_order,
+              is_tunnel,
+              is_bridge,
+              is_ford,
+              construction,
+              tracktype,
+              service,
+              access,
+              coalesce(NULLIF(name_en, ''), name) AS name_en,
+              coalesce(NULLIF(name_es, ''), name) AS name_es,
+              coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+              coalesce(NULLIF(name_de, ''), name) AS name_de,
+              coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+              coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+              nullif(ref, '') AS ref,
+              nullif(char_length(ref), 0) AS reflen,
+              round(MercLength(geometry)) AS len,
+              road_class(type, service, access) AS class,
+              'default' AS shield,
+              rank() OVER (
+                  PARTITION BY LabelGrid(geometry, 300 * !pixel_width!)
+                  ORDER BY road_localrank(type) ASC, round(MercLength(geometry)) DESC
+              ) AS localrank
+          FROM
+              osm_road_geometry
+          WHERE
+              type IN ('motorway', 'motorway_link', 'primary', 'primary_link', 'trunk', 'trunk_link', 'secondary', 'secondary_link')
+          AND
+              (name <> '' OR ref <> '')
+          AND
+              ST_GeometryType(geometry) = 'ST_LineString'
+          AND
+              geometry && !bbox!
+        ) as t
+        WHERE
+            localrank < 5
+    - minzoom: 12
+      maxzoom: 12
+      sql: |-
+        SELECT * FROM (
+          SELECT
+              osm_ids2mbid(id, false) AS osm_id,
+              geometry AS way,
+              name,
+              type,
+              oneway,
+              layer,
+              z_order,
+              is_tunnel,
+              is_bridge,
+              is_ford,
+              construction,
+              tracktype,
+              service,
+              access,
+              coalesce(NULLIF(name_en, ''), name) AS name_en,
+              coalesce(NULLIF(name_es, ''), name) AS name_es,
+              coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+              coalesce(NULLIF(name_de, ''), name) AS name_de,
+              coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+              coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+              nullif(ref, '') AS ref,
+              nullif(char_length(ref), 0) AS reflen,
+              round(MercLength(geometry)) AS len,
+              road_class(type, service, access) AS class,
+              'default' AS shield,
+              rank() OVER (
+                  PARTITION BY LabelGrid(geometry, 300 * !pixel_width!)
+                  ORDER BY road_localrank(type) ASC, round(MercLength(geometry)) DESC
+              ) AS localrank
+          FROM
+              osm_road_geometry
+          WHERE
+              type IN ('motorway', 'motorway_link', 'primary', 'primary_link', 'trunk', 'trunk_link', 'secondary', 'secondary_link', 'tertiary', 'tertiary_link', 'residential', 'unclassified', 'living_street', 'construction', 'rail', 'monorail', 'narrow_gauge', 'subway', 'tram')
+          AND
+              name <> ''
+          AND
+              ST_GeometryType(geometry) = 'ST_LineString'
+          AND
+              geometry && !bbox!
+        ) as t
+        WHERE
+            localrank < 5
+    - minzoom: 13
+      maxzoom: 13
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, false) AS osm_id,
+            geometry AS way,
+            name,
+            type,
+            oneway,
+            layer,
+            z_order,
+            is_tunnel,
+            is_bridge,
+            is_ford,
+            construction,
+            tracktype,
+            service,
+            access,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            nullif(ref, '') AS ref,
+            nullif(char_length(ref), 0) AS reflen,
+            round(MercLength(geometry)) AS len,
+            road_class(type, service, access) AS class,
+            'default' AS shield,
+            rank() OVER (
+                PARTITION BY LabelGrid(geometry, 300 * !pixel_width!)
+                ORDER BY road_localrank(type) ASC, round(MercLength(geometry)) DESC
+            ) AS localrank
+        FROM
+            osm_road_geometry
+        WHERE
+            type IN ('motorway', 'motorway_link', 'primary', 'primary_link', 'trunk', 'trunk_link', 'secondary', 'secondary_link', 'tertiary', 'tertiary_link', 'residential', 'unclassified', 'living_street', 'construction', 'rail', 'monorail', 'narrow_gauge', 'subway', 'tram')
+        AND
+            name <> ''
+        AND
+            ST_GeometryType(geometry) = 'ST_LineString'
+        AND
+            geometry && !bbox!
+    - minzoom: 14
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, false) AS osm_id,
+            geometry AS way,
+            name,
+            type,
+            oneway,
+            layer,
+            z_order,
+            is_tunnel,
+            is_bridge,
+            is_ford,
+            construction,
+            tracktype,
+            service,
+            access,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            nullif(ref, '') AS ref,
+            nullif(char_length(ref), 0) AS reflen,
+            round(MercLength(geometry)) AS len,
+            road_class(type, service, access) AS class,
+            'default' AS shield,
+            rank() OVER (
+                PARTITION BY LabelGrid(geometry, 300 * !pixel_width!)
+                ORDER BY road_localrank(type) ASC, round(MercLength(geometry)) DESC
+            ) AS localrank
+        FROM
+            osm_road_geometry
+        WHERE
+            type IN ('motorway', 'motorway_link', 'primary', 'primary_link', 'trunk', 'trunk_link', 'secondary', 'secondary_link', 'tertiary', 'tertiary_link', 'residential', 'unclassified', 'living_street', 'construction', 'rail', 'monorail', 'narrow_gauge', 'subway', 'tram', 'service', 'track', 'driveway', 'path', 'cycleway', 'ski', 'steps', 'bridleway', 'footway', 'funicular', 'light_rail', 'preserved')
+        AND
+            name <> ''
+        AND
+            ST_GeometryType(geometry) = 'ST_LineString'
+        AND
+            geometry && !bbox!
+- name: motorway_junction
+  buffer: 8
+  queries:
+    - minzoom: 12
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            geometry as way,
+            name,
+            NULLIF(ref, '') AS ref,
+            NULLIF(char_length(ref), 0) AS reflen,
+            junction_type(type) AS type,
+            road_type_class(junction_type(type)) AS class
+        FROM
+            osm_motorway_junction_point
+        WHERE
+            geometry && !bbox!
+- name: waterway_label
+  buffer: 8
+  queries:
+    - minzoom: 13
+      maxzoom: 13
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, false) AS osm_id,
+            geometry AS way,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            type,
+            type AS class
+        FROM
+            osm_water_linestring
+        WHERE
+            type IN ('river', 'canal')
+        AND
+            linelabel(13, name, geometry)
+        AND
+            geometry && !bbox!
+    - minzoom: 14
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, false) AS osm_id,
+            geometry AS way,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            type,
+            type AS class
+        FROM
+            osm_water_linestring
+        WHERE
+            linelabel(14, name, geometry)
+        AND
+            geometry && !bbox!
+- name: airport_label
+  buffer: 64
+  queries:
+    - minzoom: 9
+      maxzoom: 14
+      sql: |-
+        WITH airport_label AS (
+            SELECT
+                id, geometry, name, name_en, name_es, name_fr, name_de, name_ru, name_zh, iata, ref, icao, faa, aerodrome, type, kind, 0 AS area
+            FROM
+                osm_airport_point
+            UNION ALL
+            SELECT
+                id, geometry, name, name_en, name_es, name_fr, name_de, name_ru, name_zh, iata, ref, icao, faa, aerodrome, type, kind, area
+            FROM
+                osm_airport_polygon
+        )
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            topoint(geometry) AS way,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            coalesce(NULLIF(iata, ''), NULLIF(ref, ''), NULLIF(icao, ''), faa) AS ref,
+            airport_label_class(kind, type) AS maki,
+            airport_label_scalerank(airport_label_class(kind, type), area, aerodrome) AS scalerank
+        FROM
+            airport_label
+        WHERE
+            geometry && !bbox!
+- name: rail_station_label
+  buffer: 64
+  queries:
+    - minzoom: 13
+      maxzoom: 13
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            geometry AS way,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            rail_station_class(type) AS maki,
+            rail_station_class(type) AS network
+        FROM
+            osm_rail_station_point
+        WHERE
+            rail_station_class(type) = 'rail'
+        AND
+            geometry && !bbox!
+    - minzoom: 14
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            geometry AS way,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh,
+            rail_station_class(type) AS maki,
+            rail_station_class(type) AS network
+        FROM
+            osm_rail_station_point
+        WHERE
+            geometry && !bbox!
+- name: mountain_peak_label
+  buffer: 64
+  queries:
+    - minzoom: 12
+      maxzoom: 14
+      sql: |-
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            geometry AS way,
+            meter_to_feet(elevation_m) AS elevation_ft,
+            elevation_m,
+            mountain_peak_type(type) AS maki,
+            name,
+            coalesce(NULLIF(name_en, ''), name) AS name_en,
+            coalesce(NULLIF(name_es, ''), name) AS name_es,
+            coalesce(NULLIF(name_fr, ''), name) AS name_fr,
+            coalesce(NULLIF(name_de, ''), name) AS name_de,
+            coalesce(NULLIF(name_ru, ''), name) AS name_ru,
+            coalesce(NULLIF(name_zh, ''), name) AS name_zh
+        FROM
+            osm_mountain_peak_point
+        WHERE
+            geometry && !bbox!
+- name: housenum_label
+  buffer: 64
+  queries:
+    - minzoom: 14
+      maxzoom: 14
+      sql: |-
+        WITH housenum_label AS (
+            SELECT
+                id, geometry, house_num
+            FROM
+                osm_housenumber_point
+            UNION ALL
+            SELECT
+                id AS osm_id, geometry, house_num
+            FROM
+                osm_housenumber_polygon
+        )
+        SELECT
+            osm_ids2mbid(id, true) AS osm_id,
+            topoint(geometry) AS way,
+            house_num
+        FROM
+            housenum_label
+        WHERE
+            geometry && !bbox!

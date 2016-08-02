@@ -1,0 +1,99 @@
+{
+    "sources": [{
+        "{{ dbname }}_building": {
+            "type": "vector",
+            "tiles": [
+                "http://{{ host }}:{{ port }}/building/{z}/{x}/{y}.pbf"
+            ],
+            "maxzoom": 14,
+            "minzoom": 0
+        },
+        "{{ dbname }}_water": {
+            "type": "vector",
+            "tiles": [
+                "http://{{ host }}:{{ port }}/water/{z}/{x}/{y}.pbf"
+            ],
+            "maxzoom": 14,
+            "minzoom": 0
+        }
+    }],
+    "layers": [{
+		"id": "building-line",
+		"type": "line",
+		"source": "{{ dbname }}_building",
+		"source-layer": "building",
+        "minzoom": 15,
+		"filter": ["==", "underground", "false"],
+		"layout": {},
+		"paint": {
+			"line-color": "hsl(230, 24%, 87%)",
+			"line-width": {
+				"base": 1.5,
+				"stops": [
+					[15, 0.75],
+					[20, 3]
+				]
+			},
+			"line-opacity": {
+				"base": 1,
+				"stops": [
+					[15.5, 0],
+					[16, 1]
+				]
+			}
+		},
+        "before": "tunnel-street-low"
+	}, {
+		"id": "building",
+		"type": "fill",
+		"source": "{{ dbname }}_building",
+		"source-layer": "building",
+        "minzoom": 15,
+        "filter": ["==", "underground", "false"],
+		"layout": {},
+        "paint": {
+			"fill-color": {
+				"base": 1,
+				"stops": [
+					[15, "hsl(35, 11%, 88%)"],
+					[16, "hsl(35, 8%, 85%)"]
+				]
+			},
+			"fill-opacity": {
+				"base": 1,
+				"stops": [
+					[15.5, 0],
+					[16, 1]
+				]
+			},
+			"fill-outline-color": "hsl(35, 6%, 79%)"
+		},
+        "before": "tunnel-street-low"
+	}, {
+		"id": "water-shadow",
+		"type": "fill",
+		"source": "{{ dbname }}_water",
+		"source-layer": "water",
+		"layout": {},
+		"paint": {
+			"fill-color": "hsl(215, 84%, 69%)",
+			"fill-translate": {
+				"base": 1.2,
+				"stops": [
+					[7, [0, 0]],
+					[16, [-1, -1]]
+				]
+			},
+			"fill-translate-anchor": "viewport",
+			"fill-opacity": 1
+		},
+        "before": "barrier_line-land-polygon"
+	}, {
+		"id": "water",
+		"ref": "water-shadow",
+		"paint": {
+			"fill-color": "hsl(196, 80%, 70%)"
+		},
+        "before": "barrier_line-land-polygon"
+	}]
+}
