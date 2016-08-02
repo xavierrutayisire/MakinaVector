@@ -48,7 +48,7 @@
 ##### 6 - Serve tiles:
 
 - Run « `cd %%%/utilery/tiles` » and change %%% with the right directory
-- Run « `python -m SimpleHTTPServer %%%` » and change %%% with the port you wanna use
+- Run « `http-server -p %%%` » and change %%% with the port you wanna use
 
 ---
 

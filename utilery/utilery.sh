@@ -18,7 +18,10 @@ python_version_utilery="3.5"
 
 #  Update of the repositories and install of python, pip, virtualenv, virtualenvwrapper git and libpq-dev
 apt-get update && \
-apt-get install -y python$python_version_utilery python$python_version_utilery-dev python3-pip python-virtualenv virtualenvwrapper git libpq-dev gdal-bin
+apt-get install -y python$python_version_utilery python$python_version_utilery-dev python3-pip python-virtualenv virtualenvwrapper git libpq-dev gdal-bin nodejs npm
+
+npm install http-server -g
+ln -s /usr/bin/nodejs /usr/bin/node
 
 mkdir -p $working_dir_utilery
 

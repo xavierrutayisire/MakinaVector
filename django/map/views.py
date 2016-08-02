@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.template import loader
+from django.template import loader, TemplateDoesNotExist
 
 def index(request):
     context = locals()
@@ -26,5 +26,10 @@ def multiple_style(request):
     context['tiles_host'] = '127.0.0.1'
     context['tiles_port']  = 8001
     context['dbname'] = 'imposm3_db_ir'
-    template = loader.get_template('map/multiple-style.json')
+
+    try:
+        template = loader.get_template('map/multiple-style.json')
+    except TemplateDoesNotExist:
+        return HttpResponse(status=404)
+
     return HttpResponse(template.render(context, request))

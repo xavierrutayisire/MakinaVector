@@ -3,7 +3,7 @@
         "{{ dbname }}_building": {
             "type": "vector",
             "tiles": [
-                "http://{{ host }}:{{ port }}/building/{z}/{x}/{y}.pbf"
+                "http://{{ tiles_host }}:{{ tiles_port }}/building/{z}/{x}/{y}.pbf"
             ],
             "maxzoom": 14,
             "minzoom": 0
@@ -11,7 +11,7 @@
         "{{ dbname }}_water": {
             "type": "vector",
             "tiles": [
-                "http://{{ host }}:{{ port }}/water/{z}/{x}/{y}.pbf"
+                "http://{{ tiles_host }}:{{ tiles_port }}/water/{z}/{x}/{y}.pbf"
             ],
             "maxzoom": 14,
             "minzoom": 0
