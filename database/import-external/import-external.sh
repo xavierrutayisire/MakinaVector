@@ -256,6 +256,7 @@ sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-exter
 sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/table.sql
 
 sudo -n -u postgres -s -- psql $database_name_imposm3 -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $database_user_imposm3;"
+sudo -n -u postgres -s -- psql $database_name_imposm3 -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO $database_user_imposm3;"
 
 sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/trigger.sql > ./database/import-external/sql/trigger.sql
 sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/trigger.sql
