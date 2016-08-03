@@ -41,6 +41,9 @@ else
 fi
 rm $working_dir_diff/crontab.txt
 
+#  Set execute permission on the script
+chmod +x $working_dir_diff/add-diff.sh
+
 cp ./utilery/clean-diff.py $working_dir_diff
 
 cat > $working_dir_diff/clean-diff.sh << EOF1
@@ -60,3 +63,6 @@ else
 	crontab -l
 fi
 rm $working_dir_diff/crontab.txt
+
+#  Set execute permission on the script
+chmod +x $working_dir_diff/clean-diff.sh
