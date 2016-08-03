@@ -1,12 +1,14 @@
 ## serveVectorTilesFromAtoZ
 
-##### Info:
+### Info:
 
 This repository allows you to easily create a postgis database and import osm data with imposm3.
 
 The database will be automatically updated every 5 minutes with a cron job so the database will always be up to date.
 
-Utilery is a tool who allows you to generate vector tiles.
+With Utilery you can generate vector tiles.
+
+You also have the possibility to update the tiles with the new modifications every 5 minutes.
 
 With Django you can create an application to render a map.
 
@@ -19,6 +21,10 @@ The Django application is made so you can add or remove different layers directl
 ! Execute install-database.sh and install-utilery.sh as root user !
 
 ! Don't forget to edit the « setup user » when mentioned !
+
+---
+
+### Installation
 
 ---
 
@@ -89,7 +95,7 @@ The Django application is made so you can add or remove different layers directl
 
 ---
 
-##### Usage:
+#### Usage:
 
 When you generate you tiles Utilery create all the layers with a file name « `queries.yml` ». <br />
 You need to choose the name of all the queries with the source-layer you will want in your style Mapbox. <br />
@@ -102,7 +108,7 @@ If you don't want to use external layers style just change this line:
 
 ---
 
-##### Webography:
+#### Webography:
 
 - https://github.com/omniscale/imposm3
 - https://github.com/tilery/utilery/tree/master/utilery
