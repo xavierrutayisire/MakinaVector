@@ -27,7 +27,7 @@ for record in records:
     south = bbox["bbox"][1]
     east = bbox["bbox"][2]
     north = bbox["bbox"][3]
-    host = sys.argv[5]
+    host = sys.argv[8]
     directory_generation = sys.argv[1]
     procs = []
 

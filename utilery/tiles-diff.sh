@@ -18,6 +18,8 @@ min_zoom_diff=$8
 
 max_zoom_diff=$9
 
+utilery_host_diff=${10}
+
 #  If cron folder already exist
 if [ -d "$working_dir_diff/cron" ]; then
  while true; do
@@ -37,13 +39,13 @@ cp ./utilery/add-diff.py $working_dir_diff/cron
 cat > $working_dir_diff/cron/add-diff.sh << EOF1
 #!/bin/bash
 
-$working_dir_diff_virtualenv/bin/python3.5 $working_dir_diff/cron/add-diff.py \$1 \$2 \$3 \$4 \$5 \$6 \$7
+$working_dir_diff_virtualenv/bin/python3.5 $working_dir_diff/cron/add-diff.py \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8
 EOF1
 
 #  Add a cron job to execute the add-diff script every minute only if the cronjob doesn't exist
 crontab -l > $working_dir_diff/cron/crontab.txt
 crontab_diff=$(cat $working_dir_diff/cron/crontab.txt)
-patternToFind_diff="*/5 * * * * /usr/bin/flock -n /tmp/fcj.lockfile $working_dir_diff/cron/add-diff.sh $working_dir_diff_tiles $database_user_diff $database_user_password_diff $database_name_diff $database_host_diff $min_zoom_diff $max_zoom_diff >> $working_dir_diff/add-diff.log 2>&1"
+patternToFind_diff="*/5 * * * * /usr/bin/flock -n /tmp/fcj.lockfile $working_dir_diff/cron/add-diff.sh $working_dir_diff_tiles $database_user_diff $database_user_password_diff $database_name_diff $database_host_diff $min_zoom_diff $max_zoom_diff $utilery_host_diff >> $working_dir_diff/add-diff.log 2>&1"
 if test "${crontab_diff#*$patternToFind_diff}" != "$crontab_diff"; then
 	echo "crontab job already exist:"
     crontab -l
