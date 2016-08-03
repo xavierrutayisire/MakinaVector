@@ -2,8 +2,8 @@
 
 ####  SETUP USER ####
 
-#  Directory where you want the add-diff.py file to be:
-working_dir_diff="/srv/projects/vectortiles/project/osm-ireland/cron"
+#  Directory where you want the cron foler to be:
+working_dir_diff="/srv/projects/vectortiles/project/osm-ireland"
 
 #  Directory where the utilery-virtualenv folder is:
 working_dir_diff_virtualenv="/srv/projects/vectortiles/project/osm-ireland/utilery-virtualenv"
