@@ -1,4 +1,5 @@
 {
+    "multiple_style": true,
     "sources": [{
         "{{ dbname }}_building": {
             "type": "vector",

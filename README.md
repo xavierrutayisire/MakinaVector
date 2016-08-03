@@ -1,5 +1,21 @@
 ## serveVectorTilesFromAtoZ
 
+---
+
+##### Info:
+
+This repository allows you to easily create a postgis database and import osm data with imposm3.
+
+The database will be automatically updated every 5 minutes with a cron job so the database will always be up to date.
+
+Utilery is a tool who allows you to generate vector tiles.
+
+With Django you can create an application to render a map.
+
+The Django application is made so you can add or remove different layers directly from your browser.
+
+---
+
 ! Dont remove any file from the repository !
 
 ! Execute install-database.sh and install-utilery.sh as root user !
@@ -75,15 +91,16 @@
 
 ---
 
-##### Info:
+##### Usage:
 
-This repository allows you to easily create a postgis database and import osm data with imposm3.
-
-The database will be automatically updated 5 minute with a cron job so the database will always be up to date.
-
-Utilery is a tool who allows you to generate vector tiles.
-
-With Django you can create an application to render a map.
+When you generate you tiles Utilery create all the layers with a file name « `queries.yml` ».
+You need to choose the name of all the queries with the source-layer you will want in your style Mapbox.
+With mapbox you can style the layers you just generate into pbf tiles. For that you will have to use the « `style.json` » file.
+The actual style file and so the tiles is based on Mapbox Streets V7.
+To allow you to add more layers from the same or different sources, you have the  « `multiple-style.json` » file.
+You can find a working example of the « `multiple-style.json` » file in the templates folder of your application.
+If you don't want to use external layers style just change this line:
+- `"multiple_style": false,`
 
 ---
 

@@ -10,7 +10,12 @@ def index(request):
     context['mapboxAccessToken'] = 'pk.eyJ1IjoieGFxYXgiLCJhIjoiNm1xWjFPWSJ9.skMPG8gbuHxvqQ-9pAak4A'
     context['startingZoom'] = '14'
     context['startingPosition'] = '[-6.3316, 53.3478]'
-    template = loader.get_template('map/index.html')
+    
+    try:
+        template = loader.get_template('map/index.html')
+    except TemplateDoesNotExist:
+        return HttpResponse(status=404)
+
     return HttpResponse(template.render(context, request))
 
 def style(request):
@@ -18,7 +23,12 @@ def style(request):
     context['tiles_host'] = '127.0.0.1'
     context['tiles_port']  = 8001
     context['dbname'] = 'imposm3_db_ir'
-    template = loader.get_template('map/style.json')
+
+    try:
+        template = loader.get_template('map/style.json')
+    except TemplateDoesNotExist:
+        return HttpResponse(status=404)
+
     return HttpResponse(template.render(context, request))
 
 def multiple_style(request):

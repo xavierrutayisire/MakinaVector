@@ -120,6 +120,7 @@
 
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.21.0/mapbox-gl.js'></script>
     <script>
+        // Creation of the Mapbox map
         mapboxgl.accessToken = '{{ mapboxAccessToken }}';
         var map = new mapboxgl.Map({
             container: 'map', // container id
@@ -127,10 +128,11 @@
             center: {{ startingPosition }}, // starting position
             zoom: {{ startingZoom }} // starting zoom
         });
+
+        // Add the navigations controls
         map.addControl(new mapboxgl.Navigation({position: 'top-left'}));
 
-        var jsonStyle;
-
+        // Ajax request to get the style file
         var xhr = new XMLHttpRequest();
         xhr.open('GET', 'http://{{ django_host }}:{{ django_port }}/style');
         xhr.send(null);
@@ -147,12 +149,18 @@
               allLayers = jsonStyle.layers;
               allLayersId = [];
               allLayersSources = [];
+
+              // Recovery of all the layers id and source-layer
               for (var i = 1; i < allLayers.length; i++) {
                   allLayersId[i] = allLayers[i]['id'];
                   allLayersSources[i] = allLayers[i]['source-layer'];
               }
+
               allLayersSourcesAndId = [[]];
               nameLayersSources = [];
+
+              // Add into one list for each source-layer all the id of it
+              // Add the name of all the source-layer into one list
               for (var i = 0; i < allLayersId.length; i++) {
                   if (typeof allLayersSourcesAndId[allLayersSources[i]] == 'undefined') {
                       nameLayersSources.push(allLayersSources[i]);
@@ -163,6 +171,7 @@
                   }
               }
 
+              // Ajax request for the multiple-style file
               var xhrMultipleStyle = new XMLHttpRequest();
               xhrMultipleStyle.open('GET', 'http://{{ django_host }}:{{ django_port }}/multiple-style');
               xhrMultipleStyle.send(null);
@@ -173,54 +182,62 @@
                   if (xhrMultipleStyle.status === OKMultipleStyle) {
                       jsonMultipleStyle = JSON.parse(xhrMultipleStyle.responseText);
 
-                      map.on('load', function () {
-                        for (var i = 0; i < Object.keys(jsonMultipleStyle.sources[0]).length; i++) {
-                            map.addSource(Object.keys(jsonMultipleStyle.sources[0])[i], {
-                                type: jsonMultipleStyle.sources[0][Object.keys(jsonMultipleStyle.sources[0])[i]]["type"],
-                                tiles: jsonMultipleStyle.sources[0][Object.keys(jsonMultipleStyle.sources[0])[i]]["tiles"],
-                                maxzoom: jsonMultipleStyle.sources[0][Object.keys(jsonMultipleStyle.sources[0])[i]]["maxzoom"],
-                                minzoom: jsonMultipleStyle.sources[0][Object.keys(jsonMultipleStyle.sources[0])[i]]["minzoom"]
-                            });
-                        }
-                        for (i of jsonMultipleStyle.layers) {
-
-                            if (typeof i['source-layer'] == 'undefined') {
-                                map.addLayer({
-                                    'id': i['id'],
-                                    'ref': i['ref'],
-                                    'paint': i['paint']
-                                }, i['before']);
-                            } else {
-                                map.addLayer({
-                                    'id': i['id'],
-                                    'type': i['type'],
-                                    'source': i['source'],
-                                    'layout': i['layout'],
-                                    'paint': i['paint'],
-                                    'source-layer': i['source-layer']
-                                }, i['before']);
+                      // Add the other style only if 'multiple_style' is true
+                      if (jsonMultipleStyle.multiple_style === true) {
+                          map.on('load', function () {
+                            // Add of all sources
+                            for (var i = 0; i < Object.keys(jsonMultipleStyle.sources[0]).length; i++) {
+                                map.addSource(Object.keys(jsonMultipleStyle.sources[0])[i], {
+                                    type: jsonMultipleStyle.sources[0][Object.keys(jsonMultipleStyle.sources[0])[i]]["type"],
+                                    tiles: jsonMultipleStyle.sources[0][Object.keys(jsonMultipleStyle.sources[0])[i]]["tiles"],
+                                    maxzoom: jsonMultipleStyle.sources[0][Object.keys(jsonMultipleStyle.sources[0])[i]]["maxzoom"],
+                                    minzoom: jsonMultipleStyle.sources[0][Object.keys(jsonMultipleStyle.sources[0])[i]]["minzoom"]
+                                });
                             }
-
-                            if (typeof i['source-layer'] != 'undefined') {
-                                if (typeof allLayersSourcesAndId[i['source-layer']] == 'undefined') {
-                                    nameLayersSources.push(i['source-layer']);
-                                    allLayersSourcesAndId[i['source-layer']] = [i['id']];
+                            // Add of all layers
+                            for (i of jsonMultipleStyle.layers) {
+                                if (typeof i['source-layer'] == 'undefined') {
+                                    map.addLayer({
+                                        'id': i['id'],
+                                        'ref': i['ref'],
+                                        'paint': i['paint']
+                                    }, i['before']);
+                                } else {
+                                    map.addLayer({
+                                        'id': i['id'],
+                                        'type': i['type'],
+                                        'source': i['source'],
+                                        'layout': i['layout'],
+                                        'paint': i['paint'],
+                                        'source-layer': i['source-layer']
+                                    }, i['before']);
                                 }
-                                else {
-                                    allLayersSourcesAndId[i['source-layer']].push(i['id']);
+
+                                // Add into one list for each source-layer all the id of it
+                                // Add the name of all the source-layer into one list
+                                if (typeof i['source-layer'] != 'undefined') {
+                                    if (typeof allLayersSourcesAndId[i['source-layer']] == 'undefined') {
+                                        nameLayersSources.push(i['source-layer']);
+                                        allLayersSourcesAndId[i['source-layer']] = [i['id']];
+                                    }
+                                    else {
+                                        allLayersSourcesAndId[i['source-layer']].push(i['id']);
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
+                      }
                   }
                 }
               }
 
               for (var i = 0; i < inputs.length; i++) {
+                  // When you click on a checkbox
                   inputs[i].onclick = function (e) {
                       var id = e.path[0].id;
                       idList = [];
 
+                      // If its the all checkbox
                       if (id != 'all') {
                           idList = allLayersSourcesAndId[id];
                           if (inputs[0].checked == true) {
@@ -250,6 +267,7 @@
 
                       e.stopPropagation();
 
+                      // To change the visibility of the layer
                       idList.forEach(function(id2) {
                           var visibility = map.getLayoutProperty(id2, 'visibility');
 
