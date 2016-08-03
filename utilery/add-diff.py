@@ -9,7 +9,7 @@ from multiprocessing import cpu_count
 from subprocess import Popen
 import os
 
-conn = psycopg2.connect(host=sys.argv[4], database=sys.argv[3], user=sys.argv[1], password=sys.argv[2]))
+conn = psycopg2.connect(host=sys.argv[4], database=sys.argv[3], user=sys.argv[1], password=sys.argv[2])
 cursor = conn.cursor()
 cursor.execute("SELECT * FROM diff where processed = false")
 records = cursor.fetchall()
