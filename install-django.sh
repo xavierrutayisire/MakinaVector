@@ -10,12 +10,12 @@ working_dir_django_virtualenv="/srv/projects/vectortiles/project/osm-ireland/uti
 
 ####  END SETUP USER  ####
 
-$working_dir_django_virtualenv/pip3 install Django
+$working_dir_django_virtualenv/bin/pip3 install Django
 
 cd $working_dir_django
-$working_dir_django_virtualenv/django-admin startproject composite
+$working_dir_django_virtualenv/bin/django-admin startproject composite
 cd $working_dir_django/composite
-$working_dir_django_virtualenv/python manage.py startapp map
+$working_dir_django_virtualenv/bin/python manage.py startapp map
 
 mkdir -p $working_dir_django/composite/map/templates/map \
          $working_dir_django/composite/map/static/map
