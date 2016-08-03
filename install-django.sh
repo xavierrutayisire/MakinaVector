@@ -15,7 +15,7 @@ $working_dir_django_virtualenv/bin/pip3 install Django
 #  If composite already exist
 if [ -d "$working_dir_django/composite" ]; then
  while true; do
-   read -p "Porject 'composite' folder already exist in $working_dir_django directory, yes will delete composite folder, no will end the script. Y/N?" yn
+   read -p "Project 'composite' already exist in $working_dir_django directory, yes will delete composite folder, no will end the script. Y/N?" yn
       case $yn in
         [Yy]* ) rm -rf  "$working_dir_django/composite"; break;;
         [Nn]* ) exit;;

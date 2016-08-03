@@ -70,14 +70,14 @@ The Django application is made so you can add or remove different layers directl
 - Edit install-django.sh and change the « setup user »
 - Run « `sudo sh install-django.sh` » from Deploy-Imposm3-Utilery folder
 - Edit composite/settings.py in your django project folder and add « `'map'` » in « `INSTALLED_APPS = []` »
-- Edit views.py in your map application and change all the variables with your setup
+- Edit views.py in your map application and change all the variables with your setup !important!
 
 ---
 
 ##### 8 - Lauch Django server:
 
 - Go to the folder of django where manage.py is
-- Run « `python manage.py runserver %%%` » and change %%% with the port you wanna use
+- Run « `%%%/utilery-virtualenv/bin/python manage.py runserver %%%` » and change %%% with the right folder and the port you use in views.py
 
 ---
 
