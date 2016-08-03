@@ -91,6 +91,10 @@ The Django application is made so you can add or remove different layers directl
 
 - Open you browser and open « `%%%:%%%` » and change %%% with the host and the port you used for the django server
 
+---
+
+#### Screenshot:
+
 ![alt tag](http://image.noelshack.com/fichiers/2016/31/1470236676-screenshot-from-2016-08-03-17-03-38.png)
 
 ---
