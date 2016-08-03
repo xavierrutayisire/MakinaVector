@@ -9,7 +9,7 @@ from multiprocessing import cpu_count
 from subprocess import Popen
 import os
 
-conn = psycopg2.connect(host=sys.argv[4], database=sys.argv[3], user=sys.argv[1], password=sys.argv[2])
+conn = psycopg2.connect(host=sys.argv[5], database=sys.argv[4], user=sys.argv[2], password=sys.argv[3])
 cursor = conn.cursor()
 cursor.execute("SELECT * FROM diff where processed = false")
 records = cursor.fetchall()
@@ -21,14 +21,14 @@ for record in records:
     point = to_generate.fetchall()
     bbox = json.loads(point[0][0])
 
-    minzoom = sys.argv[5]
-    maxzoom = sys.argv[6]
+    minzoom = sys.argv[6]
+    maxzoom = sys.argv[7]
     west = bbox["bbox"][0]
     south = bbox["bbox"][1]
     east = bbox["bbox"][2]
     north = bbox["bbox"][3]
-    host = sys.argv[4]
-    directory_generation = sys.argv[0]
+    host = sys.argv[5]
+    directory_generation = sys.argv[1]
     procs = []
 
     for zoom in range(minzoom, maxzoom + 1):
