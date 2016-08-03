@@ -21,8 +21,8 @@ for record in records:
     point = to_generate.fetchall()
     bbox = json.loads(point[0][0])
 
-    minzoom = sys.argv[6]
-    maxzoom = sys.argv[7]
+    minzoom = int(sys.argv[6])
+    maxzoom = int(sys.argv[7])
     west = bbox["bbox"][0]
     south = bbox["bbox"][1]
     east = bbox["bbox"][2]
