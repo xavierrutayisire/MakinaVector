@@ -24,11 +24,11 @@ database_host_utilery="localhost"
 echo "
 The deployement will use this setup:
 
-Directory where the utilery folder will be created: $working_dir_imposm3
-Database user name: $database_user_imposm3
-Database user password: $database_user_password_imposm3
-Database name: $database_name_imposm3
-Database host: $database_host_imposm3
+Directory where the utilery folder will be created: $working_dir_utilery
+Database user name: $database_user_utilery
+Database user password: $database_user_password_utilery
+Database name: $database_name_utilery
+Database host: $database_host_utilery
 
 "
 while true; do
