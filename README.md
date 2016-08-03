@@ -1,5 +1,5 @@
 ## serveVectorTilesFromAtoZ
-[makina-corpus](makina-corpus.com)
+http://makina-corpus.com
 ---
 
 ##### Info:
