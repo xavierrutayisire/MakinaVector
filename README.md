@@ -1,8 +1,5 @@
 ## serveVectorTilesFromAtoZ
 
-http://makina-corpus.com
----
-
 ##### Info:
 
 This repository allows you to easily create a postgis database and import osm data with imposm3.
