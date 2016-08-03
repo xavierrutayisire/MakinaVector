@@ -32,8 +32,8 @@ END=$(date +%s)
 # Calculate the total import time
 DIFF=$(( $END - $START ))
 
-echo "### Fichier d'importation: $(ls -l $working_dir_imposm3/imposm3/osmosis/changes.osc.gz)"
+echo "### Importation file: $(ls -l $working_dir_imposm3/imposm3/osmosis/changes.osc.gz)"
 
-echo "### L'importation totale a prise $DIFF secondes"
+echo "### Import took $DIFF secondes"
 
 echo "###"

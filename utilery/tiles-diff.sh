@@ -39,6 +39,10 @@ cp ./utilery/add-diff.py $working_dir_diff/cron
 cat > $working_dir_diff/cron/add-diff.sh << EOF1
 #!/bin/bash
 
+echo "### \$(date) "
+
+echo "### Tiles generation "
+
 $working_dir_diff_virtualenv/bin/python3.5 $working_dir_diff/cron/add-diff.py \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8
 EOF1
 
@@ -62,6 +66,10 @@ cp ./utilery/clean-diff.py $working_dir_diff/cron
 
 cat > $working_dir_diff/cron/clean-diff.sh << EOF1
 #!/bin/bash
+
+echo "### \$(date) "
+
+echo "### Clean all generated geometry "
 
 $working_dir_diff_virtualenv/bin/python3.5 $working_dir_diff/cron/clean-diff.py \$1 \$2 \$3 \$4
 EOF1
