@@ -4,7 +4,7 @@
 
 This repository allows you to easily create a postgis database and import osm data with imposm3.
 
-The database will be automatically updated every 5 minutes with a cron job so the database will always be up to date.
+The database will be automatically updated every 5 minutes with a cron job.
 
 With Utilery you can generate vector tiles.
 
@@ -91,7 +91,7 @@ The Django application is made so you can add or remove different layers directl
 
 - Open you browser and open « `%%%:%%%` » and change %%% with the host and the port you used for the django server
 
-![alt tag](http://image.noelshack.com/fichiers/2016/31/1470150787-screenshot-from-2016-08-02-17-12-28.png)
+![alt tag](http://image.noelshack.com/fichiers/2016/31/1470236676-screenshot-from-2016-08-03-17-03-38.png)
 
 ---
 
