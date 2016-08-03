@@ -101,7 +101,7 @@ The Django application is made so you can add or remove different layers directl
 
 #### Usage:
 
-When you generate you tiles Utilery create all the layers with a file name « `queries.yml` ». <br />
+When you generate you tiles, Utilery create all the layers with a file name « `queries.yml` ». <br />
 You need to choose the name of all the queries with the source-layer you will want in your style Mapbox. <br />
 With mapbox you can style the layers you just generate into pbf tiles. For that you will have to use the « `style.json` » file. <br />
 The actual style file and so the tiles is based on Mapbox Streets V7. <br />
