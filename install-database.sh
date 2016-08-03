@@ -3,7 +3,7 @@
 ####  SETUP USER ####
 
 #  Directory where you want the imposm3 folder to be created (ex: "/project/osm")
-working_dir_imposm3="/srv/projects"
+working_dir_imposm3="/srv/projects/vectortiles/project/osm-ireland"
 
 #  Database user name
 database_user_imposm3="imposm3_user_ir"

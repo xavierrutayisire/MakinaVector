@@ -36,12 +36,12 @@ if test "${crontab_diff#*$patternToFind_diff}" != "$crontab_diff"; then
 	echo "crontab job already exist:"
     crontab -l
 else
-    crontab -l | { cat; echo $patternToFind_diff; } | crontab -
+    crontab -l | { cat; echo "$patternToFind_diff"; } | crontab -
 	crontab -l
 fi
 rm $working_dir_diff/crontab.txt
 
-cp ./utilery/add-diff.py $working_dir_diff
+cp ./utilery/clean-diff.py $working_dir_diff
 
 cat > $working_dir_diff/clean-diff.sh << EOF1
 #!/bin/bash
@@ -56,7 +56,7 @@ if test "${crontab_diff#*$patternToFind_diff}" != "$crontab_diff"; then
 	echo "crontab job already exist:"
     crontab -l
 else
-    crontab -l | { cat; echo $patternToFind_diff; } | crontab -
+    crontab -l | { cat; echo "$patternToFind_diff"; } | crontab -
 	crontab -l
 fi
 rm $working_dir_diff/crontab.txt

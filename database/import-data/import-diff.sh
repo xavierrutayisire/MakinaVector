@@ -46,7 +46,7 @@ if test "${crontab_imposm3#*$patternToFind_imposm3}" != "$crontab_imposm3"; then
 	rm $working_dir_imposm3/imposm3/cron/update.log
     crontab -l
 else
-    crontab -l | { cat; echo $patternToFind_imposm3; } | crontab -
+    crontab -l | { cat; echo "$patternToFind_imposm3"; } | crontab -
 	crontab -l
 fi
 rm $working_dir_imposm3/imposm3/cron/crontab.txt
