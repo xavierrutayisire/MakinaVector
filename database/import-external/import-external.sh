@@ -261,11 +261,18 @@ sudo -n -u postgres -s -- psql $database_name_imposm3 -c "GRANT ALL PRIVILEGES O
 sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/trigger.sql > ./database/import-external/sql/trigger.sql
 sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/trigger.sql
 
-sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/generate-trigger.sql > ./database/import-external/sql/trigger-temp.sql
-tail -n +3 ./database/import-external/sql/trigger-temp.sql > ./database/import-external/sql/trigger-temp2.sql
-rm ./database/import-external/sql/trigger-temp.sql
-head -n -2 ./database/import-external/sql/trigger-temp2.sql > ./database/import-external/sql/trigger.sql
-rm ./database/import-external/sql/trigger-temp2.sql
-sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/trigger.sql
+sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/generate-trigger-I-U.sql > ./database/import-external/sql/trigger-I-U-temp.sql
+tail -n +3 ./database/import-external/sql/trigger-I-U-temp.sql > ./database/import-external/sql/trigger-I-U-temp2.sql
+rm ./database/import-external/sql/trigger-I-U-temp.sql
+head -n -2 ./database/import-external/sql/trigger-I-U-temp2.sql > ./database/import-external/sql/trigger-I-U.sql
+rm ./database/import-external/sql/trigger-I-U-temp2.sql
+sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/trigger-I-U.sql
+
+sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/generate-trigger-D.sql > ./database/import-external/sql/trigger-D-temp.sql
+tail -n +3 ./database/import-external/sql/trigger-D-temp.sql > ./database/import-external/sql/trigger-D-temp2.sql
+rm ./database/import-external/sql/trigger-D-temp.sql
+head -n -2 ./database/import-external/sql/trigger-D-temp2.sql > ./database/import-external/sql/trigger-D.sql
+rm ./database/import-external/sql/trigger-D-temp2.sql
+sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/trigger-D.sql
 
 rm $working_dir_imposm3/imposm3/import-external/.pgpass

@@ -1,9 +1,9 @@
 SELECT
     'CREATE TRIGGER '
-    || tab_name|| '_' ||'trigger'
-    || ' BEFORE INSERT OR UPDATE OR DELETE ON '
+    || tab_name|| '_' ||'trigger_I_U'
+    || ' BEFORE INSERT OR UPDATE ON '
     || tab_name
-    || ' FOR EACH ROW EXECUTE PROCEDURE add_diff();' AS trigger_creation_query
+    || ' FOR EACH ROW EXECUTE PROCEDURE add_diff_I_U();' AS trigger_creation_query
 FROM (
     SELECT
         quote_ident(table_name) as tab_name

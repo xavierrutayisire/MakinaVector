@@ -508,15 +508,26 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
 
--- Add the id and the table name of new data into the diff table
--- add_diff()
+-- Add the geometry into diff table for Insert or Update or delete
+-- add_diff_I_U()
+-- add_diff_D()
 
-CREATE OR REPLACE FUNCTION add_diff()
+CREATE OR REPLACE FUNCTION add_diff_I_U()
   RETURNS trigger AS
 $$
 BEGIN
     INSERT INTO diff (geometry, processed)
     VALUES(new.geometry, false);
     RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION add_diff_D()
+  RETURNS trigger AS
+$$
+BEGIN
+    INSERT INTO diff (geometry, processed)
+    VALUES(old.geometry, false);
+    RETURN old;
 END;
 $$ LANGUAGE plpgsql;
