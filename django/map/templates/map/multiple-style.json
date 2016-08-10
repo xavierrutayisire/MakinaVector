@@ -1,10 +1,10 @@
 {
     "multiple_style": true,
-    "sources": [{
+    "sources": {
         "{{ dbname }}_building": {
             "type": "vector",
             "tiles": [
-                "http://{{ tiles_host }}:{{ tiles_port }}/building/{z}/{x}/{y}.pbf"
+                "http://{{ utilery_host }}:{{ utilery_port }}/building/{z}/{x}/{y}.pbf"
             ],
             "maxzoom": 14,
             "minzoom": 0
@@ -12,12 +12,12 @@
         "{{ dbname }}_water": {
             "type": "vector",
             "tiles": [
-                "http://{{ tiles_host }}:{{ tiles_port }}/water/{z}/{x}/{y}.pbf"
+                "http://{{ utilery_host }}:{{ utilery_port }}/water/{z}/{x}/{y}.pbf"
             ],
             "maxzoom": 14,
             "minzoom": 0
         }
-    }],
+    },
     "layers": [{
 		"id": "building-line",
 		"type": "line",
