@@ -60,6 +60,8 @@ def multiple_style(request):
     context['tiles_host'] = '127.0.0.1'
     context['tiles_port']  = 8001
     context['dbname'] = 'imposm3_db_ir'
+    context['utilery_host'] = '127.0.0.1'
+    context['utilery_port'] = 3579
 
     try:
         template = loader.get_template('map/multiple-style.json')
@@ -93,45 +95,6 @@ def upload(request):
         destination_geojson.close()
 
     """
-    Style (style file)
-    """
-    file_style = request.FILES['fileStyle']
-    path_style = dir_upload + 'style-' + layer_name + '-0.json'
-
-    nb_file = 0
-    for root, dirs, files in os.walk(dir_upload):
-        for file in files:
-            if os.path.isfile(dir_upload + 'style-' + layer_name + '-' + str(nb_file) + '.json'):
-                nb_file += 1
-                path_style = dir_upload + 'style-' + layer_name + '-' + str(nb_file) + '.json'
-
-
-    destination_style = open(path_style, 'wb+')
-
-    for chunk in file_style.chunks():
-        destination_style.write(chunk)
-        destination_style.close()
-
-    """
-    Queries (queries file)
-    """
-    file_queries = request.FILES['fileQueries']
-    path_queries = dir_upload + 'queries-' + layer_name + '-0.yml'
-
-    nb_file = 0
-    for root, dirs, files in os.walk(dir_upload):
-        for file in files:
-            if os.path.isfile(dir_upload + 'queries-' + layer_name + '-' + str(nb_file) + '.yml'):
-                nb_file += 1
-                path_queries = dir_upload + 'queries-' + layer_name + '-' + str(nb_file) + '.yml'
-
-    destination_queries = open(path_queries, 'wb+')
-
-    for chunk in file_queries.chunks():
-        destination_queries.write(chunk)
-        destination_queries.close()
-
-    """
     Add the geometry into the database
     """
     # psycopg2 variables
@@ -139,6 +102,7 @@ def upload(request):
     database = 'imposm3_db_ir'
     user = 'imposm3_user_ir'
     password = 'makina'
+
     # Read geojson file
     geojson_data = open(path_geojson).read()
     geometry_data = json.loads(geojson_data)
@@ -148,11 +112,12 @@ def upload(request):
     cursor = conn.cursor()
 
     # Table for the layer
-    cursor.execute("CREATE TABLE IF NOT EXISTS %s (id serial PRIMARY KEY, geometry geometry(Geometry,3857) NOT NULL)" % (layer_name))
+    cursor.execute("CREATE TABLE IF NOT EXISTS %s (id serial PRIMARY KEY, geometry geometry(Geometry,3857) NOT NULL, geometry_type varchar(40) NOT NULL)" % (layer_name))
 
     # For all geometry in my geojson
     for feature in range(len(geometry_data['features'])):
         geometry = geometry_data['features'][feature]['geometry']
+        geometry_type = geometry['type']
 
         # Convert geojson into geometry
         geojson = GEOSGeometry(str(geometry), srid=4326)
@@ -161,24 +126,85 @@ def upload(request):
 
         # Add the geometry into the table
         cursor.execute(
-        'INSERT INTO %s(geometry)'
-        'SELECT ST_SetSRID(\'%s\'::geometry, 3857) as geometry '
-        'WHERE NOT EXISTS (SELECT geometry FROM %s WHERE geometry = ST_SetSRID(\'%s\'::geometry, 3857))' % (layer_name, geom, layer_name, geom))
+        'INSERT INTO %s(geometry, geometry_type)'
+        'SELECT ST_SetSRID(\'%s\'::geometry, 3857) as geometry, \'%s\' as geometry_type '
+        'WHERE NOT EXISTS (SELECT geometry FROM %s WHERE geometry = ST_SetSRID(\'%s\'::geometry, 3857))' % (layer_name, geom, geometry_type, layer_name, geom))
 
     conn.commit()
 
     """
-    Add the style into the multiple-style.json file
+    Create a simple style for the new layer
     """
     original_style_dir = '/srv/projects/vectortiles/project/osm-ireland/composite/map/templates/map/multiple-style.json'
 
-    if layer_name not in open(original_style_dir).read():
-        # Read json style file
-        style_json_data = open(path_style).read()
-        style_data = json.loads(style_json_data)
+    original_style_json_data = open(original_style_dir).read()
+    original_style_data = json.loads(original_style_json_data)
 
-        original_style_json_data = open(original_style_dir).read()
-        original_style_data = json.loads(original_style_json_data)
+    style_already_exist = 0
+    for source_layer in range(len(original_style_data['layers'])):
+        try:
+            if original_style_data['layers'][source_layer]['source-layer'] == layer_name:
+                style_already_exist = 1
+                break
+        except:
+            pass
+
+    if style_already_exist == 0:
+        new_style = """{
+            "sources": {
+                "{{ dbname }}_{ layer_name }": {
+                    "type": "vector",
+                    "tiles": [
+                        "http://{{ utilery_host }}:{{ utilery_port }}/{ layer_name }/{z}/{x}/{y}.pbf"
+                    ],
+                    "maxzoom": 14,
+                    "minzoom": 0
+                }
+            },
+            "layers": [{
+        		"id": "{ layer_name }-line",
+        		"type": "line",
+        		"source": "{{ dbname }}_{ layer_name }",
+        		"source-layer": "{ layer_name }",
+                "layout": {
+                    "line-join": "round",
+                    "line-cap": "round"
+                },
+                "filter": ["==", "geometry_type", "LineString"],
+                "paint": {
+                    "line-color": "#877b59",
+                    "line-width": 1
+                },
+                "before": "housenum-label"
+        	}, {
+        		"id": "{ layer_name }-polygon",
+        		"type": "fill",
+        		"source": "{{ dbname }}_{ layer_name }",
+        		"source-layer": "{ layer_name }",
+                "layout": {},
+                "filter": ["==", "geometry_type", "Polygon"],
+                "paint": {
+                    "fill-color": "#877b59"
+                },
+                "before": "housenum-label"
+    	    }, {
+        		"id": "{ layer_name }-point",
+        		"type": "circle",
+        		"source": "{{ dbname }}_{ layer_name }",
+        		"source-layer": "{ layer_name }",
+                "layout": {},
+                "filter": ["==", "geometry_type", "Point"],
+                "paint": {
+                    "circle-radius": 8,
+                    "circle-color": "rgba(55,148,179,1)"
+                },
+                "before": "housenum-label"
+    	    }]
+        }
+        """
+
+        new_style = new_style.replace("{ layer_name }", layer_name)
+        style_data = json.loads(new_style)
 
         schema_sources = {
                    "properties": {
@@ -202,17 +228,33 @@ def upload(request):
 
         original_style_data = repr(original_style_data).replace("True", "true")
 
-        os.remove('/srv/projects/vectortiles/project/osm-ireland/composite/map/templates/map/multiple-style.json')
-        with open('/srv/projects/vectortiles/project/osm-ireland/composite/map/templates/map/multiple-style.json', "a+") as new_style_file:
+        os.remove(original_style_dir)
+        with open(original_style_dir, "a+") as new_style_file:
             new_style_file.write(original_style_data[1:-1])
 
     """
     Add the querie into the queries.yml file
     """
     queries_dir = '/srv/projects/vectortiles/project/osm-ireland/utilery/queries.yml'
+
     if layer_name not in open(queries_dir).read():
-        queries_data = open(path_queries).read()
+        new_queries = """- name: { layer_name }
+  buffer: 4
+  queries:
+    - minzoom: 0
+      maxzoom: 14
+      sql: |-
+        SELECT
+            id AS osm_id, geometry AS way, geometry_type
+        FROM
+            { layer_name }
+        WHERE
+            geometry && !bbox!
+        """
+
+        new_queries = new_queries.replace("{ layer_name }", layer_name)
+
         with open(queries_dir, "a") as queries_file:
-            queries_file.write(queries_data)
+            queries_file.write(new_queries)
 
     return HttpResponse(status=200)

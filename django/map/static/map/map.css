@@ -237,7 +237,7 @@ body.has-active-menu {
     padding: 20px;
     border: 1px solid #888;
     width: 450px;
-    height: 310px;
+    height: 280px;
 }
 
 .close {
@@ -316,4 +316,16 @@ body.has-active-menu {
     color: #da3838;
     font-size: 15px;
     font-family: Impact, Charcoal, sans-serif;
+}
+
+#myModal .input-text {
+    margin-bottom: 5px;
+    height: 30px;
+    width: 76%;
+    font-size: 14px;
+    padding-left: 10px;
+}
+
+#myModal #form_submit_input + label{
+    margin-left: -3px;
 }

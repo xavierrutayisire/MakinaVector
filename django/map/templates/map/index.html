@@ -44,13 +44,9 @@
             <hr>
             <form id="form_upload" action="/upload" method="POST">
                 <p id="require">« You need to select a file. »</p>
-                <input type="text" name="layerName" id="layerName" required />
+                <input type="text" name="layerName" id="layerName" class="input-text" placeholder="Layer name" required />
                 <input type="file" name="fileGeoJSON" id="fileGeoJSON" class="inputfile input-design" accept=".json" required />
                 <label for="fileGeoJSON"><span>Choose a file with the geometry</label>
-                <input type="file" name="fileStyle" id="fileStyle" class="inputfile input-design" accept=".json" required />
-                <label for="fileStyle"><span>Choose a file with the style</label>
-                <input type="file" name="fileQueries" id="fileQueries" class="inputfile input-design" accept=".yml" required />
-                <label for="fileQueries"><span>Choose a file with the queries</label></br>
                 <input id="form_submit_input" class="tp-button input-design" type="submit" value="Envoyer" />
                 <label for="form_submit_input"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17"><path d="M10 0l-5.2 4.9h3.3v5.1h3.8v-5.1h3.3l-5.2-4.9zm9.3 11.5l-3.2-2.1h-2l3.4 2.6h-3.5c-.1 0-.2.1-.2.1l-.8 2.3h-6l-.8-2.2c-.1-.1-.1-.2-.2-.2h-3.6l3.4-2.6h-2l-3.2 2.1c-.4.3-.7 1-.6 1.5l.6 3.1c.1.5.7.9 1.2.9h16.3c.6 0 1.1-.4 1.3-.9l.6-3.1c.1-.5-.2-1.2-.7-1.5z"/></svg></label>
             </form>
@@ -124,7 +120,6 @@
                   if (xhrMultipleStyle.status === OKMultipleStyle) {
                       jsonMultipleStyle = JSON.parse(xhrMultipleStyle.responseText);
                       // Add the other style only if 'multiple_style' is true
-                      console.log(jsonMultipleStyle);
                       if (jsonMultipleStyle.multiple_style === true) {
                           map.on('load', function () {
                             // Add of all sources
@@ -137,33 +132,24 @@
                                 });
                             }
                             // Add of all layers
-                            for (i of jsonMultipleStyle.layers) {
-                                if (typeof i['source-layer'] == 'undefined') {
-                                    map.addLayer({
-                                        'id': i['id'],
-                                        'ref': i['ref'],
-                                        'paint': i['paint']
-                                    }, i['before']);
-                                } else {
-                                    map.addLayer({
-                                        'id': i['id'],
-                                        'type': i['type'],
-                                        'source': i['source'],
-                                        'layout': i['layout'],
-                                        'paint': i['paint'],
-                                        'source-layer': i['source-layer']
-                                    }, i['before']);
+
+                            for (var y of jsonMultipleStyle.layers) {
+                                var newObject = {};
+                                for (var z of Object.keys(y)) {
+                                    if (z !== "before") newObject[z] = y[z];
                                 }
+
+                                map.addLayer(newObject, y['before']);
 
                                 // Add into one list for each source-layer all the id of it
                                 // Add the name of all the source-layer into one list
-                                if (typeof i['source-layer'] != 'undefined') {
-                                    if (typeof allLayersSourcesAndId[i['source-layer']] == 'undefined') {
-                                        nameLayersSources.push(i['source-layer']);
-                                        allLayersSourcesAndId[i['source-layer']] = [i['id']];
+                                if (typeof y['source-layer'] != 'undefined') {
+                                    if (typeof allLayersSourcesAndId[y['source-layer']] == 'undefined') {
+                                        nameLayersSources.push(y['source-layer']);
+                                        allLayersSourcesAndId[y['source-layer']] = [y['id']];
                                     }
                                     else {
-                                        allLayersSourcesAndId[i['source-layer']].push(i['id']);
+                                        allLayersSourcesAndId[y['source-layer']].push(y['id']);
                                     }
                                 }
                             }
@@ -195,9 +181,6 @@
                               inputs[0].checked = true;
                           }
                       } else {
-                          console.log(allLayersSourcesAndId);
-                          console.log(nameLayersSources);
-                          console.log(inputs);
                           for (var y = 1; y < nameLayersSources.length; y++) {
                               for (var z = 0; z < allLayersSourcesAndId[nameLayersSources[y]].length; z++) {
                                   idList.push(allLayersSourcesAndId[nameLayersSources[y]][z]);
@@ -309,21 +292,19 @@
         });
 
         document.addEventListener("DOMContentLoaded", function() {
-            var elements = document.getElementsByTagName("input");
-            for (var i = 0; i < elements.length; i++) {
-                elements[i].oninvalid = function(e) {
-                    e.target.setCustomValidity("");
-                    if (!e.target.validity.valid) {
-                        document.getElementById('require').style.display = 'block';
-                    }
-                };
-                elements[i].oninput = function(e) {
-                    e.target.setCustomValidity("");
-                };
-            }
+            var element = document.getElementById("fileGeoJSON");
+            element.oninvalid = function(e) {
+                e.target.setCustomValidity("");
+                if (!e.target.validity.valid) {
+                    document.getElementById('require').style.display = 'block';
+                }
+            };
+            element.oninput = function(e) {
+                e.target.setCustomValidity("");
+            };
         })
 
-        $('input, select, textarea').on("invalid", function(e) {
+        $('#fileGeoJSON').on("invalid", function(e) {
             e.preventDefault();
         });
     </script>

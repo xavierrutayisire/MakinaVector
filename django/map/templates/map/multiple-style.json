@@ -1,1 +1,100 @@
-{"multiple_style": true, "sources": {"{{ dbname }}_building": {"maxzoom": 14, "tiles": ["http://{{ tiles_host }}:{{ tiles_port }}/building/{z}/{x}/{y}.pbf"], "minzoom": 0, "type": "vector"}, "{{ dbname }}_simple_line": {"maxzoom": 14, "tiles": ["http://{{ tiles_host }}:3579/simple_line/{z}/{x}/{y}.pbf"], "minzoom": 0, "type": "vector"}, "{{ dbname }}_simple_polygon": {"maxzoom": 14, "minzoom": 0, "tiles": ["http://{{ tiles_host }}:3579/simple_polygon/{z}/{x}/{y}.pbf"], "type": "vector"}, "{{ dbname }}_water": {"maxzoom": 14, "tiles": ["http://{{ tiles_host }}:{{ tiles_port }}/water/{z}/{x}/{y}.pbf"], "minzoom": 0, "type": "vector"}}, "layers": [{"source": "{{ dbname }}_building", "minzoom": 15, "id": "building-line", "type": "line", "paint": {"line-opacity": {"base": 1, "stops": [[15.5, 0], [16, 1]]}, "line-width": {"base": 1.5, "stops": [[15, 0.75], [20, 3]]}, "line-color": "hsl(230, 24%, 87%)"}, "source-layer": "building", "before": "tunnel-street-low", "filter": ["==", "underground", "false"], "layout": {}}, {"source": "{{ dbname }}_building", "minzoom": 15, "id": "building", "type": "fill", "paint": {"fill-opacity": {"base": 1, "stops": [[15.5, 0], [16, 1]]}, "fill-outline-color": "hsl(35, 6%, 79%)", "fill-color": {"base": 1, "stops": [[15, "hsl(35, 11%, 88%)"], [16, "hsl(35, 8%, 85%)"]]}}, "source-layer": "building", "before": "tunnel-street-low", "filter": ["==", "underground", "false"], "layout": {}}, {"source": "{{ dbname }}_water", "id": "water-shadow", "type": "fill", "paint": {"fill-opacity": 1, "fill-color": "hsl(215, 84%, 69%)", "fill-translate-anchor": "viewport", "fill-translate": {"base": 1.2, "stops": [[7, [0, 0]], [16, [-1, -1]]]}}, "source-layer": "water", "before": "barrier_line-land-polygon", "layout": {}}, {"ref": "water-shadow", "before": "barrier_line-land-polygon", "id": "water", "paint": {"fill-color": "hsl(196, 80%, 70%)"}}, {"source": "{{ dbname }}_simple_line", "id": "simple-line", "type": "line", "paint": {"line-width": 1, "line-color": "#877b59"}, "source-layer": "simple_line", "before": "housenum-label", "layout": {"line-cap": "round", "line-join": "round"}}, {"source": "{{ dbname }}_simple_polygon", "id": "simple-polygon", "type": "fill", "paint": {"fill-color": "#877b59"}, "source-layer": "simple_polygon", "before": "housenum-label", "layout": {}}]}
+{
+    "multiple_style": true,
+    "sources": [{
+        "{{ dbname }}_building": {
+            "type": "vector",
+            "tiles": [
+                "http://{{ tiles_host }}:{{ tiles_port }}/building/{z}/{x}/{y}.pbf"
+            ],
+            "maxzoom": 14,
+            "minzoom": 0
+        },
+        "{{ dbname }}_water": {
+            "type": "vector",
+            "tiles": [
+                "http://{{ tiles_host }}:{{ tiles_port }}/water/{z}/{x}/{y}.pbf"
+            ],
+            "maxzoom": 14,
+            "minzoom": 0
+        }
+    }],
+    "layers": [{
+		"id": "building-line",
+		"type": "line",
+		"source": "{{ dbname }}_building",
+		"source-layer": "building",
+        "minzoom": 15,
+		"filter": ["==", "underground", "false"],
+		"layout": {},
+		"paint": {
+			"line-color": "hsl(230, 24%, 87%)",
+			"line-width": {
+				"base": 1.5,
+				"stops": [
+					[15, 0.75],
+					[20, 3]
+				]
+			},
+			"line-opacity": {
+				"base": 1,
+				"stops": [
+					[15.5, 0],
+					[16, 1]
+				]
+			}
+		},
+        "before": "tunnel-street-low"
+	}, {
+		"id": "building",
+		"type": "fill",
+		"source": "{{ dbname }}_building",
+		"source-layer": "building",
+        "minzoom": 15,
+        "filter": ["==", "underground", "false"],
+		"layout": {},
+        "paint": {
+			"fill-color": {
+				"base": 1,
+				"stops": [
+					[15, "hsl(35, 11%, 88%)"],
+					[16, "hsl(35, 8%, 85%)"]
+				]
+			},
+			"fill-opacity": {
+				"base": 1,
+				"stops": [
+					[15.5, 0],
+					[16, 1]
+				]
+			},
+			"fill-outline-color": "hsl(35, 6%, 79%)"
+		},
+        "before": "tunnel-street-low"
+	}, {
+		"id": "water-shadow",
+		"type": "fill",
+		"source": "{{ dbname }}_water",
+		"source-layer": "water",
+		"layout": {},
+		"paint": {
+			"fill-color": "hsl(215, 84%, 69%)",
+			"fill-translate": {
+				"base": 1.2,
+				"stops": [
+					[7, [0, 0]],
+					[16, [-1, -1]]
+				]
+			},
+			"fill-translate-anchor": "viewport",
+			"fill-opacity": 1
+		},
+        "before": "barrier_line-land-polygon"
+	}, {
+		"id": "water",
+		"ref": "water-shadow",
+		"paint": {
+			"fill-color": "hsl(196, 80%, 70%)"
+		},
+        "before": "barrier_line-land-polygon"
+	}]
+}
