@@ -16,6 +16,7 @@ from shutil import copyfile
 from django.core.urlresolvers import resolve
 from jsonmerge import Merger
 import yaml
+import ujson
 
 def index(request):
     context = locals()
@@ -30,10 +31,7 @@ def index(request):
     with open('/srv/projects/vectortiles/project/osm-ireland/utilery/queries.yml', 'r') as queries_yml_file:
         queries_yml = yaml.load(queries_yml_file)
 
-    context['list_item'] = []
-    for layer in queries_yml['layers']:
-        if layer['name'] != 'mountain_peak_label':
-            context['list_item'].append(layer['name'])
+    context['list_item'] = [layer['name'] for layer in queries_yml['layers'] if layer['name'] != 'mountain_peak_label']
 
     try:
         template = loader.get_template('map/index.html')
@@ -70,9 +68,9 @@ def multiple_style(request):
 
     return HttpResponse(template.render(context, request))
 
-def upload(request):
+def add_layer(request):
     dir_upload = 'upload/'
-    layer_name = request.POST['layerName']
+    layer_name = request.POST['layerNameAdd']
 
     """
     Geometry (geojson file)
@@ -92,7 +90,7 @@ def upload(request):
 
     for chunk in file_geojson.chunks():
         destination_geojson.write(chunk)
-        destination_geojson.close()
+    destination_geojson.close()
 
     """
     Add the geometry into the database
@@ -102,17 +100,18 @@ def upload(request):
     database = 'imposm3_db_ir'
     user = 'imposm3_user_ir'
     password = 'makina'
+    table_name = 'custom_' + layer_name
 
     # Read geojson file
-    geojson_data = open(path_geojson).read()
-    geometry_data = json.loads(geojson_data)
+    with open(path_geojson) as file_stream: 
+        geometry_data = ujson.load(file_stream)
 
     # Database connexion
     conn = psycopg2.connect(host=host, database=database, user=user, password=password)
     cursor = conn.cursor()
 
     # Table for the layer
-    cursor.execute("CREATE TABLE IF NOT EXISTS %s (id serial PRIMARY KEY, geometry geometry(Geometry,3857) NOT NULL, geometry_type varchar(40) NOT NULL)" % (layer_name))
+    cursor.execute("CREATE TABLE IF NOT EXISTS %s (id serial PRIMARY KEY, geometry geometry(Geometry,3857) NOT NULL, geometry_type varchar(40) NOT NULL)" % (table_name))
 
     # For all geometry in my geojson
     for feature in range(len(geometry_data['features'])):
@@ -128,7 +127,7 @@ def upload(request):
         cursor.execute(
         'INSERT INTO %s(geometry, geometry_type)'
         'SELECT ST_SetSRID(\'%s\'::geometry, 3857) as geometry, \'%s\' as geometry_type '
-        'WHERE NOT EXISTS (SELECT geometry FROM %s WHERE geometry = ST_SetSRID(\'%s\'::geometry, 3857))' % (layer_name, geom, geometry_type, layer_name, geom))
+        'WHERE NOT EXISTS (SELECT geometry FROM %s WHERE geometry = ST_SetSRID(\'%s\'::geometry, 3857))' % (table_name, geom, geometry_type, table_name, geom))
 
     conn.commit()
 
@@ -247,14 +246,96 @@ def upload(request):
         SELECT
             id AS osm_id, geometry AS way, geometry_type
         FROM
-            { layer_name }
+            { table_name }
         WHERE
             geometry && !bbox!
         """
 
         new_queries = new_queries.replace("{ layer_name }", layer_name)
+        new_queries = new_queries.replace("{ table_name }", table_name)
 
-        with open(queries_dir, "a") as queries_file:
+        old_queries_file = open(queries_dir).read()
+        old_queries_yml = yaml.load(old_queries_file)
+        
+        del old_queries_yml['srid']
+
+        with open(queries_dir, "w") as queries_file:
+            queries_file.write(yaml.dump((old_queries_yml)))
+
+        with open(queries_dir, "a+") as queries_file:
             queries_file.write(new_queries)
 
+        new_queries_file = open(queries_dir).read()
+        new_queries_yml = yaml.load(new_queries_file)
+
+        old_queries_file_yml = yaml.load(old_queries_file)
+        old_queries_file_yml['layers'] = new_queries_yml['layers']
+
+        with open(queries_dir, "w") as queries_file:
+            queries_file.write(yaml.dump(old_queries_file_yml))
+        
     return HttpResponse(status=200)
+
+def delete_layer(request):
+    layer_name = request.POST['layerNameDel']
+    table_name = 'custom_' + layer_name
+
+    # psycopg2 variables
+    host = '127.0.0.1'
+    database = 'imposm3_db_ir'
+    user = 'imposm3_user_ir'
+    password = 'makina'
+
+    # Database connexion
+    conn = psycopg2.connect(host=host, database=database, user=user, password=password)
+    cursor = conn.cursor()
+
+    # Find if table_name exist
+    cursor.execute("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE  table_schema = 'public' AND table_name = \'%s\')" % (table_name))
+    table_exist = cursor.fetchall()
+
+    if table_exist[0][0] == True:
+        cursor.execute("DROP TABLE %s" % (table_name))
+        conn.commit()
+
+        queries_path = '/srv/projects/vectortiles/project/osm-ireland/utilery/queries.yml'
+
+        queries_yml_file = open(queries_path).read()
+        queries_yml = yaml.load(queries_yml_file)
+
+        new_layers = [layer for layer in queries_yml['layers'] if layer['name'] != layer_name]
+        queries_yml['layers'] = new_layers
+
+        os.remove(queries_path)
+        with open(queries_path, "w") as new_queries_file:
+            new_queries_file.write(yaml.dump((queries_yml)))
+
+        multiple_style_path = '/srv/projects/vectortiles/project/osm-ireland/composite/map/templates/map/multiple-style.json'
+
+        multiple_style_file = open(multiple_style_path).read()
+        multiple_style_json = json.loads(multiple_style_file)
+
+        new_multiple_style_layers = []
+        for layer in multiple_style_json['layers']:
+            try:
+              if layer['source-layer'] != layer_name:
+                  new_multiple_style_layers.append(layer)
+            except:
+              new_multiple_style_layers.append(layer)
+              pass
+
+        multiple_style_json['layers'] = new_multiple_style_layers
+
+        new_multiple_style_sources = {name: source for name, source in multiple_style_json['sources'].items() if name != '{{ dbname }}_' + layer_name}
+        multiple_style_json['sources'] = new_multiple_style_sources
+
+        multiple_style_json = repr(multiple_style_json).replace("'", '"')
+        multiple_style_json = repr(multiple_style_json).replace("True", "true")
+
+        os.remove(multiple_style_path)
+        with open(multiple_style_path, "w") as new_multiple_style_file:
+            new_multiple_style_file.write(multiple_style_json[1:-1])
+
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=202)

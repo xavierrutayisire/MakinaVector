@@ -30,7 +30,7 @@ body {
 /**
  * Close button resets.
  */
-.c-menu__close, .c-menu__add-layer {
+.c-menu__close, .c-menu__add-layer, .c-menu__del-layer {
   color: #d6e61f;
   background-color: rgb(53, 53, 53);
   font-size: 14px;
@@ -46,7 +46,7 @@ body {
 /**
  * Close button resets.
  */
-.c-menu__close:focus, .c-menu__add-layer:focus {
+.c-menu__close:focus, .c-menu__add-layer:focus, .c-menu__del-layer:focus {
   outline: none;
 }
 
@@ -97,7 +97,7 @@ body.has-active-menu {
   color: #fff;
 }
 
-.c-menu--slide-right .c-menu__close, .c-menu__add-layer {
+.c-menu--slide-right .c-menu__close, .c-menu__add-layer, .c-menu__del-layer {
   display: block;
   padding: 12px 24px;
   width: 100%;
@@ -135,7 +135,7 @@ body.has-active-menu {
     border-bottom: 1px solid rgba(214, 230, 31, 0.42);
 }
 
-.c-menu__add-layer{
+.c-menu__add-layer, .c-menu__del-layer {
     color: #fff;
     width: 80%;
     margin: auto;
@@ -240,26 +240,33 @@ body.has-active-menu {
     height: 280px;
 }
 
-.close {
+#myModalDelLayer .modal-content{
+    height: 240px;
+}
+
+
+.closeAddLayer, .closeDelLayer {
     color: #aaaaaa;
     float: right;
     font-size: 35px;
     font-weight: bold;
 }
 
-.close:hover,
-.close:focus {
+.closeAddLayer:hover,
+.closeAddLayer:focus,
+.closeDelLayer:hover,
+.closeDelLayer:focus  {
     color: #000;
     text-decoration: none;
     cursor: pointer;
 }
 
-#myModal h2{
+#myModalAddLayer h2, #myModalDelLayer h2 {
     font-family: Impact, Charcoal, sans-serif;
     color: #656565;
 }
 
-#myModal form {
+#myModalAddLayer form, #myModalDelLayer form {
     text-align: center;
     margin-top: 45px;
 }
@@ -300,7 +307,7 @@ body.has-active-menu {
 	outline: none;
 }
 
-.tp-button + label svg {
+.tp-button + label i {
     width: 1em;
     height: 1em;
     vertical-align: middle;
@@ -309,7 +316,7 @@ body.has-active-menu {
     margin-right: 0.25em;
 }
 
-#myModal #require {
+#myModalAddLayer #requireAddLayer, #myModalDelLayer #requireDelLayer {
     margin-top: -15px;
     font-style: italic;
     display: none;
@@ -318,7 +325,7 @@ body.has-active-menu {
     font-family: Impact, Charcoal, sans-serif;
 }
 
-#myModal .input-text {
+#myModalAddLayer .input-text, #myModalDelLayer .input-text {
     margin-bottom: 5px;
     height: 30px;
     width: 76%;
@@ -326,6 +333,6 @@ body.has-active-menu {
     padding-left: 10px;
 }
 
-#myModal #form_submit_input + label{
+#myModalAddLayer #form_submit_input_add + label, #myModalDelLayer #form_submit_input_del + label {
     margin-left: -3px;
 }
