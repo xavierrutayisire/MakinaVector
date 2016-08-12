@@ -84,6 +84,7 @@ The Django application is made so you can add or remove different layers directl
 
 - Go to the folder of django where manage.py is
 - Run « `%%%/utilery-virtualenv/bin/python manage.py runserver %%%` » and change %%% with the right folder and the port you use in views.py
+- Run « `service varnish start` »
 
 ---
 
