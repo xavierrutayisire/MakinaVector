@@ -242,6 +242,7 @@ def add_layer(request):
 
     # Create a new querie for the layer
     if layer_name not in open(queries_dir).read():
+        # Load the new querie
         new_queries = open(new_querie_dir).read()
         new_queries = new_queries.replace("{ layer_name }", layer_name)
         new_queries = new_queries.replace("{ table_name }", table_name)
