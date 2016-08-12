@@ -28,9 +28,9 @@ database_host = '127.0.0.1'
 database_user = 'imposm3_user_ir'
 database_password = 'makina'
 
-# Utilery
+# Utilery (by the varnish cache)
 utilery_host = '127.0.0.1' 
-utilery_port = 3579
+utilery_port = 6081
 
 # Tiles
 tiles_host = '127.0.0.1'
