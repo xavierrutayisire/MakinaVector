@@ -1,0 +1,12 @@
+- name: { layer_name }
+  buffer: 4
+  queries:
+    - minzoom: 0
+      maxzoom: 14
+      sql: |-
+        SELECT
+            id AS osm_id, geometry AS way, geometry_type
+        FROM
+            { table_name }
+        WHERE
+            geometry && !bbox!

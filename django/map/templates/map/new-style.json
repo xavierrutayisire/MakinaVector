@@ -1,0 +1,51 @@
+{
+    "sources": {
+        "{{ dbname }}_{ layer_name }": {
+            "type": "vector",
+            "tiles": [
+                "http://{{ utilery_host }}:{{ utilery_port }}/{ layer_name }/{z}/{x}/{y}.pbf"
+            ],
+            "maxzoom": 14,
+            "minzoom": 0
+        }
+    },
+    "layers": [{
+		"id": "{ layer_name }-line",
+		"type": "line",
+		"source": "{{ dbname }}_{ layer_name }",
+		"source-layer": "{ layer_name }",
+        "layout": {
+            "line-join": "round",
+            "line-cap": "round"
+        },
+        "filter": ["==", "geometry_type", "LineString"],
+        "paint": {
+            "line-color": "#877b59",
+            "line-width": 1
+        },
+        "before": "housenum-label"
+	}, {
+		"id": "{ layer_name }-polygon",
+		"type": "fill",
+		"source": "{{ dbname }}_{ layer_name }",
+		"source-layer": "{ layer_name }",
+        "layout": {},
+        "filter": ["==", "geometry_type", "Polygon"],
+        "paint": {
+            "fill-color": "#877b59"
+        },
+        "before": "housenum-label"
+    }, {
+		"id": "{ layer_name }-point",
+		"type": "circle",
+		"source": "{{ dbname }}_{ layer_name }",
+		"source-layer": "{ layer_name }",
+        "layout": {},
+        "filter": ["==", "geometry_type", "Point"],
+        "paint": {
+            "circle-radius": 8,
+            "circle-color": "rgba(55,148,179,1)"
+        },
+        "before": "housenum-label"
+    }]
+}

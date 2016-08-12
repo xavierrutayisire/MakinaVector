@@ -1,14 +1,14 @@
-from django.http import HttpResponse
 from django.template import loader, TemplateDoesNotExist
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.urlresolvers import resolve
-import yaml
-import ujson
+from django.http import HttpResponse
+from shutil import move, copyfile
 from jsonmerge import Merger
+import psycopg2
+import ujson
+import yaml
 import io
 import os
-import psycopg2
-from shutil import move, copyfile
 
 ## Variables ##
 
@@ -19,7 +19,7 @@ title_of_index = 'Map'
 
 # Mapbox
 mapboxAccessToken = 'pk.eyJ1IjoieGFxYXgiLCJhIjoiNm1xWjFPWSJ9.skMPG8gbuHxvqQ-9pAak4A'
-startingZoom = '14'
+startingZoom = 14
 startingPosition = '[-6.3316, 53.3478]'
 
 # Database
@@ -38,8 +38,10 @@ tiles_port = 8001
 
 # Directory
 queries_dir = '/srv/projects/vectortiles/project/osm-ireland/utilery/queries.yml'
+new_querie_dir = '/srv/projects/vectortiles/project/osm-ireland/utilery/new-querie.yml'
 style_dir = '/srv/projects/vectortiles/project/osm-ireland/composite/map/templates/map/style.json'
 multiple_style_dir = '/srv/projects/vectortiles/project/osm-ireland/composite/map/templates/map/multiple-style.json'
+new_style_dir = '/srv/projects/vectortiles/project/osm-ireland/composite/map/templates/map/new-style.json'
 upload_dir = 'upload/'
 
 # Render the index page
@@ -204,59 +206,8 @@ def add_layer(request):
 
     # Create the new style for the new layer
     if style_already_exist == 0:
-        new_style = """{
-            "sources": {
-                "{{ dbname }}_{ layer_name }": {
-                    "type": "vector",
-                    "tiles": [
-                        "http://{{ utilery_host }}:{{ utilery_port }}/{ layer_name }/{z}/{x}/{y}.pbf"
-                    ],
-                    "maxzoom": 14,
-                    "minzoom": 0
-                }
-            },
-            "layers": [{
-        		"id": "{ layer_name }-line",
-        		"type": "line",
-        		"source": "{{ dbname }}_{ layer_name }",
-        		"source-layer": "{ layer_name }",
-                "layout": {
-                    "line-join": "round",
-                    "line-cap": "round"
-                },
-                "filter": ["==", "geometry_type", "LineString"],
-                "paint": {
-                    "line-color": "#877b59",
-                    "line-width": 1
-                },
-                "before": "housenum-label"
-        	}, {
-        		"id": "{ layer_name }-polygon",
-        		"type": "fill",
-        		"source": "{{ dbname }}_{ layer_name }",
-        		"source-layer": "{ layer_name }",
-                "layout": {},
-                "filter": ["==", "geometry_type", "Polygon"],
-                "paint": {
-                    "fill-color": "#877b59"
-                },
-                "before": "housenum-label"
-    	    }, {
-        		"id": "{ layer_name }-point",
-        		"type": "circle",
-        		"source": "{{ dbname }}_{ layer_name }",
-        		"source-layer": "{ layer_name }",
-                "layout": {},
-                "filter": ["==", "geometry_type", "Point"],
-                "paint": {
-                    "circle-radius": 8,
-                    "circle-color": "rgba(55,148,179,1)"
-                },
-                "before": "housenum-label"
-    	    }]
-        }
-        """
-
+        # Load the new style
+        new_style = open(new_style_dir).read()
         new_style = new_style.replace("{ layer_name }", layer_name)
         style_data = ujson.loads(new_style)
 
@@ -291,20 +242,7 @@ def add_layer(request):
 
     # Create a new querie for the layer
     if layer_name not in open(queries_dir).read():
-        new_queries = """- name: { layer_name }
-  buffer: 4
-  queries:
-    - minzoom: 0
-      maxzoom: 14
-      sql: |-
-        SELECT
-            id AS osm_id, geometry AS way, geometry_type
-        FROM
-            { table_name }
-        WHERE
-            geometry && !bbox!
-        """
-
+        new_queries = open(new_querie_dir).read()
         new_queries = new_queries.replace("{ layer_name }", layer_name)
         new_queries = new_queries.replace("{ table_name }", table_name)
 
