@@ -28,9 +28,9 @@ database_host = '127.0.0.1'
 database_user = 'imposm3_user_ir'
 database_password = 'makina'
 
-# Utilery (by the varnish cache)
-utilery_host = '127.0.0.1' 
-utilery_port = 6081
+# Utilery
+utilery_host = '127.0.0.1'
+utilery_port = 3579
 
 # Tiles
 tiles_host = '127.0.0.1'
@@ -160,7 +160,7 @@ def add_layer(request):
     table_name = 'custom_' + layer_name
 
     # Decode geojson file
-    with open(path_geojson) as file_stream: 
+    with open(path_geojson) as file_stream:
         geometry_data = ujson.load(file_stream)
 
     # Database connexion
@@ -211,7 +211,7 @@ def add_layer(request):
         new_style = new_style.replace("{ layer_name }", layer_name)
         style_data = ujson.loads(new_style)
 
-        # Merge the sources of the original style with the new style into the 
+        # Merge the sources of the original style with the new style into the
         schema_sources = {
                    "properties": {
                        "sources": {
@@ -271,7 +271,7 @@ def add_layer(request):
         # Create the new queries file with the old and the new queries
         with open(queries_dir, "w") as queries_file:
             queries_file.write(yaml.dump(old_queries_file_yml))
-    
+
     # Response
     return HttpResponse(status=200)
 
@@ -338,7 +338,7 @@ def delete_layer(request):
         if style_exist == 1:
             new_multiple_style_layers = []
 
-            # Remove the layers of the style 
+            # Remove the layers of the style
             for layer in multiple_style_json['layers']:
                 try:
                   if layer['source-layer'] != layer_name:
@@ -349,7 +349,7 @@ def delete_layer(request):
 
             multiple_style_json['layers'] = new_multiple_style_layers
 
-            # Remove the source of the style 
+            # Remove the source of the style
             new_multiple_style_sources = {name: source for name, source in multiple_style_json['sources'].items() if name != '{{ dbname }}_' + layer_name}
             multiple_style_json['sources'] = new_multiple_style_sources
 
