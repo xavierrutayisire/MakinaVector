@@ -31,7 +31,7 @@ utilery_port = 3579
 
 # Directory
 queries_dir = '/srv/projects/vectortiles/project/osm-ireland/utilery/queries.yml'
-new_querie_dir = '/srv/projects/vectortiles/project/osm-ireland/utilery/new-querie.yml'
+new_query_dir = '/srv/projects/vectortiles/project/osm-ireland/utilery/new-query.yml'
 style_dir = '/srv/projects/vectortiles/project/osm-ireland/composite/map/templates/map/style.json'
 multiple_style_dir = '/srv/projects/vectortiles/project/osm-ireland/composite/map/templates/map/multiple-style.json'
 new_style_dir = '/srv/projects/vectortiles/project/osm-ireland/composite/map/templates/map/new-style.json'
@@ -234,7 +234,7 @@ def add_layer(request):
     # Create a new querie for the layer
     if layer_name not in open(queries_dir).read():
         # Load the new querie
-        new_queries = open(new_querie_dir).read()
+        new_queries = open(new_query_dir).read()
         new_queries = new_queries.replace("{ layer_name }", layer_name)
         new_queries = new_queries.replace("{ table_name }", table_name)
 
@@ -262,14 +262,11 @@ def add_layer(request):
         # Create the new queries file with the old and the new queries
         with open(queries_dir, "w") as queries_file:
             queries_file.write(yaml.dump(old_queries_file_yml))
-<<<<<<< HEAD
     
     ## VARNISH 
     conn = HTTPConnection(utilery_host + ':' + str(utilery_port)) 
     conn.request("BAN", "/" + layer_name + "/")
     resp = conn.getresponse()
-=======
->>>>>>> origin/master
 
     # Response
     return HttpResponse(status=200)

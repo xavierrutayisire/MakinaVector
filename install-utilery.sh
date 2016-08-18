@@ -112,7 +112,7 @@ EOF1
 
 # Import of the queries you wanna use
 cp ./utilery/queries.yml $working_dir_utilery/utilery
-cp ./utilery/new-querie.yml $working_dir_utilery/utilery
+cp ./utilery/new-query.yml $working_dir_utilery/utilery
 
 #  Create the virtualenv
 rm -rf $working_dir_utilery/utilery-virtualenv
