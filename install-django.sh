@@ -35,7 +35,7 @@ mkdir $working_dir_django/varnish
 rm /etc/varnish/default.vcl
 
 cat > /etc/varnish/default.vcl << EOF1
-vvcl 4.0;
+vcl 4.0;
 
 backend default {
     .host = "127.0.0.1";

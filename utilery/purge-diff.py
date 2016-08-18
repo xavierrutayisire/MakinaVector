@@ -29,9 +29,10 @@ for record in records:
     east = bbox["bbox"][2]
     north = bbox["bbox"][3]
     host = sys.argv[8]
+    port = sys.argv[9]
     directory_generation = sys.argv[1]
     procs = []
-    conn = HTTPConnection('127.0.0.1:6081') 
+    conn = HTTPConnection(host:port) 
 
     for zoom in range(minzoom, maxzoom + 1):
         if not os.path.exists("%s/%s" % (directory_generation, zoom)):
@@ -45,15 +46,15 @@ for record in records:
                 filename = "%s/%s/%s" % (directory_generation, zoom, x)
                 tile_already_generate = 0
                 if not os.path.isfile(filename):
-                    url = "http://%s:3579/default/all/%s/%s/%s.pbf" % (host, zoom, x, y)
+                    url = "/all/%s/%s/%s.pbf" % (zoom, x, y)
                     for tile in tiles_generate:
-                        if(tile == '%s/%s/%s' % (zoom, x, y)):
+                        if(tile == url):
                             tile_already_generate = 1
                             break
                     if(tile_already_generate == 0):
                         print(zoom, x, y)                 
-                        tiles_generate.append('%s/%s/%s' % (zoom, x, y))
-                        procs.append(conn.request("PURGE", "/all/" + zoom + "/" + x + "/" + y + ".pbf"))
+                        tiles_generate.append(url)
+                        procs.append(conn.request("PURGE", url))
                         if len(procs) > (cpu_count() * 4):
                             procs[0].wait()
                             procs.remove(procs[0])
