@@ -25,9 +25,9 @@ database_host = '127.0.0.1'
 database_user = 'imposm3_user_ir'
 database_password = 'makina'
 
-# Utilery
-utilery_host = '127.0.0.1'
-utilery_port = 3579
+# Utilery (by the varnish cache)
+utilery_host = '127.0.0.1' 
+utilery_port = 6081
 
 # Directory
 queries_dir = '/srv/projects/vectortiles/project/osm-ireland/utilery/queries.yml'
