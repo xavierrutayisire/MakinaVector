@@ -12,6 +12,17 @@ database_host_imposm3="$5"
 
 database_port_imposm3="$6"
 
+# Password support
+cat > $working_dir_imposm3/imposm3/import-external/.pgpass << EOF1
+$database_host_imposm3:$database_port_imposm3:$database_name_imposm3:$database_user_imposm3:$database_user_password_imposm3
+EOF1
+
+chmod 0600 $working_dir_imposm3/imposm3/import-external/.pgpass
+
+export PGPASSFILE=$working_dir_imposm3/imposm3/import-external/.pgpass
+
+#### Downloads ####
+
 wget -P $working_dir_imposm3/imposm3/import-external http://data.openstreetmapdata.com/water-polygons-split-3857.zip
 unzip -oj $working_dir_imposm3/imposm3/import-external/water-polygons-split-3857.zip -d $working_dir_imposm3/imposm3/import-external
 rm $working_dir_imposm3/imposm3/import-external/water-polygons-split-3857.zip
@@ -172,27 +183,19 @@ PGCLIENTENCODING=LATIN1 ogr2ogr \
 
 #### Import water ####
 
-cat > $working_dir_imposm3/imposm3/import-external/.pgpass << EOF1
-$database_host_imposm3:$database_port_imposm3:$database_name_imposm3:$database_user_imposm3:$database_user_password_imposm3
-EOF1
-
-chmod 0600 $working_dir_imposm3/imposm3/import-external/.pgpass
-
-export PGPASSFILE=$working_dir_imposm3/imposm3/import-external/.pgpass
-
 exec_psql() {
     psql --host="$database_host_imposm3" --port=$database_port_imposm3 --dbname="$database_name_imposm3" --username="$database_user_imposm3"
 }
 
 exec_sql_file() {
-	local sql_file=$1
+    local sql_file=$1
     cat "$sql_file" | exec_psql
 }
 
 drop_table() {
     local table=$1
-	local drop_command="DROP TABLE IF EXISTS $table;"
-	echo $drop_command | exec_psql
+    local drop_command="DROP TABLE IF EXISTS $table;"
+    echo $drop_command | exec_psql
 }
 
 hide_inserts() {
@@ -200,9 +203,9 @@ hide_inserts() {
 }
 
 import_shp() {
-	local shp_file=$1
-	local table_name=$2
-	shp2pgsql -s 3857 -I -g geometry "$shp_file" "$table_name" | exec_psql | hide_inserts
+    local shp_file=$1
+    local table_name=$2
+    shp2pgsql -s 3857 -I -g geometry "$shp_file" "$table_name" | exec_psql | hide_inserts
 }
 
 import_water() {
@@ -250,29 +253,5 @@ import_labels() {
 
 import_labels
 
-#### Create table and index ####
-
-sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/function.sql
-sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/table.sql
-
-sudo -n -u postgres -s -- psql $database_name_imposm3 -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $database_user_imposm3;"
-sudo -n -u postgres -s -- psql $database_name_imposm3 -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO $database_user_imposm3;"
-
-sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/trigger.sql > ./database/import-external/sql/trigger.sql
-sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/trigger.sql
-
-sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/generate-trigger-I-U.sql > ./database/import-external/sql/trigger-I-U-temp.sql
-tail -n +3 ./database/import-external/sql/trigger-I-U-temp.sql > ./database/import-external/sql/trigger-I-U-temp2.sql
-rm ./database/import-external/sql/trigger-I-U-temp.sql
-head -n -2 ./database/import-external/sql/trigger-I-U-temp2.sql > ./database/import-external/sql/trigger-I-U.sql
-rm ./database/import-external/sql/trigger-I-U-temp2.sql
-sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/trigger-I-U.sql
-
-sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/generate-trigger-D.sql > ./database/import-external/sql/trigger-D-temp.sql
-tail -n +3 ./database/import-external/sql/trigger-D-temp.sql > ./database/import-external/sql/trigger-D-temp2.sql
-rm ./database/import-external/sql/trigger-D-temp.sql
-head -n -2 ./database/import-external/sql/trigger-D-temp2.sql > ./database/import-external/sql/trigger-D.sql
-rm ./database/import-external/sql/trigger-D-temp2.sql
-sudo -n -u postgres -s -- psql $database_name_imposm3 -f ./database/import-external/sql/trigger-D.sql
-
+# Password support 
 rm $working_dir_imposm3/imposm3/import-external/.pgpass

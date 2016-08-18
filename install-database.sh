@@ -162,6 +162,11 @@ sh ./database/import-data/import-initial.sh $working_dir_imposm3 $database_user_
 
 sh ./database/import-external/import-external.sh $working_dir_imposm3 $database_user_imposm3 $database_user_password_imposm3 $database_name_imposm3 $database_host_imposm3 $database_port_imposm3
 
+#### Create all the slq functions, tables, index and triggers ####
+
+sh ./database/sql/sql.sh $working_dir_imposm3 $database_user_imposm3 $database_user_password_imposm3 $database_name_imposm3 $database_host_imposm3 $database_port_imposm3
+
 ####  Automatic update of the PostGIS database every minute ####
 
 sh ./database/import-data/import-diff.sh $working_dir_imposm3 $database_user_imposm3 $database_user_password_imposm3 $database_name_imposm3 $database_host_imposm3 $url_changes_imposm3
+
