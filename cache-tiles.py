@@ -7,7 +7,7 @@ south = 51.122
 east = -5.5582362
 north = 55.736
 host = '127.0.0.1'
-directory_generation = '/srv/projects/vectortiles/project/osm-ireland/utilery/tiles'
+port = 6081
 
 # END SETUP USER
 
@@ -18,6 +18,7 @@ from subprocess import Popen
 import os
 
 procs = []
+directory_generation = '/dev/null'
 
 if not os.path.exists("%s" % (directory_generation)):
 		os.makedirs("%s" % (directory_generation))
@@ -34,7 +35,7 @@ for zoom in range(minzoom, maxzoom + 1):
 			print(zoom, x, y)
 			filename = "%s/%s/%s" % (directory_generation, zoom, x)
 			if not os.path.isfile(filename):
-				url = "http://%s:3579/default/all/%s/%s/%s.pbf" % (host, zoom, x, y)
+				url = "http://%s:%s/default/all/%s/%s/%s.pbf" % (host, port, zoom, x, y)
 				procs.append(subprocess.Popen(['wget', url, '-P', filename, '-q']))
 				if len(procs) > (cpu_count() * 4):
 					procs[0].wait()

@@ -32,6 +32,9 @@ max_zoom_diff=14
 #  Utilery host
 utilery_host_diff="localhost"
 
+#  Utilery port
+utilery_host_diff="6081"
+
 ####  END SETUP USER  ####
 
-sh ./utilery/tiles-diff.sh $working_dir_diff $working_dir_diff_virtualenv $working_dir_diff_tiles $database_user_diff $database_user_password_diff $database_name_diff $database_host_diff $min_zoom_diff $max_zoom_diff $utilery_host_diff
+sh ./utilery/tiles-diff.sh $working_dir_diff $working_dir_diff_virtualenv $working_dir_diff_tiles $database_user_diff $database_user_password_diff $database_name_diff $database_host_diff $min_zoom_diff $max_zoom_diff $utilery_host_diff $utilery_host_diff

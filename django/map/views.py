@@ -2,13 +2,10 @@ from django.template import loader, TemplateDoesNotExist
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.urlresolvers import resolve
 from django.http import HttpResponse
+from http.client import HTTPConnection
 from shutil import move, copyfile
 from jsonmerge import Merger
-import psycopg2
-import ujson
-import yaml
-import io
-import os
+import psycopg2, signal, ujson, yaml, io, os
 
 ## Variables ##
 
@@ -31,10 +28,6 @@ database_password = 'makina'
 # Utilery (by the varnish cache)
 utilery_host = '127.0.0.1' 
 utilery_port = 6081
-
-# Tiles
-tiles_host = '127.0.0.1'
-tiles_port = 8001
 
 # Directory
 queries_dir = '/srv/projects/vectortiles/project/osm-ireland/utilery/queries.yml'
@@ -97,8 +90,8 @@ def index(request):
 # Return the style file
 def style(request):
     context = locals()
-    context['tiles_host'] = tiles_host
-    context['tiles_port'] = tiles_port
+    context['utilery_host'] = utilery_host
+    context['utilery_port'] = utilery_port
     context['dbname'] = database_name
 
     # Load the template
@@ -113,8 +106,6 @@ def style(request):
 # Return the multiple style file
 def multiple_style(request):
     context = locals()
-    context['tiles_host'] = tiles_host
-    context['tiles_port']  = tiles_port
     context['dbname'] = database_name
     context['utilery_host'] = utilery_host
     context['utilery_port'] = utilery_port
@@ -272,6 +263,11 @@ def add_layer(request):
         with open(queries_dir, "w") as queries_file:
             queries_file.write(yaml.dump(old_queries_file_yml))
     
+    ## VARNISH 
+    conn = HTTPConnection(utilery_host + ':' + str(utilery_port)) 
+    conn.request("BAN", "/" + layer_name + "/")
+    resp = conn.getresponse()
+
     # Response
     return HttpResponse(status=200)
 
@@ -360,6 +356,11 @@ def delete_layer(request):
             # Create a new multiple style file without the old styles
             with open(multiple_style_dir, "w") as new_multiple_style_file:
                 new_multiple_style_file.write(multiple_style_json[1:-1])
+
+        ## VARNISH 
+        conn = HTTPConnection(utilery_host + ':' + str(utilery_port)) 
+        conn.request("BAN", "/" + layer_name + "/")
+        resp = conn.getresponse()
 
         # Response if delete was done
         return HttpResponse(status=200)

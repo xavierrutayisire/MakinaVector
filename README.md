@@ -42,7 +42,7 @@ The Django application is made so you can add or remove different layers directl
 
 ---
 
-##### 3 - Usage of Utilery:
+##### 3 - Lauch Utilery:
 
 - Add the config for Utilery:
     - Run « `export UTILERY_SETTINGS=%%%/utilery/utilery/config/default.py` » and change %%% with the right directory
@@ -50,24 +50,16 @@ The Django application is made so you can add or remove different layers directl
 
 ---
 
-##### 4 - Generate tiles:
+##### 4 - Lauch varnish:
 
-- Edit generate-tiles.py and change the « setup user »
-- Run « `sudo %%%/utilery-virtualenv/bin/python generate-tiles.py` » and change %%% with the right directory
-
----
-
-##### 5 - Update tiles: (Utilery server need to be running)
-
-- Edit update-tiles.sh and change the « setup user »
-- Run « `sudo sh update-tiles.sh` » from Deploy-Imposm3-Utilery folder
+- Run « `service varnish start` »
 
 ---
 
-##### 6 - Serve tiles:
+##### 5 - Purge varnish tiles: (Cron job)
 
-- Run « `cd %%%/utilery/tiles` » and change %%% with the right directory
-- Run « `http-server -p %%%` » and change %%% with the port you wanna use
+- Edit purge-tiles-diff.sh and change the « setup user »
+- Run « `sudo sh purge-tiles-diff.sh` » from Deploy-Imposm3-Utilery folder
 
 ---
 
@@ -83,8 +75,8 @@ The Django application is made so you can add or remove different layers directl
 ##### 8 - Lauch Django server:
 
 - Go to the folder of django where manage.py is
+
 - Run « `%%%/utilery-virtualenv/bin/python manage.py runserver %%%` » and change %%% with the right folder and the port you use in views.py
-- Run « `service varnish start` »
 
 ---
 

@@ -8,6 +8,7 @@ import subprocess
 from multiprocessing import cpu_count
 from subprocess import Popen
 import os
+from http.client import HTTPConnection
 
 conn = psycopg2.connect(host=sys.argv[5], database=sys.argv[4], user=sys.argv[2], password=sys.argv[3])
 cursor = conn.cursor()
@@ -30,6 +31,7 @@ for record in records:
     host = sys.argv[8]
     directory_generation = sys.argv[1]
     procs = []
+    conn = HTTPConnection('127.0.0.1:6081') 
 
     for zoom in range(minzoom, maxzoom + 1):
         if not os.path.exists("%s/%s" % (directory_generation, zoom)):
@@ -49,9 +51,9 @@ for record in records:
                             tile_already_generate = 1
                             break
                     if(tile_already_generate == 0):
-                        print(zoom, x, y)
+                        print(zoom, x, y)                 
                         tiles_generate.append('%s/%s/%s' % (zoom, x, y))
-                        procs.append(subprocess.Popen(['wget', url, '-P', filename, '-q']))
+                        procs.append(conn.request("PURGE", "/all/" + zoom + "/" + x + "/" + y + ".pbf"))
                         if len(procs) > (cpu_count() * 4):
                             procs[0].wait()
                             procs.remove(procs[0])
