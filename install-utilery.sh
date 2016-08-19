@@ -54,9 +54,10 @@ fi
 
 #### Configuration ####
 
+
 #  Update of the repositories and install of python, pip, virtualenv, virtualenvwrapper git and libpq-dev
 apt-get update && \
-apt-get install -y python$python_version_utilery python$python_version_utilery-dev python3-pip python-virtualenv virtualenvwrapper git libpq-dev gdal-bin nodejs npm
+apt-get install -y python3.5 python3.5-dev python3-pip python-virtualenv virtualenvwrapper git libpq-dev gdal-bin nodejs npm
 
 npm install http-server -g
 ln -s /usr/bin/nodejs /usr/bin/node
@@ -89,7 +90,7 @@ cat > $working_dir_utilery/utilery/utilery/config/default.py << EOF1
 DATABASES = {
     "default": "dbname=$database_name_utilery user=$database_user_utilery password=$database_user_password_utilery host=$database_host_utilery"
 }
-RECIPES = ['$queries_path_utilery/utilery/queries.yml']
+RECIPES = ['$working_dir_utilery/utilery/queries.yml']
 TILEJSON = {
     "tilejson": "2.1.0",
     "name": "utilery",
@@ -114,10 +115,14 @@ EOF1
 cp ./utilery/queries.yml $working_dir_utilery/utilery
 cp ./utilery/new-query.yml $working_dir_utilery/utilery
 
+#  If virtualenv already exist
+if [ -d "$working_dir_utilery/utilery-virtualenv" ]; then
+  rm -rf $working_dir_utilery/utilery-virtualenv
+fi
+
 #  Create the virtualenv
-rm -rf $working_dir_utilery/utilery-virtualenv
 cd $working_dir_utilery
-virtualenv utilery-virtualenv --python=/usr/bin/python$python_version_utilery
+virtualenv utilery-virtualenv --python=/usr/bin/python3.5
 cd -
 
 #  Install python package
@@ -128,6 +133,11 @@ cd -
 
 #  Install unstable python dependencies
 $working_dir_utilery/utilery-virtualenv/bin/pip3 install -r $working_dir_utilery/utilery/requirements.txt
+
+#  If utilery service exist
+if [ -d "/etc/systemd/system/utilery.service" ]; then
+  rm /etc/systemd/system/utilery.service
+fi
 
 #  Create utilery service with systemd
 cat > /etc/systemd/system/utilery.service << EOF1
@@ -152,5 +162,15 @@ EOF1
 #  Set execute permission on the script
 chmod +x $working_dir_utilery/utilery/utilery-service.sh
 
+systemctl daemon-reload
+
 # Add the UTILERY_SETTINGS into the environements variables
-echo "UTILERY_SETTINGS=$working_dir_utilery/utilery/utilery/config/default.py" >> /etc/environment
+if grep -Fq "UTILERY_SETTINGS" /etc/environment
+then
+    echo "UTILERY_SETTINGS ALREADY FOUND ! DELETING OLD ONE in /etc/environment"
+    sed -i '/UTILERY_SETTINGS/d' /etc/environment
+    echo "UTILERY_SETTINGS=$working_dir_utilery/utilery/utilery/config/default.py" >> /etc/environment
+else
+    echo "UTILERY_SETTINGS=$working_dir_utilery/utilery/utilery/config/default.py" >> /etc/environment
+fi
+
