@@ -43,7 +43,10 @@ apt-get install -y varnish
 
 mkdir $working_dir_varnish/varnish
 
-rm /etc/varnish/default.vcl
+#  If varnish service exist
+if [ -d "/etc/varnish/default.vcl" ]; then
+  rm /etc/varnish/default.vcl
+fi
 
 cat > /etc/varnish/default.vcl << EOF1
 vcl 4.0;
@@ -90,7 +93,10 @@ sub vcl_deliver {
 }
 EOF1
 
-rm /etc/systemd/system/varnish.service
+#  If varnish service exist
+if [ -d "/etc/systemd/system/varnish.service" ]; then
+  rm /etc/systemd/system/varnish.service
+fi
 
 cat > /etc/systemd/system/varnish.service << EOF1
 [Unit]
@@ -112,7 +118,7 @@ LimitMEMLOCK=-l
 # Maximum size of the corefile.
 LimitCORE=infinity
 
-ExecStart=/usr/sbin/varnishd -a :6081 -T localhost:6082 -f /etc/varnish/default.vcl -S /etc/varnish/secret -s "file,$working_dir_django/varnish/varnish_storage.bin,20G"
+ExecStart=/usr/sbin/varnishd -a :6081 -T localhost:6082 -f /etc/varnish/default.vcl -S /etc/varnish/secret -s "file,$working_dir_varnish/varnish/varnish_storage.bin,20G"
 ExecReload=/usr/share/varnish/reload-vcl
 
 [Install]
