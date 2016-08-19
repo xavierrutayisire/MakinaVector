@@ -1,18 +1,18 @@
 // Setup the form
-function setupForm(formId, url, type) {
+function setupForm(formId, url) {
     // Get the form
     var form = document.getElementById(formId);
     if (form && window.FormData) {
         // Listen for the form being submitted
         form.addEventListener('submit', function(evt) {
             evt.preventDefault();
-            sendForm(event.target, url, type);
+            sendForm(event.target, url);
         });
     }
 }
 
 // Send the form
-function sendForm(form, url, type) {
+function sendForm(form, url) {
     // Create a new formData
     var formData = new FormData(form);
 
@@ -22,20 +22,29 @@ function sendForm(form, url, type) {
 
     // Watch for changes to request.readyState
     request.onload = function() {
-        handleFormRequest(request, type);
+        handleFormRequest(request);
     };
 
     // Send the formData
     request.send(formData);
 }
 
+// Display or hide all .requirelayer
+function toggle(displayState){
+    var elements = document.getElementsByClassName('requireLayer')
+
+    for (var i = 0; i < elements.length; i++){
+        elements[i].style.display = displayState;
+    }
+}
+
 // Handle the request
-function handleFormRequest(request, type) {
+function handleFormRequest(request) {
     if (request.readyState === 4) {
         if (request.status === 200) {
             window.location = 'http://' + window.vtParameters.djangoHost + ':' + window.vtParameters.djangoPort;
-        } else if (type === 'delLayer' && request.status === 202) {
-            document.getElementById("requireDelLayer").style.display = "block";
+        } else if (request.status === 202) {
+            toggle('block');
         }
     }
 }
@@ -47,13 +56,14 @@ var spanAddLayer = document.getElementsByClassName("closeAddLayer")[0];
 
 btnAddLayer.onclick = function() {
     modalAddLayer.style.display = "block";
+    toggle('none');
 }
 
 spanAddLayer.onclick = function() {
     modalAddLayer.style.display = "none";
 }
 
-setupForm('form_add_layer', '/add-layer', 'addLayer');
+setupForm('form_add_layer', '/add-layer');
 
 // Delete layer
 var modalDelLayer = document.getElementById('myModalDelLayer');
@@ -62,6 +72,7 @@ var spanDelLayer = document.getElementsByClassName("closeDelLayer")[0];
 
 btnDelLayer.onclick = function() {
     modalDelLayer.style.display = "block";
+    toggle('none');
 }
 
 spanDelLayer.onclick = function() {

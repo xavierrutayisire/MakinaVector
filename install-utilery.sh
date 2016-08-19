@@ -128,3 +128,29 @@ cd -
 
 #  Install unstable python dependencies
 $working_dir_utilery/utilery-virtualenv/bin/pip3 install -r $working_dir_utilery/utilery/requirements.txt
+
+#  Create utilery service with systemd
+cat > /etc/systemd/system/utilery.service << EOF1
+[Unit]
+Description=Utilery
+
+[Service]
+Type=forking
+ExecStart=/bin/sh $working_dir_utilery/utilery/utilery-service.sh
+
+[Install]
+WantedBy=multi-user.target
+EOF1
+
+#  Create utilery-service.sh
+cat > $working_dir_utilery/utilery/utilery-service.sh << EOF1
+#!/bin/bash
+
+nohup $working_dir_utilery/utilery-virtualenv/bin/python $working_dir_utilery/utilery/utilery/serve.py &
+EOF1
+
+#  Set execute permission on the script
+chmod +x $working_dir_utilery/utilery/utilery-service.sh
+
+# Add the UTILERY_SETTINGS into the environements variables
+echo "UTILERY_SETTINGS=$working_dir_utilery/utilery/utilery/config/default.py" >> /etc/environment

@@ -145,131 +145,161 @@ def add_layer(request):
         destination_geojson.write(chunk)
     destination_geojson.close()
 
-    ## DATABASE ##
+    # Get all the layer name
+    style_file = open(style_dir).read()
+    style_json = ujson.loads(style_file)
+    layer_exist = 0
 
-    # Add the geometry into the database
-    table_name = 'custom_' + layer_name
-
-    # Decode geojson file
-    with open(path_geojson) as file_stream:
-        geometry_data = ujson.load(file_stream)
-
-    # Database connexion
-    conn = psycopg2.connect(host=database_host, database=database_name, user=database_user, password=database_password)
-    cursor = conn.cursor()
-
-    # Create table if not exist for the layer
-    cursor.execute("CREATE TABLE IF NOT EXISTS %s (id serial PRIMARY KEY, geometry geometry(Geometry,3857) NOT NULL, geometry_type varchar(40) NOT NULL)" % (table_name))
-
-    # Add geometry and geometry type of the geojson into the database
-    for feature in range(len(geometry_data['features'])):
-        geometry = geometry_data['features'][feature]['geometry']
-        geometry_type = geometry['type']
-
-        # Convert geojson into geometry
-        geojson = GEOSGeometry(str(geometry), srid=4326)
-        geojson.transform(3857)
-        geom = geojson.hex.decode()
-
-        # Add the geometry into the table if the geometry doesn't already exist
-        cursor.execute(
-        'INSERT INTO %s(geometry, geometry_type)'
-        'SELECT ST_SetSRID(\'%s\'::geometry, 3857) as geometry, \'%s\' as geometry_type '
-        'WHERE NOT EXISTS (SELECT geometry FROM %s WHERE geometry = ST_SetSRID(\'%s\'::geometry, 3857))' % (table_name, geom, geometry_type, table_name, geom))
-
-    conn.commit()
-
-    ## STYLE ##
-
-    # Load the original multiple style file
-    original_style_json_data = open(multiple_style_dir).read()
-    original_style_data = ujson.loads(original_style_json_data)
-    style_already_exist = 0
-
-    # Check if style already exist for this layer
-    for source_layer in range(len(original_style_data['layers'])):
+    for layer in style_json['layers']:
         try:
-            if original_style_data['layers'][source_layer]['source-layer'] == layer_name:
-                style_already_exist = 1
-                break
+            if layer_name == layer['source-layer']:
+                layer_exist = 1
         except:
             pass
 
-    # Create the new style for the new layer
-    if style_already_exist == 0:
-        # Load the new style
-        new_style = open(new_style_dir).read()
-        new_style = new_style.replace("{ layer_name }", layer_name)
-        style_data = ujson.loads(new_style)
+    # Only if layer is not in initial map
+    if layer_exist == 0:
+        # Decode geojson file
+        with open(path_geojson) as file_stream:
+            geometry_data = ujson.load(file_stream)
 
-        # Merge the sources of the original style with the new style into the
-        schema_sources = {
-                   "properties": {
-                       "sources": {
-                          "mergeStrategy": "append"
+        ## DATABASE ##
+
+        # Add the geometry into the database
+        table_name = 'custom_' + layer_name
+
+        # Database connexion
+        conn = psycopg2.connect(host=database_host, database=database_name, user=database_user, password=database_password)
+        cursor = conn.cursor()
+
+        # Create table if not exist for the layer
+        cursor.execute("CREATE TABLE IF NOT EXISTS %s (id serial PRIMARY KEY, geometry geometry(Geometry,3857) NOT NULL, geometry_type varchar(40) NOT NULL)" % (table_name))
+
+        # Add geometry and geometry type of the geojson into the database
+        for feature in range(len(geometry_data['features'])):
+            geometry = geometry_data['features'][feature]['geometry']
+            geometry_type = geometry['type']
+
+            # Convert geojson into geometry
+            geojson = GEOSGeometry(str(geometry), srid=4326)
+            geojson.transform(3857)
+            geom = geojson.hex.decode()
+
+            # Add the geometry into the table if the geometry doesn't already exist
+            cursor.execute(
+            'INSERT INTO %s(geometry, geometry_type)'
+            'SELECT ST_SetSRID(\'%s\'::geometry, 3857) as geometry, \'%s\' as geometry_type '
+            'WHERE NOT EXISTS (SELECT geometry FROM %s WHERE geometry = ST_SetSRID(\'%s\'::geometry, 3857))' % (table_name, geom, geometry_type, table_name, geom))
+
+        conn.commit()
+
+        ## STYLE ##
+
+        # Load the original multiple style file
+        original_style_json_data = open(multiple_style_dir).read()
+        original_style_data = ujson.loads(original_style_json_data)
+        style_already_exist = 0
+
+        # Check if style already exist for this layer
+        for source_layer in range(len(original_style_data['layers'])):
+            try:
+                if original_style_data['layers'][source_layer]['source-layer'] == layer_name:
+                    style_already_exist = 1
+                    break
+            except:
+                pass
+
+        # Create the new style for the new layer
+        if style_already_exist == 0:
+            # Load the new style
+            new_style = open(new_style_dir).read()
+            new_style = new_style.replace("{ layer_name }", layer_name)
+            style_data = ujson.loads(new_style)
+
+            # Merge the sources of the original style with the new style into the
+            schema_sources = {
+                       "properties": {
+                           "sources": {
+                              "mergeStrategy": "append"
+                          }
                       }
-                  }
-               }
-        merger = Merger(schema_sources)
-        sources = merger.merge(style_data['sources'], original_style_data['sources'])
-        original_style_data['sources'] = sources
+                   }
+            merger = Merger(schema_sources)
+            sources = merger.merge(style_data['sources'], original_style_data['sources'])
+            original_style_data['sources'] = sources
 
-        # Add the layers of the new style into the original style
-        for i in range(len(style_data['layers'])):
-            original_style_data['layers'].append(style_data['layers'][i])
+            # Add the layers of the new style into the original style
+            for i in range(len(style_data['layers'])):
+                original_style_data['layers'].append(style_data['layers'][i])
 
-        # Clean the json file
-        original_style_data = repr(original_style_data).replace("True", "true")
-        remove_char = "'"
+            # Clean the json file
+            original_style_data = repr(original_style_data).replace("True", "true")
+            remove_char = "'"
 
-        for char in remove_char:
-            original_style_data = repr(original_style_data).replace(char,'"')
+            for char in remove_char:
+                original_style_data = repr(original_style_data).replace(char,'"')
 
-        # Create the new multiple style file
-        with open(multiple_style_dir, "w") as new_style_file:
-            new_style_file.write(original_style_data[1:-1])
+            # Create the new multiple style file
+            with open(multiple_style_dir, "w") as new_style_file:
+                new_style_file.write(original_style_data[1:-1])
 
-    ## QUERIE ##
+        ## QUERIE ##
 
-    # Create a new querie for the layer
-    if layer_name not in open(queries_dir).read():
-        # Load the new querie
-        new_queries = open(new_query_dir).read()
-        new_queries = new_queries.replace("{ layer_name }", layer_name)
-        new_queries = new_queries.replace("{ table_name }", table_name)
+        # Load the queries file
+        queries_yml_file = open(queries_dir).read()
+        queries_yml = yaml.load(queries_yml_file)
+        querie_exist = 0
 
-        # Load the old queries file
-        old_queries_file = open(queries_dir).read()
-        old_queries_yml = yaml.load(old_queries_file)
-        del old_queries_yml['srid']
+        # Check if the querie exist
+        for layer in queries_yml['layers']:
+            if layer['name'] == layer_name:
+                querie_exist = 1
 
-        # Create the queries file without the sird
-        with open(queries_dir, "w") as queries_file:
-            queries_file.write(yaml.dump(old_queries_yml))
+        # Create a new querie for the layer if not exist
+        if querie_exist == 0:
+            # Load the new querie
+            new_queries = open(new_query_dir).read()
+            new_queries = new_queries.replace("{ layer_name }", layer_name)
+            new_queries = new_queries.replace("{ table_name }", table_name)
 
-        # Add the querie into the queries.yml file
-        with open(queries_dir, "a+") as queries_file:
-            queries_file.write(new_queries)
+            # Load the old queries file
+            old_queries_file = open(queries_dir).read()
+            old_queries_yml = yaml.load(old_queries_file)
+            del old_queries_yml['srid']
 
-        # Load the file with the new querie in it
-        new_queries_file = open(queries_dir).read()
-        new_queries_yml = yaml.load(new_queries_file)
+            # Create the queries file without the sird
+            with open(queries_dir, "w") as queries_file:
+                queries_file.write(yaml.dump(old_queries_yml))
 
-        # Add the queries of the new queries file into the old one
-        old_queries_file_yml = yaml.load(old_queries_file)
-        old_queries_file_yml['layers'] = new_queries_yml['layers']
+            # Add the querie into the queries.yml file
+            with open(queries_dir, "a+") as queries_file:
+                queries_file.write(new_queries)
 
-        # Create the new queries file with the old and the new queries
-        with open(queries_dir, "w") as queries_file:
-            queries_file.write(yaml.dump(old_queries_file_yml))
-    
-    ## VARNISH 
-    conn = HTTPConnection(utilery_host + ':' + str(utilery_port)) 
-    conn.request("BAN", "/" + layer_name + "/")
-    resp = conn.getresponse()
+            # Load the file with the new querie in it
+            new_queries_file = open(queries_dir).read()
+            new_queries_yml = yaml.load(new_queries_file)
 
-    # Response
-    return HttpResponse(status=200)
+            # Add the queries of the new queries file into the old one
+            old_queries_file_yml = yaml.load(old_queries_file)
+            old_queries_file_yml['layers'] = new_queries_yml['layers']
+
+            # Create the new queries file with the old and the new queries
+            with open(queries_dir, "w") as queries_file:
+                queries_file.write(yaml.dump(old_queries_file_yml))
+        
+        ## VARNISH 
+        conn = HTTPConnection(utilery_host + ':' + str(utilery_port)) 
+        conn.request("BAN", "/" + layer_name + "/")
+        resp = conn.getresponse()
+
+        ## Utilery
+        os.system('/bin/systemctl restart utilery.service')
+
+        # Response if add was done
+        return HttpResponse(status=200)
+    else:
+        # Response if you try to add a layer from initial map
+        return HttpResponse(status=202)
 
 # Delete a layer from the database, his style and querie
 def delete_layer(request):
@@ -361,6 +391,9 @@ def delete_layer(request):
         conn = HTTPConnection(utilery_host + ':' + str(utilery_port)) 
         conn.request("BAN", "/" + layer_name + "/")
         resp = conn.getresponse()
+
+        ## Utilery
+        os.system('/bin/systemctl restart utilery.service')
 
         # Response if delete was done
         return HttpResponse(status=200)

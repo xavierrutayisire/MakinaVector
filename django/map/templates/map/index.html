@@ -46,6 +46,7 @@
             <hr>
             <form id="form_add_layer" action="/add-layer" method="POST">{% csrf_token %}
                 <p id="requireAddLayer">« You need to select a file. »</p>
+                <p class="requireLayer">« You can't add geometry on this layer. »</p>
                 <input type="text" name="layerNameAdd" id="layerNameAdd" class="input-text" placeholder="Layer name" required />
                 <input type="file" name="fileGeoJSON" id="fileGeoJSON" class="inputfile input-design" accept=".json, .geojson" required />
                 <label for="fileGeoJSON"><span>Choose a file with the geometry</label>
@@ -61,7 +62,7 @@
             <h2>Delete your layer</h2>
             <hr>
             <form id="form_delete_layer" action="/delete-layer" method="POST">{% csrf_token %}
-                <p id="requireDelLayer">« This layer dont exist or cant be deleted. »</p>
+                <p class="requireLayer">« This layer dont exist or cant be deleted. »</p>
                 <input type="text" name="layerNameDel" id="layerNameDel" class="input-text" placeholder="Layer name" required />
                 <input id="form_submit_input_del" class="tp-button input-design" type="submit" value="Envoyer" />
                 <label for="form_submit_input_del"><i class="fa fa-upload" aria-hidden="true"></i></label>

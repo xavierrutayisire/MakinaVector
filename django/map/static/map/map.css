@@ -316,7 +316,7 @@ body.has-active-menu {
     margin-right: 0.25em;
 }
 
-#myModalAddLayer #requireAddLayer, #myModalDelLayer #requireDelLayer {
+#myModalAddLayer #requireAddLayer, .requireLayer {
     margin-top: -15px;
     font-style: italic;
     display: none;
