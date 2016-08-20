@@ -77,6 +77,7 @@ database_port_database="5432"
 
 #  Update of the repositories and install of postgresql, postgis and osmosis
 apt-get update && \
+apt-get upgrade -y && \
 apt-get install -y postgresql-$postgresql_version_database postgresql-contrib-$postgresql_version_database \
 postgis postgresql-$postgresql_version_database-postgis-$postgis_version_database \
 osmosis wget unzip gdal-bin sqlite3
