@@ -79,10 +79,9 @@ database_port_imposm3="5432"
 apt-get update && \
 apt-get install -y postgresql-$postgresql_version_imposm3 postgresql-contrib-$postgresql_version_imposm3 \
 postgis postgresql-$postgresql_version_imposm3-postgis-$postgis_version_imposm3 \
-osmosis \
-wget unzip gdal-bin sqlite3
+osmosis wget unzip gdal-bin sqlite3
 
-#  Database creation
+##  Database creation
 
 # Check if user exist
 user_exist_imposm3=$(sudo -n -u postgres -s -- psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='$database_user_imposm3'")
@@ -135,15 +134,16 @@ if [ -d "$working_dir_imposm3/imposm3" ]; then
       esac
    done
 fi
+
 mkdir -p $working_dir_imposm3/imposm3/binary \
 	 $working_dir_imposm3/imposm3/cache \
 	 $working_dir_imposm3/imposm3/config \
 	 $working_dir_imposm3/imposm3/cron \
 	 $working_dir_imposm3/imposm3/import \
 	 $working_dir_imposm3/imposm3/osmosis \
-     $working_dir_imposm3/imposm3/import-external
+         $working_dir_imposm3/imposm3/import-external
 
-#  Install of imposm3
+#  Installation of imposm3
 wget -P $working_dir_imposm3/imposm3/binary $url_binary_imposm3
 tar -zxvf $working_dir_imposm3/imposm3/binary/$binary_tar_name_imposm3 -C $working_dir_imposm3/imposm3/binary
 mv $working_dir_imposm3/imposm3/binary/$binary_name_imposm3/* $working_dir_imposm3/imposm3/binary
