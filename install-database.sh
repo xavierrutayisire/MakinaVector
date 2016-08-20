@@ -38,7 +38,7 @@ url_binary_imposm3="http://imposm.org/static/rel/imposm3-0.2.0dev-20160517-3c271
 ####  END SETUP USER  ####
 
 
-# Verification
+#  Verification
 echo "
 The deployement will use this setup:
 
@@ -83,7 +83,7 @@ osmosis wget unzip gdal-bin sqlite3
 
 ##  Database creation
 
-# Check if user exist
+#  Check if user exist
 user_exist_imposm3=$(sudo -n -u postgres -s -- psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='$database_user_imposm3'")
 if [ "$user_exist_imposm3" = "1" ]; then
     while true; do
@@ -98,7 +98,7 @@ else
     sudo -n -u postgres -s -- psql -c "CREATE USER $database_user_imposm3 WITH PASSWORD '$database_user_password_imposm3';"
 fi
 
-# Check if database exist
+#  Check if database exist
 if sudo -n -u postgres -s -- psql -lqt | cut -d \| -f 1 | grep -qw $database_name_imposm3; then
     while true; do
      read -p "Database already exist, yes will remove everything from it, no will end the script. Y/N?" yn
@@ -123,7 +123,7 @@ fi
 #  Add extension postgis and hstore to the database
 sudo -n -u postgres -s -- psql -c "CREATE EXTENSION postgis; CREATE EXTENSION postgis_topology; CREATE EXTENSION hstore;" $database_name_imposm3
 
-#  Folders structure
+# Delete folder imposm3 if exist
 if [ -d "$working_dir_imposm3/imposm3" ]; then
  while true; do
    read -p "A imposm3 folder already exist in $working_dir_imposm3 directory, yes will delete imposm3 folder, no will end the script. Y/N?" yn
@@ -135,6 +135,7 @@ if [ -d "$working_dir_imposm3/imposm3" ]; then
    done
 fi
 
+#  Folders structure
 mkdir -p $working_dir_imposm3/imposm3/binary \
 	 $working_dir_imposm3/imposm3/cache \
 	 $working_dir_imposm3/imposm3/config \
