@@ -93,6 +93,9 @@ if [ -d "/etc/varnish/default.vcl" ]; then
   rm /etc/varnish/default.vcl
 fi
 
+# Creation of /etc/varnish folder if not exist
+mkdir -p /etc/varnish
+
 #  Creation of vcl varnish service
 cat > /etc/varnish/default.vcl << EOF1
 vcl 4.0;
