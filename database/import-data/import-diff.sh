@@ -32,15 +32,15 @@ cp $working_dir_imposm3/imposm3/osmosis/state.txt $working_dir_imposm3/imposm3/o
 imposm3 diff -config $working_dir_imposm3/imposm3/config/config.json $working_dir_imposm3/imposm3/osmosis/changes.osc.gz
 
 #  update minutly the PostGIS database
-cp ./database/import-data/majdb.sh $working_dir_imposm3/imposm3/cron
+cp ./database/import-data/update-database.sh $working_dir_imposm3/imposm3/cron
 
 #  Set execute permission on the script
-chmod +x $working_dir_imposm3/imposm3/cron/majdb.sh
+chmod +x $working_dir_imposm3/imposm3/cron/update-database.sh
 
 #  Add a cron job to execute the script every minute only if the cronjob doesn't exist
 crontab -l > $working_dir_imposm3/imposm3/cron/crontab.txt
 crontab_imposm3=$(cat $working_dir_imposm3/imposm3/cron/crontab.txt)
-patternToFind_imposm3="*/5 * * * * /usr/bin/flock -n /tmp/fcj.lockfile $working_dir_imposm3/imposm3/cron/majdb.sh $working_dir_imposm3 --minutely >> $working_dir_imposm3/imposm3/cron/update.log 2>&1"
+patternToFind_imposm3="*/5 * * * * /usr/bin/flock -n /tmp/fcj.lockfile $working_dir_imposm3/imposm3/cron/update-database.sh $working_dir_imposm3 --minutely >> $working_dir_imposm3/imposm3/cron/update.log 2>&1"
 if test "${crontab_imposm3#*$patternToFind_imposm3}" != "$crontab_imposm3"; then
 	echo "crontab job already exist:"
 	rm $working_dir_imposm3/imposm3/cron/update.log
