@@ -1,3 +1,4 @@
+-- Trigger for insert and update
 SELECT
     'CREATE TRIGGER '
     || tab_name|| '_' ||'trigger_I_U'
