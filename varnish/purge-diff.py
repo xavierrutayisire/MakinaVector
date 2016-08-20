@@ -43,7 +43,7 @@ for record in records:
         for x in range(west_south_tile.x, east_north_tile.x + 1):
             for y in range(east_north_tile.y, west_south_tile.y + 1):
                 tile_already_generate = 0
-                url = "/all/%s/%s/%s.pbf" % (zoom, x, y)
+                url = "http://%s:%s/all/%s/%s/%s.pbf" % (host, port, zoom, x, y)
                 for tile in tiles_generate:
                     if(tile == url):
                         tile_already_generate = 1
@@ -51,7 +51,7 @@ for record in records:
                 if(tile_already_generate == 0):
                     print(zoom, x, y)                 
                     tiles_generate.append(url)
-                    subprocess.Popen(['curl', 'PURGE', 'http://' + host + : port + url])
+                    subprocess.Popen(['curl', '-X', 'PURGE', url])
                     # To prevent stack overflow
                     if len(procs) > (cpu_count() * 4):
                         procs[0].wait()
