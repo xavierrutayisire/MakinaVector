@@ -5,6 +5,12 @@
 #  Directory where you want your varnish folder:
 working_dir_varnish="/srv/projects/vectortiles/project/osm-ireland"
 
+#  Directory where the utilery-virtualenv folder is:
+working_dir_varnish_virtualenv="/srv/projects/vectortiles/project/osm-ireland/utilery-virtualenv"
+
+#  Varnish host
+varnish_host_varnish="localhost"
+
 #  Varnish port
 varnish_port_varnish=6081
 
@@ -14,13 +20,43 @@ utilery_host_varnish="127.0.0.1"
 #  Utilery port
 utilery_port_varnish=3579
 
+#  Database user name
+database_user_varnish="imposm3_user_ir"
+
+#  Database user password
+database_user_password_varnish="makina"
+
+#  Database name
+database_name_varnish="imposm3_db_ir"
+
+#  Database host
+database_host_varnish="localhost"
+
+#  Min zoom tiles
+min_zoom_varnish=0
+
+#  Max zoom tiles
+max_zoom_varnish=14
+
 #### END SETUP USER ####
+
 
 #  Verification
 echo "
 The deployement will use this setup:
 
 Directory where the varnish folder will be created: $working_dir_varnish
+Directory where the utilery-virtualenv folder is: $working_dir_varnish_virtualenv
+Varnish host: $varnish_host_varnish
+Varnish port: $varnish_port_varnish
+Utilery host: $utilery_host_varnish
+Utilery port: $utilery_port_varnish
+Database user name: $database_user_varnish
+Database user password: $database_user_password_varnish
+Database name: $database_name_varnish
+Database host: $database_host_varnish
+Min zoom tiles: $min_zoom_varnish
+Max zoom tiles: $max_zoom_varnish
 
 "
 while true; do
@@ -129,7 +165,7 @@ LimitMEMLOCK=-l
 # Maximum size of the corefile.
 LimitCORE=infinity
 
-ExecStart=/usr/sbin/varnishd -a :$varnish_port_varnish -T localhost:6082 -f /etc/varnish/default.vcl -S /etc/varnish/secret -s "file,$working_dir_varnish/varnish/varnish_storage.bin,20G"
+ExecStart=/usr/sbin/varnishd -a :$varnish_port_varnish -T $varnish_host_varnish:6082 -f /etc/varnish/default.vcl -S /etc/varnish/secret -s "file,$working_dir_varnish/varnish/varnish_storage.bin,20G"
 ExecReload=/usr/share/varnish/reload-vcl
 
 [Install]
@@ -138,3 +174,64 @@ EOF1
 
 #  Reload systemctl
 systemctl daemon-reload
+
+#  Move the purge-diff.py script
+cp ./varnish/purge-diff.py $working_dir_varnish/varnish
+
+#  Create the purge-diff.sh script
+cat > $working_dir_varnish/varnish/purge-diff.sh << EOF1
+#!/bin/bash
+
+echo "### \$(date) "
+
+echo "### Tiles generation "
+
+$working_dir_varnish_virtualenv/bin/python3.5 $working_dir_varnish/varnish/purge-diff.py \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8
+EOF1
+
+#  Add a cron job to execute the purge-diff script every minute only if the cronjob doesn't exist
+crontab -l > $working_dir_varnish/varnish/crontab.txt
+crontab_diff=$(cat $working_dir_varnish/varnish/crontab.txt)
+patternToFind_diff="*/5 * * * * /usr/bin/flock -n /tmp/fcj.lockfile $working_dir_varnish/varnish/purge-diff.sh $database_user_varnish $database_user_password_varnish $database_name_varnish $database_host_varnish $min_zoom_varnish $max_zoom_varnish $varnish_host_varnish $varnish_port_varnish >> $working_dir_varnish/varnish/purge-diff.log 2>&1"
+if test "${crontab_diff#*$patternToFind_diff}" != "$crontab_diff"; then
+	echo "crontab job already exist:"
+    crontab -l
+else
+    crontab -l | { cat; echo "$patternToFind_diff"; } | crontab -
+	crontab -l
+fi
+rm $working_dir_varnish/varnish/crontab.txt
+
+#  Set execute permission on the script
+chmod +x $working_dir_varnish/varnish/purge-diff.sh
+
+#  Move the clean-diff.py script
+cp ./varnish/clean-diff.py $working_dir_varnish/varnish
+
+#  Create the clean-diff.sh script
+cat > $working_dir_varnish/varnish/clean-diff.sh << EOF1
+#!/bin/bash
+
+echo "### \$(date) "
+
+echo "### Clean all generated geometry "
+
+$working_dir_varnish_virtualenv/bin/python3.5 $working_dir_varnish/varnish/clean-diff.py \$1 \$2 \$3 \$4
+EOF1
+
+#  Add a cron job to execute the clean-diff script every minute only if the cronjob doesn't exist
+crontab -l > $working_dir_varnish/varnish/crontab.txt
+crontab_diff=$(cat $working_dir_varnish/varnish/crontab.txt)
+patternToFind_diff="0 0 * * * /usr/bin/flock -n /tmp/fcj.lockfile $working_dir_varnish/varnish/clean-diff.sh $database_user_varnish $database_user_password_varnish $database_name_varnish $database_host_varnish  >> $working_dir_varnish/varnish/clean-diff.log 2>&1"
+if test "${crontab_diff#*$patternToFind_diff}" != "$crontab_diff"; then
+	echo "crontab job already exist:"
+    crontab -l
+else
+    crontab -l | { cat; echo "$patternToFind_diff"; } | crontab -
+	crontab -l
+fi
+rm $working_dir_varnish/varnish/crontab.txt
+
+#  Set execute permission on the script
+chmod +x $working_dir_varnish/varnish/clean-diff.sh
+
