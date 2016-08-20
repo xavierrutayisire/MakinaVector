@@ -20,7 +20,7 @@ database_host_utilery="localhost"
 ####  END SETUP USER  ####
 
 
-# Verification
+#  Verification
 echo "
 The deployement will use this setup:
 
@@ -54,14 +54,11 @@ fi
 
 #### Configuration ####
 
-
-#  Update of the repositories and install of python, pip, virtualenv, virtualenvwrapper git and libpq-dev
+#  Update of the repositories and install of python, pip, virtualenv, virtualenvwrapper git libpq-dev and gdal
 apt-get update && \
-apt-get install -y python3.5 python3.5-dev python3-pip python-virtualenv virtualenvwrapper git libpq-dev gdal-bin nodejs npm
+apt-get install -y python3.5 python3.5-dev python3-pip python-virtualenv virtualenvwrapper git libpq-dev gdal-bin
 
-npm install http-server -g
-ln -s /usr/bin/nodejs /usr/bin/node
-
+# Creation of directory
 mkdir -p $working_dir_utilery
 
 #  Database port (default: 5432)
@@ -111,7 +108,7 @@ CLIP = True
 CORS = "*"
 EOF1
 
-# Import of the queries you wanna use
+#  Import of the queries you wanna use
 cp ./utilery/queries.yml $working_dir_utilery/utilery
 cp ./utilery/new-query.yml $working_dir_utilery/utilery
 
@@ -162,9 +159,10 @@ EOF1
 #  Set execute permission on the script
 chmod +x $working_dir_utilery/utilery/utilery-service.sh
 
+#  Reload systemctl
 systemctl daemon-reload
 
-# Add the UTILERY_SETTINGS into the environements variables
+#  Add the UTILERY_SETTINGS into the environements variables
 if grep -Fq "UTILERY_SETTINGS" /etc/environment
 then
     echo "UTILERY_SETTINGS ALREADY FOUND ! DELETING OLD ONE in /etc/environment"
