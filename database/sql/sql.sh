@@ -12,15 +12,6 @@ database_host_database="$5"
 
 database_port_database="$6"
 
-#  Password support
-cat > $working_dir_database/imposm3/sql/.pgpass << EOF1
-$database_host_database:$database_port_database:$database_name_database:$database_user_database:$database_user_password_database
-EOF1
-
-chmod 0600 $working_dir_database/imposm3/sql/.pgpass
-
-export PGPASSFILE=$working_dir_database/imposm3/sql/.pgpass
-
 #  Create functions
 sudo -n -u postgres -s -- psql $database_name_database -f ./database/sql/function.sql
 
@@ -49,5 +40,3 @@ head -n -2 ./database/sql/trigger-D-temp2.sql > ./database/sql/trigger-D.sql
 rm ./database/sql/trigger-D-temp2.sql
 sudo -n -u postgres -s -- psql $database_name_database -f ./database/sql/trigger-D.sql
 
-# Password support
-rm $working_dir_database/imposm3/sql/.pgpass
