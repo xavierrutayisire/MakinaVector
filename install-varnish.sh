@@ -82,7 +82,6 @@ fi
 
 #  Installation of varnish
 apt-get update && \
-apt-get upgrade && \
 apt-get install -y varnish
 
 #  Create varnish folder
