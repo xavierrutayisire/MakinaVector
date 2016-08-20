@@ -8,9 +8,6 @@ working_dir_diff="/srv/projects/vectortiles/project/osm-ireland"
 #  Directory where the utilery-virtualenv folder is:
 working_dir_diff_virtualenv="/srv/projects/vectortiles/project/osm-ireland/utilery-virtualenv"
 
-#  Directory where the tiles folder is:
-working_dir_diff_tiles="/srv/projects/vectortiles/project/osm-ireland/utilery/tiles"
-
 #  Database user name
 database_user_diff="imposm3_user_ir"
 
@@ -29,10 +26,10 @@ min_zoom_diff=0
 #  Max zoom tiles
 max_zoom_diff=14
 
-#  Utilery host
+#  Utilery host (by varnish)
 utilery_host_diff="localhost"
 
-#  Utilery port
+#  Utilery port (by varnish)
 utilery_host_diff="6081"
 
 ####  END SETUP USER  ####
