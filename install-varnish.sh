@@ -94,9 +94,6 @@ apt-get update && \
 apt-get upgrade -y && \
 apt-get install -y varnish
 
-# Creation of /etc/varnish folder if not exist
-mkdir -p /etc/varnish
-
 #  Creation of vcl varnish service
 cat > /etc/varnish/default.vcl << EOF1
 vcl 4.0;
