@@ -8,4 +8,6 @@ cursor = conn.cursor()
 
 # Request
 cursor.execute("DELETE FROM diff WHERE processed = true")
+
+# Save changes
 conn.commit()
