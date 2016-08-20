@@ -5,8 +5,14 @@
 #  Directory where you want your varnish folder:
 working_dir_varnish="/srv/projects/vectortiles/project/osm-ireland"
 
+#  Varnish port
+varnish_port_varnish=6081
+
 #  Utilery host
 utilery_host_varnish="127.0.0.1"
+
+#  Utilery port
+utilery_port_varnish=3579
 
 #### END SETUP USER ####
 
@@ -57,7 +63,7 @@ vcl 4.0;
 
 backend default {
     .host = "$utilery_host_varnish";
-    .port = "3579";
+    .port = "$utilery_port_varnish";
 }
 
 acl local {
@@ -123,7 +129,7 @@ LimitMEMLOCK=-l
 # Maximum size of the corefile.
 LimitCORE=infinity
 
-ExecStart=/usr/sbin/varnishd -a :6081 -T localhost:6082 -f /etc/varnish/default.vcl -S /etc/varnish/secret -s "file,$working_dir_varnish/varnish/varnish_storage.bin,20G"
+ExecStart=/usr/sbin/varnishd -a :$varnish_port_varnish -T localhost:6082 -f /etc/varnish/default.vcl -S /etc/varnish/secret -s "file,$working_dir_varnish/varnish/varnish_storage.bin,20G"
 ExecReload=/usr/share/varnish/reload-vcl
 
 [Install]
