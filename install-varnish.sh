@@ -80,11 +80,6 @@ if [ -d "$working_dir_varnish/varnish" ]; then
    done
 fi
 
-#  Installation of varnish
-apt-get update && \
-apt-get upgrade -y && \
-apt-get install -y varnish
-
 #  Create varnish folder
 mkdir $working_dir_varnish/varnish
 
@@ -92,6 +87,12 @@ mkdir $working_dir_varnish/varnish
 if [ -d "/etc/varnish/default.vcl" ]; then
   rm /etc/varnish/default.vcl
 fi
+
+#  Installation of varnish
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 60E7C096C4DEFFEB && \
+apt-get update && \
+apt-get upgrade -y && \
+apt-get install -y varnish
 
 # Creation of /etc/varnish folder if not exist
 mkdir -p /etc/varnish
