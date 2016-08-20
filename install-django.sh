@@ -39,22 +39,25 @@ if [ -d "$working_dir_django/composite" ]; then
    done
 fi
 
-$working_dir_django_virtualenv/bin/pip3 install Django
+# Installation 
+$working_dir_django_virtualenv/bin/pip3 install Django jsonmerge ujson
 
-$working_dir_django_virtualenv/bin/pip3 install jsonmerge ujson
-
+# Creation of a Django project named 'composite'
 cd $working_dir_django
 $working_dir_django_virtualenv/bin/django-admin startproject composite
 cd -
 
+# Creation of a Django application named 'map'
 cd $working_dir_django/composite
 $working_dir_django_virtualenv/bin/python manage.py startapp map
 cd -
 
+# Folder structure
 mkdir -p $working_dir_django/composite/map/templates/map \
          $working_dir_django/composite/map/static/map \
          $working_dir_django/composite/upload
 
+# Import repository files into the Django application 
 cp ./django/composite/urls.py $working_dir_django/composite/composite
 cp ./django/map/urls.py $working_dir_django/composite/map
 cp ./django/map/views.py $working_dir_django/composite/map
