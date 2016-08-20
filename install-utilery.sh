@@ -58,7 +58,7 @@ fi
 apt-get update && \
 apt-get install -y python3.5 python3.5-dev python3-pip python-virtualenv virtualenvwrapper git libpq-dev gdal-bin
 
-# Creation of directory
+#  Creation of directory
 mkdir -p $working_dir_utilery
 
 #  Database port (default: 5432)
