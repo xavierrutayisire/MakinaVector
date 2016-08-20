@@ -1,14 +1,8 @@
 #!/usr/bin/python
-import mercantile
-import psycopg2
-import sys
-import pprint
-import json
-import subprocess
 from multiprocessing import cpu_count
 from subprocess import Popen
-import os
 from http.client import HTTPConnection
+import mercantile, psycopg2, sys, ujson, subprocess
 
 # Database connection
 conn = psycopg2.connect(host=sys.argv[4], database=sys.argv[3], user=sys.argv[1], password=sys.argv[2])
@@ -25,7 +19,7 @@ for record in records:
     to_generate = conn.cursor()
     to_generate.execute("SELECT ST_AsGeoJSON(ST_Transform(geometry, 4326), 15, 1) as geojson FROM diff where id = %s" % (record[0]))
     point = to_generate.fetchall()
-    bbox = json.loads(point[0][0])
+    bbox = ujson.loads(point[0][0])
     
     # Zoom
     minzoom = int(sys.argv[5])
