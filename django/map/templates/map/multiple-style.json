@@ -23,7 +23,7 @@
 		"type": "line",
 		"source": "{{ dbname }}_building",
 		"source-layer": "building",
-        "minzoom": 15,
+        	"minzoom": 15,
 		"filter": ["==", "underground", "false"],
 		"layout": {},
 		"paint": {
@@ -43,16 +43,16 @@
 				]
 			}
 		},
-        "before": "tunnel-street-low"
+ 		"before": "tunnel-street-low"
 	}, {
 		"id": "building",
 		"type": "fill",
 		"source": "{{ dbname }}_building",
 		"source-layer": "building",
-        "minzoom": 15,
-        "filter": ["==", "underground", "false"],
+	        "minzoom": 15,
+	        "filter": ["==", "underground", "false"],
 		"layout": {},
-        "paint": {
+        	"paint": {
 			"fill-color": {
 				"base": 1,
 				"stops": [
@@ -69,7 +69,7 @@
 			},
 			"fill-outline-color": "hsl(35, 6%, 79%)"
 		},
-        "before": "tunnel-street-low"
+        	"before": "tunnel-street-low"
 	}, {
 		"id": "water-shadow",
 		"type": "fill",
@@ -88,13 +88,13 @@
 			"fill-translate-anchor": "viewport",
 			"fill-opacity": 1
 		},
-        "before": "barrier_line-land-polygon"
+        	"before": "barrier_line-land-polygon"
 	}, {
 		"id": "water",
 		"ref": "water-shadow",
 		"paint": {
 			"fill-color": "hsl(196, 80%, 70%)"
 		},
-        "before": "barrier_line-land-polygon"
+        	"before": "barrier_line-land-polygon"
 	}]
 }
