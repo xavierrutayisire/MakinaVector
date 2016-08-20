@@ -18,7 +18,7 @@ database_name_utilery="imposm3_db_ir"
 database_host_utilery="localhost"
 
 #  Utilery port
-database_host_utilery=3579
+utilery_port_utilery=3579
 
 ####  END SETUP USER  ####
 
@@ -32,6 +32,7 @@ Database user name: $database_user_utilery
 Database user password: $database_user_password_utilery
 Database name: $database_name_utilery
 Database host: $database_host_utilery
+Utilery port: $utilery_port_utilery
 
 "
 while true; do
@@ -81,7 +82,7 @@ from utilery.views import app
 from werkzeug.serving import run_simple
 from multiprocessing import cpu_count
 
-run_simple('0.0.0.0', $database_host_utilery, app, use_debugger=True, use_reloader=True, processes=cpu_count())
+run_simple('0.0.0.0', $utilery_port_utilery, app, use_debugger=True, use_reloader=True, processes=cpu_count())
 EOF1
 
 #  Change the database connexion
