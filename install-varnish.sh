@@ -5,11 +5,12 @@
 #  Directory where you want your varnish folder:
 working_dir_varnish="/srv/projects/vectortiles/project/osm-ireland"
 
+#  Utilery host
 utilery_host_varnish="127.0.0.1"
 
 #### END SETUP USER ####
 
-# Verification
+#  Verification
 echo "
 The deployement will use this setup:
 
@@ -25,7 +26,7 @@ while true; do
      esac
 done
 
-#  If vanrish folder already exist
+#  If varnish folder already exist
 if [ -d "$working_dir_varnish/varnish" ]; then
  while true; do
    read -p "Folder 'varnish' already exist in $working_dir_varnish directory, yes will delete varnish folder, no will end the script. Y/N?" yn
@@ -37,17 +38,20 @@ if [ -d "$working_dir_varnish/varnish" ]; then
    done
 fi
 
+#  Installation of varnish
 apt-get update && \
 apt-get upgrade && \
 apt-get install -y varnish
 
+#  Create varnish folder
 mkdir $working_dir_varnish/varnish
 
-#  If varnish service exist
+#  If vcl varnish service exist
 if [ -d "/etc/varnish/default.vcl" ]; then
   rm /etc/varnish/default.vcl
 fi
 
+#  Creation of vcl varnish service
 cat > /etc/varnish/default.vcl << EOF1
 vcl 4.0;
 
@@ -93,11 +97,12 @@ sub vcl_deliver {
 }
 EOF1
 
-#  If varnish service exist
+#  If systemd varnish service exist
 if [ -d "/etc/systemd/system/varnish.service" ]; then
   rm /etc/systemd/system/varnish.service
 fi
 
+#  Creation of systemd varnish service
 cat > /etc/systemd/system/varnish.service << EOF1
 [Unit]
 Description=Varnish Cache, a high-performance HTTP accelerator
@@ -125,4 +130,5 @@ ExecReload=/usr/share/varnish/reload-vcl
 WantedBy=multi-user.target
 EOF1
 
+#  Reload systemctl
 systemctl daemon-reload
