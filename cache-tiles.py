@@ -25,7 +25,7 @@ import os
 # Variable to prevent stack overflow
 procs = []
 
-# Cache the tiles in the delimited zone
+# Cache all tiles in the delimited zone
 for zoom in range(minzoom, maxzoom + 1):
 	west_south_tile = mercantile.tile(west, south, zoom)
 	east_north_tile = mercantile.tile(east, north, zoom)
