@@ -18,11 +18,9 @@ port = 6081
 
 # END SETUP USER
 
-import mercantile
-import subprocess
 from multiprocessing import cpu_count
 from subprocess import Popen 
-import os
+import mercantile, subprocess
 
 # Variable to prevent stack overflow
 procs = []
