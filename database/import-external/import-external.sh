@@ -12,7 +12,7 @@ database_host_imposm3="$5"
 
 database_port_imposm3="$6"
 
-# Password support
+#  Password support
 cat > $working_dir_imposm3/imposm3/import-external/.pgpass << EOF1
 $database_host_imposm3:$database_port_imposm3:$database_name_imposm3:$database_user_imposm3:$database_user_password_imposm3
 EOF1
@@ -253,5 +253,5 @@ import_labels() {
 
 import_labels
 
-# Password support 
+#  Password support 
 rm $working_dir_imposm3/imposm3/import-external/.pgpass
