@@ -11,7 +11,7 @@ import os
 from http.client import HTTPConnection
 
 # Database connection
-conn = psycopg2.connect(host=sys.argv[5], database=sys.argv[4], user=sys.argv[2], password=sys.argv[3])
+conn = psycopg2.connect(host=sys.argv[4], database=sys.argv[3], user=sys.argv[1], password=sys.argv[2])
 cursor = conn.cursor()
 
 # Request to get all the diff not processed 
@@ -28,8 +28,8 @@ for record in records:
     bbox = json.loads(point[0][0])
     
     # Zoom
-    minzoom = int(sys.argv[6])
-    maxzoom = int(sys.argv[7])
+    minzoom = int(sys.argv[5])
+    maxzoom = int(sys.argv[6])
     
     # Zone
     west = bbox["bbox"][0]
@@ -38,8 +38,8 @@ for record in records:
     north = bbox["bbox"][3]
     
     # Utilery host (by varnish)
-    host = sys.argv[8]
-    port = sys.argv[9]
+    host = sys.argv[7]
+    port = sys.argv[8]
     conn = HTTPConnection(host:port) 
     
     # Variable to prevent stack overflow
