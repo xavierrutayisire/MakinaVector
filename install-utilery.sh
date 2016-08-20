@@ -162,9 +162,6 @@ EOF1
 #  Set execute permission on the script
 chmod +x $working_dir_utilery/utilery/utilery-service.sh
 
-#  Reload systemctl
-systemctl daemon-reload
-
 #  Add the UTILERY_SETTINGS into the environements variables
 if grep -Fq "UTILERY_SETTINGS" /etc/environment
 then
@@ -175,3 +172,8 @@ else
     echo "UTILERY_SETTINGS=$working_dir_utilery/utilery/utilery/config/default.py" >> /etc/environment
 fi
 
+#  Reload systemctl
+systemctl daemon-reload
+
+#  Start utilery service
+systemctl start utilery.service
