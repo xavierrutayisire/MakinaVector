@@ -81,7 +81,7 @@ if [ -d "$working_dir_varnish/varnish" ]; then
 fi
 
 #  Create varnish folder
-mkdir $working_dir_varnish/varnish
+mkdir -p $working_dir_varnish/varnish
 
 #  If vcl varnish service exist
 if [ -d "/etc/varnish/default.vcl" ]; then
