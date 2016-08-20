@@ -15,7 +15,7 @@ django_port = 8080
 title_of_index = 'Map'
 
 # Mapbox
-mapboxAccessToken = 'pk.eyJ1IjoieGFxYXgiLCJhIjoiNm1xWjFPWSJ9.skMPG8gbuHxvqQ-9pAak4A'
+mapboxAccessToken = 'CHANGE-THIS-TOKEN'
 startingZoom = 14
 startingPosition = '[-6.3316, 53.3478]'
 
