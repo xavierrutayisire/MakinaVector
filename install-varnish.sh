@@ -192,6 +192,9 @@ echo "### Tiles generation "
 $working_dir_varnish_virtualenv/bin/python3.5 $working_dir_varnish/varnish/purge-diff.py \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8
 EOF1
 
+#  Set execute permission on the script
+chmod +x $working_dir_varnish/varnish/purge-diff.sh
+
 #  Add a cron job to execute the purge-diff script every minute only if the cronjob doesn't exist
 crontab -l > $working_dir_varnish/varnish/crontab.txt
 crontab_diff=$(cat $working_dir_varnish/varnish/crontab.txt)
@@ -204,9 +207,6 @@ else
 	crontab -l
 fi
 rm $working_dir_varnish/varnish/crontab.txt
-
-#  Set execute permission on the script
-chmod +x $working_dir_varnish/varnish/purge-diff.sh
 
 #  Move the clean-diff.py script
 cp ./varnish/clean-diff.py $working_dir_varnish/varnish
@@ -222,6 +222,9 @@ echo "### Clean all generated geometry "
 $working_dir_varnish_virtualenv/bin/python3.5 $working_dir_varnish/varnish/clean-diff.py \$1 \$2 \$3 \$4
 EOF1
 
+#  Set execute permission on the script
+chmod +x $working_dir_varnish/varnish/clean-diff.sh
+
 #  Add a cron job to execute the clean-diff script every minute only if the cronjob doesn't exist
 crontab -l > $working_dir_varnish/varnish/crontab.txt
 crontab_diff=$(cat $working_dir_varnish/varnish/crontab.txt)
@@ -234,7 +237,3 @@ else
 	crontab -l
 fi
 rm $working_dir_varnish/varnish/crontab.txt
-
-#  Set execute permission on the script
-chmod +x $working_dir_varnish/varnish/clean-diff.sh
-
