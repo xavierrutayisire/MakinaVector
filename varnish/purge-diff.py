@@ -1,7 +1,6 @@
 #!/usr/bin/python
 from multiprocessing import cpu_count
 from subprocess import Popen
-from http.client import HTTPConnection
 import mercantile, psycopg2, sys, ujson, subprocess
 
 # Database connection
@@ -34,7 +33,6 @@ for record in records:
     # Utilery host (by varnish)
     host = sys.argv[7]
     port = sys.argv[8]
-    conn = HTTPConnection(host:port) 
     
     # Variable to prevent stack overflow
     procs = []
@@ -53,7 +51,7 @@ for record in records:
                 if(tile_already_generate == 0):
                     print(zoom, x, y)                 
                     tiles_generate.append(url)
-                    procs.append(conn.request("PURGE", url))
+                    subprocess.Popen(['curl', 'PURGE', 'http://' + host + : port + url])
                     # To prevent stack overflow
                     if len(procs) > (cpu_count() * 4):
                         procs[0].wait()
