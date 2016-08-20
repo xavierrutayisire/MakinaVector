@@ -10,6 +10,7 @@ working_dir_django_virtualenv="/srv/projects/vectortiles/project/osm-ireland/uti
 
 ####  END SETUP USER  ####
 
+
 #  Verification
 echo "
 The deployement will use this setup:
