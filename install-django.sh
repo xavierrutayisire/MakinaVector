@@ -64,13 +64,3 @@ cp ./django/map/urls.py $working_dir_django/composite/map
 cp ./django/map/views.py $working_dir_django/composite/map
 cp ./django/map/static/map/* $working_dir_django/composite/map/static/map
 cp ./django/map/templates/map/* $working_dir_django/composite/map/templates/map
-
-
-
-
-
-
-
-
-
-
