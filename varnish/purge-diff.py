@@ -49,9 +49,8 @@ for record in records:
                         tile_already_generate = 1
                         break
                 if(tile_already_generate == 0):
-                    print(zoom, x, y)                 
                     tiles_generate.append(url)
-                    subprocess.Popen(['curl', '-X', 'PURGE', url])
+                    subprocess.Popen(['echo', url, ';', 'curl', 's', '-X', 'PURGE', url])
                     # To prevent stack overflow
                     if len(procs) > (cpu_count() * 4):
                         procs[0].wait()
