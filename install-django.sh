@@ -116,7 +116,7 @@ $style_dir_django='$working_dir_django/composite/map/templates/map/style.json'
 $multiple_style_dir_django='$working_dir_django/composite/map/templates/map/multiple-style.json'
 $new_style_dir_django='$working_dir_django/composite/map/templates/map/new-style.json'
 
-#  Add variables
+#  Add variables to settings.py file
 echo "
 # Map variables
 
