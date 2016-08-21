@@ -4,7 +4,7 @@ from django.http import HttpResponse
 import ujson
 
 # Get all the layer name
-def getlayersNames():
+def get_layers_Names():
     style_file = open(settings.STYLE_DIR).read()
     style_json = ujson.loads(style_file)
     list_item = []
@@ -46,7 +46,7 @@ def index(request):
     context['mapboxAccessToken'] = settings.MAPBOX_ACCESS_TOKEN
     context['startingZoom'] = settings.STARTING_ZOOM
     context['startingPosition'] = settings.STARTING_POSITION
-    context['list_item'] = getlayersNames()
+    context['list_item'] = get_layers_Names()
 
     # Load the template
     try:
