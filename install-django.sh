@@ -140,7 +140,7 @@ DATABASE_PASSWORD = '$database_password_django'
 UTILERY_HOST = '$utilery_host_django'
 UTILERY_PORT = $utilery_port_django
 
-# Directory
+# Directories
 QUERIES_DIR = '$queries_dir_django'
 NEW_QUERY_DIR = '$new_query_dir_django'
 STYLE_DIR = '$style_dir_django'
