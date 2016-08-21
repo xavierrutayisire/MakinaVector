@@ -92,7 +92,7 @@ fi
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 60E7C096C4DEFFEB && \
 apt-get update && \
 apt-get upgrade -y && \
-apt-get install -y varnish
+apt-get install -y varnish curl
 
 #  Creation of vcl varnish service
 cat > /etc/varnish/default.vcl << EOF1
