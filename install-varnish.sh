@@ -154,11 +154,11 @@ Description=Varnish Cache, a high-performance HTTP accelerator
 Type=forking
 
 # Maximum number of open files (for ulimit -n)
-LimitNOFILE="unlimited"
+LimitNOFILE=infinity
 
 # Locked shared memory (for ulimit -l)
 # Default log size is 82MB + header
-LimitMEMLOCK="unlimited"
+LimitMEMLOCK=infinity
 
 # On systemd >= 228 enable this to avoid "fork failed" on reload.
 #TasksMax=infinity
@@ -177,7 +177,7 @@ EOF1
 systemctl daemon-reload
 
 #  Lauch varnish service
-service varnish start
+systemctl start varnish.service
 
 #  Move the purge-diff.py script
 cp ./varnish/purge-diff.py $working_dir_varnish/varnish
