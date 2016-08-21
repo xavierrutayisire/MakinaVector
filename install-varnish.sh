@@ -154,11 +154,11 @@ Description=Varnish Cache, a high-performance HTTP accelerator
 Type=forking
 
 # Maximum number of open files (for ulimit -n)
-LimitNOFILE=-n
+LimitNOFILE="unlimited"
 
 # Locked shared memory (for ulimit -l)
 # Default log size is 82MB + header
-LimitMEMLOCK=-l
+LimitMEMLOCK="unlimited"
 
 # On systemd >= 228 enable this to avoid "fork failed" on reload.
 #TasksMax=infinity
