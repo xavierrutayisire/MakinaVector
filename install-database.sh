@@ -143,7 +143,8 @@ mkdir -p $working_dir_database/imposm3/binary \
 	 $working_dir_database/imposm3/cron \
 	 $working_dir_database/imposm3/import \
 	 $working_dir_database/imposm3/osmosis \
-         $working_dir_database/imposm3/import-external
+         $working_dir_database/imposm3/import-external \
+         $working_dir_database/imposm3/sql
 
 #  Installation of imposm3
 wget -P $working_dir_database/imposm3/binary $url_binary_database
