@@ -1,7 +1,5 @@
 #!/usr/bin/python
-from multiprocessing import cpu_count
-from subprocess import Popen
-import mercantile, psycopg2, sys, ujson, subprocess
+import mercantile, psycopg2, sys, ujson, os
 
 # Database connection
 conn = psycopg2.connect(host=sys.argv[4], database=sys.argv[3], user=sys.argv[1], password=sys.argv[2])
@@ -34,9 +32,6 @@ for record in records:
     host = sys.argv[7]
     port = sys.argv[8]
     
-    # Variable to prevent stack overflow
-    procs = []
-    
     for zoom in range(minzoom, maxzoom + 1):
         west_south_tile = mercantile.tile(west, south, zoom)
         east_north_tile = mercantile.tile(east, north, zoom)
@@ -49,13 +44,10 @@ for record in records:
                         tile_already_generate = 1
                         break
                 if(tile_already_generate == 0):
-                    print(zoom, x, y)                 
+                    print(zoom, x, y)
                     tiles_generate.append(url)
-                    subprocess.Popen(['curl', '-X', 'PURGE', url])
-                    # To prevent stack overflow
-                    if len(procs) > (cpu_count() * 4):
-                        procs[0].wait()
-                        procs.remove(procs[0])
+                    os.system('curl -s -X PURGE %s > /dev/null 2>&1' % (url))
+                    
     # Set the diff as processed
     update_diff = conn.cursor()
     update_diff.execute("UPDATE diff SET processed = true WHERE id = %s" % (record[0]))

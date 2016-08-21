@@ -80,18 +80,19 @@ if [ -d "$working_dir_varnish/varnish" ]; then
    done
 fi
 
-#  Installation of varnish
-apt-get update && \
-apt-get upgrade && \
-apt-get install -y varnish
-
 #  Create varnish folder
-mkdir $working_dir_varnish/varnish
+mkdir -p $working_dir_varnish/varnish
 
 #  If vcl varnish service exist
 if [ -d "/etc/varnish/default.vcl" ]; then
   rm /etc/varnish/default.vcl
 fi
+
+#  Installation of varnish
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 60E7C096C4DEFFEB && \
+apt-get update && \
+apt-get upgrade -y && \
+apt-get install -y varnish curl wget
 
 #  Creation of vcl varnish service
 cat > /etc/varnish/default.vcl << EOF1
@@ -153,11 +154,11 @@ Description=Varnish Cache, a high-performance HTTP accelerator
 Type=forking
 
 # Maximum number of open files (for ulimit -n)
-LimitNOFILE=-n
+LimitNOFILE=infinity
 
 # Locked shared memory (for ulimit -l)
 # Default log size is 82MB + header
-LimitMEMLOCK=-l
+LimitMEMLOCK=infinity
 
 # On systemd >= 228 enable this to avoid "fork failed" on reload.
 #TasksMax=infinity
@@ -176,7 +177,7 @@ EOF1
 systemctl daemon-reload
 
 #  Lauch varnish service
-service varnish start
+systemctl restart varnish.service
 
 #  Move the purge-diff.py script
 cp ./varnish/purge-diff.py $working_dir_varnish/varnish

@@ -60,6 +60,7 @@ fi
 
 #  Update of the repositories and install of python, pip, virtualenv, virtualenvwrapper git libpq-dev and gdal
 apt-get update && \
+apt-get upgrade -y && \
 apt-get install -y python3.5 python3.5-dev python3-pip python-virtualenv virtualenvwrapper git libpq-dev gdal-bin
 
 #  Creation of directory
