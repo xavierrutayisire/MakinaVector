@@ -92,6 +92,9 @@ cd $working_dir_django/composite
 $working_dir_virtualenv_django/bin/python manage.py startapp map
 cd -
 
+# Remove default views.py
+rm $working_dir_django/composite/map/views.py
+
 #  Folders structure
 mkdir -p $working_dir_django/composite/map/templates/map \
          $working_dir_django/composite/map/static/map \
