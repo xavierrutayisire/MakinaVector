@@ -25,18 +25,18 @@ sudo -n -u postgres -s -- psql $database_name_database -c "GRANT ALL PRIVILEGES 
 ##  Triggers to know the diffs
 
 #  Triggers for Import and Update
-sudo -n -u postgres -s -- psql $database_name_database -f ./database/sql/generate-trigger-I-U.sql > ./database/sql/trigger-I-U-temp.sql
-tail -n +3 ./database/sql/trigger-I-U-temp.sql > ./database/sql/trigger-I-U-temp2.sql
-rm ./database/sql/trigger-I-U-temp.sql
-head -n -2 ./database/sql/trigger-I-U-temp2.sql > ./database/sql/trigger-I-U.sql
-rm ./database/sql/trigger-I-U-temp2.sql
-sudo -n -u postgres -s -- psql $database_name_database -f ./database/sql/trigger-I-U.sql
+sudo -n -u postgres -s -- psql $database_name_database -f ./database/sql/generate-trigger-I-U.sql > $working_dir_database/imposm3/sql/trigger-I-U-temp.sql
+tail -n +3 $working_dir_database/imposm3/sql/trigger-I-U-temp.sql > $working_dir_database/imposm3/sql/trigger-I-U-temp2.sql
+rm $working_dir_database/imposm3/sql/trigger-I-U-temp.sql
+head -n -2 $working_dir_database/imposm3/sql/trigger-I-U-temp2.sql > $working_dir_database/imposm3/sql/trigger-I-U.sql
+rm $working_dir_database/imposm3/sql/trigger-I-U-temp2.sql
+sudo -n -u postgres -s -- psql $database_name_database -f $working_dir_database/imposm3/sql/trigger-I-U.sql
 
 # Triggers for Deleting
-sudo -n -u postgres -s -- psql $database_name_database -f ./database/sql/generate-trigger-D.sql > ./database/sql/trigger-D-temp.sql
-tail -n +3 ./database/sql/trigger-D-temp.sql > ./database/sql/trigger-D-temp2.sql
-rm ./database/sql/trigger-D-temp.sql
-head -n -2 ./database/sql/trigger-D-temp2.sql > ./database/sql/trigger-D.sql
-rm ./database/sql/trigger-D-temp2.sql
-sudo -n -u postgres -s -- psql $database_name_database -f ./database/sql/trigger-D.sql
+sudo -n -u postgres -s -- psql $database_name_database -f ./database/sql/generate-trigger-D.sql > $working_dir_database/imposm3/sql/trigger-D-temp.sql
+tail -n +3 $working_dir_database/imposm3/sql/trigger-D-temp.sql > $working_dir_database/imposm3/sql/trigger-D-temp2.sql
+rm $working_dir_database/imposm3/sql/trigger-D-temp.sql
+head -n -2 $working_dir_database/imposm3/sql/trigger-D-temp2.sql > $working_dir_database/imposm3/sql/trigger-D.sql
+rm $working_dir_database/imposm3/sql/trigger-D-temp2.sql
+sudo -n -u postgres -s -- psql $database_name_database -f $working_dir_database/imposm3/sql/trigger-D.sql
 
