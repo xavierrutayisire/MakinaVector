@@ -177,7 +177,7 @@ EOF1
 systemctl daemon-reload
 
 #  Lauch varnish service
-systemctl start varnish.service
+systemctl restart varnish.service
 
 #  Move the purge-diff.py script
 cp ./varnish/purge-diff.py $working_dir_varnish/varnish
