@@ -28,6 +28,8 @@ def add_layer_style(style_json, list_item):
             list_item.append(layer['source-layer'])
     except:
         pass
+    
+    return list_item
 
 
 def load_multiple_style():
