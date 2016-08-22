@@ -3,49 +3,49 @@
 ####  SETUP USER ####
 
 #  Directory where you want your composite project:
-working_dir_django="/srv/projects/vectortiles/project/osm-ireland"
+working_dir_django='/srv/projects/vectortiles/project/osm-ireland'
 
 #  Directory of utilery-virtualenv folder:
-working_dir_virtualenv_django="/srv/projects/vectortiles/project/osm-ireland/utilery-virtualenv"
+working_dir_virtualenv_django='/srv/projects/vectortiles/project/osm-ireland/utilery-virtualenv'
 
 #  Directory of utilery folder:
-working_dir_utilery_django="/srv/projects/vectortiles/project/osm-ireland/utilery"
+working_dir_utilery_django='/srv/projects/vectortiles/project/osm-ireland/utilery'
 
 # Django host
-$django_host_django='127.0.0.1'
+django_host_django='127.0.0.1'
 
 # Django port
-$django_port_django=8080
+django_port_django=8080
 
 # Title of the index page
-$title_index_django='Map'
+title_index_django='Map'
 
 # Mapxbox access token
-$mapbox_access_token_django='CHANGE-THIS-TOKEN'
+mapbox_access_token_django='CHANGE-THIS-TOKEN'
 
 # Mapxbox starting zoom
-$mapbox_starting_zoom_django=14
+mapbox_starting_zoom_django=14
 
 # Mapxbo starting position
-$mapbox_starting_position_django='[-6.3316, 53.3478]'
+mapbox_starting_position_django='[-6.3316, 53.3478]'
 
 # Database name
-$database_name_django='imposm3_db_ir'
+database_name_django='imposm3_db_ir'
 
-# Database hsot
-$database_host_django='127.0.0.1'
+# Database host
+database_host_django='127.0.0.1'
 
 # Database user
-$database_user_django='imposm3_user_ir'
+database_user_django='imposm3_user_ir'
 
 # Datanase password
-$database_password_django='makina'
+database_password_django='makina'
 
 # Utilery host (by varnish)
-$utilery_host_django='127.0.0.1'
+utilery_host_django='127.0.0.1'
 
 # Utilery port (by varnish)
-$utilery_port_django=6081
+utilery_port_django=6081
 
 ####  END SETUP USER  ####
 
@@ -56,6 +56,18 @@ The deployement will use this setup:
 
 Directory where composite project will be created: $working_dir_django
 Directory where the utilery-virtualenv folder is: $working_dir_virtualenv_django
+Django host: $django_host_django
+Django port: $django_port_django
+Title of the index page: title_index_django
+Mapxbox access token: $mapbox_access_token_django
+Mapxbox starting zoom: $mapbox_starting_zoom_django
+Mapxbo starting position: $mapbox_starting_position_django
+Database name: $database_name_django
+Database host: $database_host_django
+Database user: $database_user_django
+Datanase password: $database_password_django
+Utilery host (by varnish): $utilery_host_django
+Utilery port (by varnish): $utilery_port_django
 
 "
 while true; do
@@ -108,13 +120,16 @@ cp ./django/map/views/* $working_dir_django/composite/map/views
 cp ./django/map/static/map/* $working_dir_django/composite/map/static/map
 cp ./django/map/templates/map/* $working_dir_django/composite/map/templates/map
 
+# Add map application to INSTALLED_APPS in setttings.py file
+sed -i "/INSTALLED_APPS = /a  \    \'map'," $working_dir_django/composite/composite/settings.py 
+
 # Extra variables
-$upload_dir_django='upload/'
-$queries_dir_django='$working_dir_utilery_django/queries.yml'
-$new_query_dir_django='$working_dir_utilery_django/new_query.yml'
-$style_dir_django='$working_dir_django/composite/map/templates/map/style.json'
-$multiple_style_dir_django='$working_dir_django/composite/map/templates/map/multiple-style.json'
-$new_style_dir_django='$working_dir_django/composite/map/templates/map/new-style.json'
+upload_dir_django='upload/'
+queries_dir_django=$working_dir_utilery_django'/queries.yml'
+new_query_dir_django=$working_dir_utilery_django'/new_query.yml'
+style_dir_django=$working_dir_django'/composite/map/templates/map/style.json'
+multiple_style_dir_django=$working_dir_django'/composite/map/templates/map/multiple-style.json'
+new_style_dir_django=$working_dir_django'/composite/map/templates/map/new-style.json'
 
 #  Add variables to settings.py file
 echo "
