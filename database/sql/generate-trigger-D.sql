@@ -1,4 +1,4 @@
--- Trigger for deleting
+-- Trigger for delete
 SELECT
     'CREATE TRIGGER '
     || tab_name|| '_' ||'trigger_D'
