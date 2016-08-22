@@ -13,7 +13,7 @@ def database_connection():
 
 # Check if the table exist
 def check_table_exist(table_name, cursor):
-    cursor.execute("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE  table_schema = 'public' AND table_name = \'%s\')" % (table_name))
+    cursor.execute("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE  table_schema = 'public' AND table_name = \'{0}\')".format(table_name))
     table_exist = cursor.fetchall()
     table_exist = table_exist[0][0]
 
@@ -21,7 +21,7 @@ def check_table_exist(table_name, cursor):
 
 # Drop the table
 def drop_table(table_name, cursor, conn):
-    cursor.execute("DROP TABLE %s" % (table_name))
+    cursor.execute("DROP TABLE {0}".format(table_name))
     conn.commit()
 
 # Load the queries file

@@ -64,7 +64,7 @@ def database_connection():
 # Add the geometry into the database
 def add_geometry_database(table_name, geometry_data, cursor, conn):
     # Create table if not exist for the layer
-    cursor.execute("CREATE TABLE IF NOT EXISTS %s (id serial PRIMARY KEY, geometry geometry(Geometry,3857) NOT NULL, geometry_type varchar(40) NOT NULL)" % (table_name))
+    cursor.execute("CREATE TABLE IF NOT EXISTS {0} (id serial PRIMARY KEY, geometry geometry(Geometry,3857) NOT NULL, geometry_type varchar(40) NOT NULL)".format(table_name))
 
     # Add geometry and geometry type of the geojson into the database
     for feature in range(len(geometry_data['features'])):
@@ -78,9 +78,9 @@ def add_geometry_database(table_name, geometry_data, cursor, conn):
 
         # Add the geometry into the table if the geometry doesn't already exist
         cursor.execute(
-        'INSERT INTO %s(geometry, geometry_type)'
-        'SELECT ST_SetSRID(\'%s\'::geometry, 3857) as geometry, \'%s\' as geometry_type '
-        'WHERE NOT EXISTS (SELECT geometry FROM %s WHERE geometry = ST_SetSRID(\'%s\'::geometry, 3857))' % (table_name, geom, geometry_type, table_name, geom))
+        'INSERT INTO {0}(geometry, geometry_type)'
+        'SELECT ST_SetSRID(\'{1}\'::geometry, 3857) as geometry, \'{2}\' as geometry_type '
+        'WHERE NOT EXISTS (SELECT geometry FROM {0} WHERE geometry = ST_SetSRID(\'{1}\'::geometry, 3857))'.format(table_name, geom, geometry_type))
 
     # Save changes
     conn.commit()

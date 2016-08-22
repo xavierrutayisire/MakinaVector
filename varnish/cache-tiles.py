@@ -32,7 +32,7 @@ for zoom in range(minzoom, maxzoom + 1):
 	for x in range(west_south_tile.x, east_north_tile.x + 1):
 		for y in range(east_north_tile.y, west_south_tile.y + 1):
 			print(zoom, x, y)
-			url = "http://%s:%s/all/%s/%s/%s.pbf" % (host, port, zoom, x, y)
+			url = "http://{0}:{1}/all/{2}/{3}/{4}.pbf".format(host, port, zoom, x, y) 
 			procs.append(subprocess.Popen(['wget', '-q', url, '-O', '/dev/null']))
 			# To prevent stack overflow
 			if len(procs) > (cpu_count() * 4): 
