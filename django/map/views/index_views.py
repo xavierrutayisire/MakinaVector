@@ -10,7 +10,7 @@ def load_style():
     """
     style_file = open(settings.STYLE_DIR).read()
     style_json = ujson.loads(style_file)
-    
+
     return style_json
 
 
@@ -28,7 +28,7 @@ def add_layer_style(style_json, list_item):
             list_item.append(layer['source-layer'])
     except:
         pass
-    
+
     return list_item
 
 
@@ -38,10 +38,10 @@ def load_multiple_style():
     """
     multiple_style_file = open(settings.MULTIPLE_STYLE_DIR).read()
     multiple_style_json = ujson.loads(multiple_style_file)
-    
+
     return multiple_style_json
-    
-    
+
+
 def add_layer_multiple_style(multiple_style_json, list_item):
     """
     Add all the layers present in the multiple style file
@@ -56,7 +56,7 @@ def add_layer_multiple_style(multiple_style_json, list_item):
                 list_item.append(layer['source-layer'])
         except:
             pass
-    
+
     return list_item
 
 
@@ -65,16 +65,17 @@ def get_layers_Names():
     Get all the layers names
     """
     list_item = []
-    
+
     # Style
     style_json = load_style()
     list_item = add_layer_style(style_json, list_item)
-    
+
     # Multiple style
     multiple_style_json = load_multiple_style()
     list_item = add_layer_multiple_style(multiple_style_json, list_item)
-    
+
     return list_item
+
 
 def index(request):
     """
