@@ -4,41 +4,75 @@ from django.http import HttpResponse
 import ujson
 
 
-def get_layers_Names():
+def load_style():
     """
-    Get all the layer name
+    Load the style file
     """
     style_file = open(settings.STYLE_DIR).read()
     style_json = ujson.loads(style_file)
-    list_item = []
+    
+    return style_json
 
+
+def add_layer_style(style_json, list_item):
+    """
+    Add all the layers present in the style file
+    """
     for layer in style_json['layers']:
-        try:
-            layer_already_exist = 0
-            for context_layer in list_item:
-                if context_layer == layer['source-layer']:
-                    layer_already_exist = 1
-            if layer_already_exist == 0:
-                list_item.append(layer['source-layer'])
-        except:
-            pass
+    try:
+        layer_already_exist = False
+        for context_layer in list_item:
+            if context_layer == layer['source-layer']:
+                layer_already_exist = True
+        if layer_already_exist is False:
+            list_item.append(layer['source-layer'])
+    except:
+        pass
 
+
+def load_multiple_style():
+    """
+    Load the multiple style file
+    """
     multiple_style_file = open(settings.MULTIPLE_STYLE_DIR).read()
     multiple_style_json = ujson.loads(multiple_style_file)
-
+    
+    return multiple_style_json
+    
+    
+def add_layer_multiple_style(multiple_style_json, list_item):
+    """
+    Add all the layers present in the multiple style file
+    """
     for layer in multiple_style_json['layers']:
         try:
-            layer_already_exist = 0
+            layer_already_exist = False
             for context_layer in list_item:
                 if context_layer == layer['source-layer']:
-                    layer_already_exist = 1
-            if layer_already_exist == 0:
+                    layer_already_exist = True
+            if layer_already_exist is False:
                 list_item.append(layer['source-layer'])
         except:
             pass
-
+    
     return list_item
 
+
+def get_layers_Names():
+    """
+    Get all the layers names
+    """
+    list_item = []
+    
+    # Style
+    style_json = load_style()
+    list_item = add_layer_style(style_json, list_item)
+    
+    # Multiple style
+    multiple_style_json = load_multiple_style()
+    list_item = add_layer_multiple_style(multiple_style_json, list_item)
+    
+    return list_item
 
 def index(request):
     """
