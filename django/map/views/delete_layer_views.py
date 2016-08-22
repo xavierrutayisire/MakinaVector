@@ -1,8 +1,10 @@
 from django.conf import settings
-from django.template import loader, TemplateDoesNotExist
 from django.http import HttpResponse
 from http.client import HTTPConnection
-import psycopg2, ujson, yaml, os
+import psycopg2
+import ujson
+import yaml
+import os
 
 
 def database_connection():
@@ -48,11 +50,12 @@ def check_query_exist(layer_name, queries_yml):
     """
     Check if the query exist
     """
-    query_exist = 0
+    query_exist = False
 
     for layer in queries_yml['layers']:
         if layer['name'] == layer_name:
-            query_exist = 1
+            query_exist = True
+            break
 
     return query_exist
 
@@ -77,19 +80,21 @@ def load_multiple_style():
     multiple_style_json = ujson.loads(multiple_style_file)
 
     return multiple_style_json
- 
+
+
 def check_layer_exist_multiple_style(layer_name, multiple_style_json):
     """
     Check if the layer style exist in the multiple style file
     """
-    style_exist = 0
+    style_exist = False
 
     for layer in multiple_style_json['layers']:
         try:
-          if layer['source-layer'] == layer_name:
-              style_exist = 1
+            if layer['source-layer'] == layer_name:
+                style_exist = True
+                break
         except:
-          pass
+            pass
 
     return style_exist
 
@@ -102,11 +107,11 @@ def create_new_multiple_style(layer_name, multiple_style_json):
 
     for layer in multiple_style_json['layers']:
         try:
-          if layer['source-layer'] != layer_name:
-              new_multiple_style_layers.append(layer)
+            if layer['source-layer'] != layer_name:
+                new_multiple_style_layers.append(layer)
         except:
-          new_multiple_style_layers.append(layer)
-          pass
+            new_multiple_style_layers.append(layer)
+            pass
 
     multiple_style_json['layers'] = new_multiple_style_layers
 
@@ -129,9 +134,6 @@ def ban_varnish_tiles(layer_name):
     """
     connHTTP = HTTPConnection(settings.UTILERY_HOST + ':' + str(settings.UTILERY_PORT))
     connHTTP.request("BAN", "/" + layer_name + "/")
-    resp = connHTTP.getresponse()
-
-    return resp
 
 
 def delete_layer(request):
@@ -146,28 +148,28 @@ def delete_layer(request):
 
     # Database
     conn, cursor = database_connection()
-    table_exist = check_table_exist(table_name,cursor)
+    table_exist = check_table_exist(table_name, cursor)
 
     # Remove layer from database and delete his style and querie if table exist
-    if table_exist == True:
+    if table_exist:
         drop_table(table_name, cursor, conn)
 
         # Queries
         queries_yml = load_queries()
         query_exist = check_query_exist(layer_name, queries_yml)
 
-        if query_exist == 1:
+        if query_exist:
             remove_query(queries_yml, layer_name)
 
         # Style
         multiple_style_json = load_multiple_style()
         style_exist = check_layer_exist_multiple_style(layer_name, multiple_style_json)
 
-        if style_exist == 1:
+        if style_exist:
             create_new_multiple_style(layer_name, multiple_style_json)
 
         # Varnish
-        resp = ban_varnish_tiles(layer_name)
+        ban_varnish_tiles(layer_name)
 
         # Utilery
         os.system('/bin/systemctl restart utilery.service')

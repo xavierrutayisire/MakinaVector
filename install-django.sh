@@ -161,8 +161,7 @@ NEW_QUERY_DIR = '$new_query_dir_django'
 STYLE_DIR = '$style_dir_django'
 MULTIPLE_STYLE_DIR = '$multiple_style_dir_django'
 NEW_STYLE_DIR = '$new_style_dir_django'
-UPLOAD_DIR = '$upload_dir_django'
-" >> $working_dir_django/composite/composite/settings.py
+UPLOAD_DIR = '$upload_dir_django'" >> $working_dir_django/composite/composite/settings.py
 
 # Apply migrations
 $working_dir_virtualenv_django/bin/python manage.py migrate
