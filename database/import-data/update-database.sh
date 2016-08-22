@@ -4,36 +4,60 @@ working_dir_database="$1"
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$working_dir_database/imposm3/cron
 
-# Get the start time
-START=$(date +%s)
-
-#  Setup of the environment variable osmosis will use
+# Setup of the environment variable osmosis will use
 export working_osmosis_database=$working_dir_database/imposm3/osmosis
 
-echo "### $(date) "
+# Start time
+print_start_time() {
+    # Get the start time
+    START=$(date +%s)
 
-echo "### RECUPERATION "
+    echo "### $(date) "
+}
 
-# Update database will last changes
-osmosis --read-replication-interval workingDirectory=$working_osmosis_database --simplify-change --write-xml-change $working_dir_database/imposm3/osmosis/changes.osc.gz
+# Recuperation of changes
+recuperation() {
+    echo "### RECUPERATION "
 
-echo "### IMPORTATION "
+    # Update database will last changes
+    osmosis --read-replication-interval workingDirectory=$working_osmosis_database --simplify-change --write-xml-change $working_dir_database/imposm3/osmosis/changes.osc.gz
+}
 
-# Duplicate the state imposm3 will use
-rm $working_dir_database/imposm3/osmosis/changes.state.txt
-cp $working_dir_database/imposm3/osmosis/state.txt $working_dir_database/imposm3/osmosis/changes.state.txt
+# Importation of changes
+importation() {
+    echo "### IMPORTATION "
 
-# Import the update into the database
-imposm3 diff -config $working_dir_database/imposm3/config/config.json $working_dir_database/imposm3/osmosis/changes.osc.gz
+    # Duplicate the state imposm3 will use
+    rm $working_dir_database/imposm3/osmosis/changes.state.txt
+    cp $working_dir_database/imposm3/osmosis/state.txt $working_dir_database/imposm3/osmosis/changes.state.txt
 
-# Get the end time
-END=$(date +%s)
+    # Import the update into the database
+    imposm3 diff -config $working_dir_database/imposm3/config/config.json $working_dir_database/imposm3/osmosis/changes.osc.gz
+}
 
 # Calculate the total import time
-DIFF=$(( $END - $START ))
+time_import() {
+    # Get the end time
+    END=$(date +%s)
 
-echo "### Importation file: $(ls -l $working_dir_database/imposm3/osmosis/changes.osc.gz)"
+    # Calculate the total import time
+    DIFF=$(( $END - $START ))
+}
 
-echo "### Import took $DIFF secondes"
+# Print informations on importations
+print_info() {}
+    echo "### Importation file: $(ls -l $working_dir_database/imposm3/osmosis/changes.osc.gz)"
 
-echo "###"
+    echo "### Import took $DIFF secondes"
+
+    echo "###"
+}
+
+main() {
+    print_start_time
+    recuperation
+    importation
+    time_import
+    print_info
+}
+main

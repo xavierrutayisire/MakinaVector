@@ -1,101 +1,113 @@
 #!/bin/bash
 
-####  SETUP USER ####
+# SETUP USER
 
-#  Directory where you want your varnish folder:
+# Directory where you want your varnish folder:
 working_dir_varnish="/srv/projects/vectortiles/project/osm-ireland"
 
-#  Directory where the utilery-virtualenv folder is:
-working_dir_varnish_virtualenv="/srv/projects/vectortiles/project/osm-ireland/utilery-virtualenv"
-
-#  Varnish host
+# Varnish host
 varnish_host_varnish="localhost"
 
-#  Varnish port
+# Varnish port
 varnish_port_varnish=6081
 
-#  Utilery host
+# Utilery host
 utilery_host_varnish="127.0.0.1"
 
-#  Utilery port
+# Utilery port
 utilery_port_varnish=3579
 
-#  Database user name
+# Database user name
 database_user_varnish="imposm3_user_ir"
 
-#  Database user password
+# Database user password
 database_user_password_varnish="makina"
 
-#  Database name
+# Database name
 database_name_varnish="imposm3_db_ir"
 
-#  Database host
+# Database host
 database_host_varnish="localhost"
 
-#  Min zoom tiles
+# Min zoom tiles
 min_zoom_varnish=0
 
-#  Max zoom tiles
+# Max zoom tiles
 max_zoom_varnish=14
 
-#### END SETUP USER ####
+# END SETUP USER
 
 
-#  Verification
-echo "
-The deployement will use this setup:
+# Verification
+verif() {
+    echo "
+    The deployement will use this setup:
 
-Directory where the varnish folder will be created: $working_dir_varnish
-Directory where the utilery-virtualenv folder is: $working_dir_varnish_virtualenv
-Varnish host: $varnish_host_varnish
-Varnish port: $varnish_port_varnish
-Utilery host: $utilery_host_varnish
-Utilery port: $utilery_port_varnish
-Database user name: $database_user_varnish
-Database user password: $database_user_password_varnish
-Database name: $database_name_varnish
-Database host: $database_host_varnish
-Min zoom tiles: $min_zoom_varnish
-Max zoom tiles: $max_zoom_varnish
+    Directory where the varnish folder will be created: $working_dir_varnish
+    Varnish host: $varnish_host_varnish
+    Varnish port: $varnish_port_varnish
+    Utilery host: $utilery_host_varnish
+    Utilery port: $utilery_port_varnish
+    Database user name: $database_user_varnish
+    Database user password: $database_user_password_varnish
+    Database name: $database_name_varnish
+    Database host: $database_host_varnish
+    Min zoom tiles: $min_zoom_varnish
+    Max zoom tiles: $max_zoom_varnish
 
-"
-while true; do
-     read -p "Do you want to continue with this setup? [Y/N]" yn
-       case $yn in
-        [Yy]* ) break;;
-        [Nn]* ) exit;;
-        * ) echo "Please answer yes or no.";;
-     esac
-done
+    "
+    while true; do
+        read -p "Do you want to continue with this setup? [Y/N]" yn
+            case $yn in
+                [Yy]* ) break;;
+                [Nn]* ) exit;;
+                * ) echo "Please answer yes or no.";;
+        esac
+    done
+}
 
-#  If varnish folder already exist
-if [ -d "$working_dir_varnish/varnish" ]; then
- while true; do
-   read -p "Folder 'varnish' already exist in $working_dir_varnish directory, yes will delete varnish folder, no will end the script. Y/N?" yn
-      case $yn in
-        [Yy]* ) rm -rf  "$working_dir_varnish/varnish"; break;;
-        [Nn]* ) exit;;
-        * ) echo "Please answer yes or no.";;
-      esac
-   done
-fi
+# Delete varnish folder if already exist
+delete_varnish_folder() {
+    if [ -d "$working_dir_varnish/varnish" ]; then
+        while true; do
+            read -p "Folder 'varnish' already exist in $working_dir_varnish directory, yes will delete varnish folder, no will end the script. Y/N?" yn
+                case $yn in
+                [Yy]* ) rm -rf  "$working_dir_varnish/varnish"; break;;
+                [Nn]* ) exit;;
+                * ) echo "Please answer yes or no.";;
+            esac
+        done
+    fi
+}
 
-#  Create varnish folder
-mkdir -p $working_dir_varnish/varnish
+# Configuration
+config() {
+    # Update of the repositories and install of python curl and wget
+    apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y python3.5 python3.5-dev curl wget
 
-#  If vcl varnish service exist
-if [ -d "/etc/varnish/default.vcl" ]; then
-  rm /etc/varnish/default.vcl
-fi
+    #  Create varnish folder
+    mkdir -p $working_dir_varnish/varnish
+}
 
-#  Installation of varnish
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 60E7C096C4DEFFEB && \
-apt-get update && \
-apt-get upgrade -y && \
-apt-get install -y varnish curl wget
 
-#  Creation of vcl varnish service
-cat > /etc/varnish/default.vcl << EOF1
+# Delete vcl varnish service if exist
+delete_vcl_varnish_service() {
+    if [ -d "/etc/varnish/default.vcl" ]; then
+        rm /etc/varnish/default.vcl
+    fi
+}
+
+# Installation of varnish
+install_varnish() {
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 60E7C096C4DEFFEB && \
+    apt-get install -y varnish
+}
+
+# Creation of vcl varnish service
+create_vcl_varnish_service() {
+    cat > /etc/varnish/default.vcl << EOF1
 vcl 4.0;
 
 backend default {
@@ -139,14 +151,18 @@ sub vcl_deliver {
     }
 }
 EOF1
+}
 
-#  If systemd varnish service exist
-if [ -d "/etc/systemd/system/varnish.service" ]; then
-  rm /etc/systemd/system/varnish.service
-fi
+# Delete systemd varnish service if exist
+delete_systemd_varnish_service() {
+    if [ -d "/etc/systemd/system/varnish.service" ]; then
+        rm /etc/systemd/system/varnish.service
+    fi
+}
 
-#  Creation of systemd varnish service
-cat > /etc/systemd/system/varnish.service << EOF1
+# Creation of systemd varnish service
+create_systemd_varnish_service() {
+    cat > /etc/systemd/system/varnish.service << EOF1
 [Unit]
 Description=Varnish Cache, a high-performance HTTP accelerator
 
@@ -172,69 +188,96 @@ ExecReload=/usr/share/varnish/reload-vcl
 [Install]
 WantedBy=multi-user.target
 EOF1
+}
 
-#  Reload systemctl
-systemctl daemon-reload
+# Reload systemctl
+systemctl_reload() {
+    systemctl daemon-reload
+}
 
-#  Lauch varnish service
-systemctl restart varnish.service
+# Lauch varnish service
+restart_varnish_service() {
+    systemctl restart varnish.service
+}
 
-#  Move the purge-diff.py script
-cp ./varnish/purge-diff.py $working_dir_varnish/varnish
+# Purge diff script
+purge_diff() {
+    # Move the purge-diff.py script
+    cp ./varnish/purge-diff.py $working_dir_varnish/varnish
 
-#  Create the purge-diff.sh script
-cat > $working_dir_varnish/varnish/purge-diff.sh << EOF1
+    # Create the purge-diff.sh script
+    cat > $working_dir_varnish/varnish/purge-diff.sh << EOF1
 #!/bin/bash
 
 echo "### \$(date) "
 
 echo "### Tiles generation "
 
-$working_dir_varnish_virtualenv/bin/python3.5 $working_dir_varnish/varnish/purge-diff.py \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8
+/usr/bin/python3.5 $working_dir_varnish/varnish/purge-diff.py \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8
 EOF1
 
-#  Set execute permission on the script
-chmod +x $working_dir_varnish/varnish/purge-diff.sh
+    # Set execute permission on the script
+    chmod +x $working_dir_varnish/varnish/purge-diff.sh
 
-#  Add a cron job to execute the purge-diff script every minute only if the cronjob doesn't exist
-crontab -l > $working_dir_varnish/varnish/crontab.txt
-crontab_diff=$(cat $working_dir_varnish/varnish/crontab.txt)
-patternToFind_diff="*/5 * * * * /usr/bin/flock -n /tmp/fcj.lockfile $working_dir_varnish/varnish/purge-diff.sh $database_user_varnish $database_user_password_varnish $database_name_varnish $database_host_varnish $min_zoom_varnish $max_zoom_varnish $varnish_host_varnish $varnish_port_varnish >> $working_dir_varnish/varnish/purge-diff.log 2>&1"
-if test "${crontab_diff#*$patternToFind_diff}" != "$crontab_diff"; then
-	echo "crontab job already exist:"
-    crontab -l
-else
-    crontab -l | { cat; echo "$patternToFind_diff"; } | crontab -
-	crontab -l
-fi
-rm $working_dir_varnish/varnish/crontab.txt
+    # Add a cron job to execute the purge-diff script every minute only if the cronjob doesn't exist
+    crontab -l > $working_dir_varnish/varnish/crontab.txt
+    crontab_diff=$(cat $working_dir_varnish/varnish/crontab.txt)
+    patternToFind_diff="*/5 * * * * /usr/bin/flock -n /tmp/fcj.lockfile $working_dir_varnish/varnish/purge-diff.sh $database_user_varnish $database_user_password_varnish $database_name_varnish $database_host_varnish $min_zoom_varnish $max_zoom_varnish $varnish_host_varnish $varnish_port_varnish >> $working_dir_varnish/varnish/purge-diff.log 2>&1"
+    if test "${crontab_diff#*$patternToFind_diff}" != "$crontab_diff"; then
+    	echo "crontab job already exist:"
+        crontab -l
+    else
+        crontab -l | { cat; echo "$patternToFind_diff"; } | crontab -
+    	crontab -l
+    fi
+    rm $working_dir_varnish/varnish/crontab.txt
+}
 
-#  Move the clean-diff.py script
-cp ./varnish/clean-diff.py $working_dir_varnish/varnish
+# Clean diff script
+clean_diff() {
+    # Move the clean-diff.py script
+    cp ./varnish/clean-diff.py $working_dir_varnish/varnish
 
-#  Create the clean-diff.sh script
-cat > $working_dir_varnish/varnish/clean-diff.sh << EOF1
+    # Create the clean-diff.sh script
+    cat > $working_dir_varnish/varnish/clean-diff.sh << EOF1
 #!/bin/bash
 
 echo "### \$(date) "
 
 echo "### Clean all generated geometry "
 
-$working_dir_varnish_virtualenv/bin/python3.5 $working_dir_varnish/varnish/clean-diff.py \$1 \$2 \$3 \$4
+/usr/bin/python3.5 $working_dir_varnish/varnish/clean-diff.py \$1 \$2 \$3 \$4
 EOF1
 
-#  Set execute permission on the script
-chmod +x $working_dir_varnish/varnish/clean-diff.sh
+    # Set execute permission on the script
+    chmod +x $working_dir_varnish/varnish/clean-diff.sh
 
-#  Add a cron job to execute the clean-diff script every minute only if the cronjob doesn't exist
-crontab -l > $working_dir_varnish/varnish/crontab.txt
-crontab_diff=$(cat $working_dir_varnish/varnish/crontab.txt)
-patternToFind_diff="0 0 * * * /usr/bin/flock -n /tmp/fcj.lockfile $working_dir_varnish/varnish/clean-diff.sh $database_user_varnish $database_user_password_varnish $database_name_varnish $database_host_varnish  >> $working_dir_varnish/varnish/clean-diff.log 2>&1"
-if test "${crontab_diff#*$patternToFind_diff}" != "$crontab_diff"; then
-	echo "crontab job already exist:"
-    crontab -l
-else
-    crontab -l | { cat; echo "$patternToFind_diff"; } | crontab -
-	crontab -l
-fi
-rm $working_dir_varnish/varnish/crontab.txt
+    # Add a cron job to execute the clean-diff script every minute only if the cronjob doesn't exist
+    crontab -l > $working_dir_varnish/varnish/crontab.txt
+    crontab_diff=$(cat $working_dir_varnish/varnish/crontab.txt)
+    patternToFind_diff="0 0 * * * /usr/bin/flock -n /tmp/fcj.lockfile $working_dir_varnish/varnish/clean-diff.sh $database_user_varnish $database_user_password_varnish $database_name_varnish $database_host_varnish  >> $working_dir_varnish/varnish/clean-diff.log 2>&1"
+    if test "${crontab_diff#*$patternToFind_diff}" != "$crontab_diff"; then
+    	echo "crontab job already exist:"
+        crontab -l
+    else
+        crontab -l | { cat; echo "$patternToFind_diff"; } | crontab -
+    	crontab -l
+    fi
+    rm $working_dir_varnish/varnish/crontab.txt
+}
+
+main() {
+    verif
+    delete_varnish_folder
+    config
+    delete_vcl_varnish_service
+    install_varnish
+    create_vcl_varnish_service
+    delete_systemd_varnish_service
+    create_systemd_varnish_service
+    systemctl_reload
+    restart_varnish_service
+    purge_diff
+    clean_diff
+}
+main
