@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.template import loader, TemplateDoesNotExist
 from django.http import HttpResponse
 from http.client import HTTPConnection
@@ -11,7 +12,7 @@ def database_connection():
     return conn, cursor
 
 # Check if the table exist
-def table_exist(table_name):
+def check_table_exist(table_name, cursor):
     cursor.execute("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE  table_schema = 'public' AND table_name = \'%s\')" % (table_name))
     table_exist = cursor.fetchall()
     table_exist = table_exist[0][0]
@@ -19,7 +20,7 @@ def table_exist(table_name):
     return table_exist
 
 # Drop the table
-def drop_table(table_name):
+def drop_table(table_name, cursor, conn):
     cursor.execute("DROP TABLE %s" % (table_name))
     conn.commit()
 
@@ -31,7 +32,7 @@ def load_queries():
     return queries_yml
 
 # Check if the query exist
-def query_exist(layer_name, queries_yml):
+def check_query_exist(layer_name, queries_yml):
     query_exist = 0
 
     for layer in queries_yml['layers']:
@@ -57,7 +58,7 @@ def load_multiple_style():
     return multiple_style_json
 
 # Check if the layer style exist in the multiple style file
-def layer_exist_multiple_style(layer_name, multiple_style_json):
+def check_layer_exist_multiple_style(layer_name, multiple_style_json):
     style_exist = 0
 
     for layer in multiple_style_json['layers']:
@@ -97,9 +98,9 @@ def create_new_multiple_style(layer_name, multiple_style_json):
 
 # Ban all the tiles of this layer
 def ban_varnish_tiles(layer_name):
-    conn = HTTPConnection(settings.UTILERY_HOST + ':' + str(settings.UTILERY_PORT))
-    conn.request("BAN", "/" + layer_name + "/")
-    resp = conn.getresponse()
+    connHTTP = HTTPConnection(settings.UTILERY_HOST + ':' + str(settings.UTILERY_PORT))
+    connHTTP.request("BAN", "/" + layer_name + "/")
+    resp = connHTTP.getresponse()
 
     return resp
 
@@ -109,24 +110,24 @@ def delete_layer(request):
     layer_name = request.POST['layerNameDel']
 
     # Set the table name
-    table_name = 'custom_' + layer_name
+    table_name = 'extra_' + layer_name
 
     # Database connection
     conn, cursor = database_connection()
 
     # Check if the table exist
-    table_exist = table_exist(table_name)
+    table_exist = check_table_exist(table_name,cursor)
 
     # Remove layer from database and delete his style and querie if table exist
     if table_exist == True:
         # Drop the table
-        drop_table(table_name)
+        drop_table(table_name, cursor, conn)
 
         # Load the queries file
         queries_yml = load_queries()
 
         # Check if the query exist
-        query_exist = query_exist(layer_name, queries_yml)
+        query_exist = check_query_exist(layer_name, queries_yml)
 
         # If query exist
         if query_exist == 1:
@@ -137,7 +138,7 @@ def delete_layer(request):
         multiple_style_json = load_multiple_style()
 
         # Check if the layer style exist
-        style_exist = layer_exist_multiple_style(layer_name, multiple_style_json)
+        style_exist = check_layer_exist_multiple_style(layer_name, multiple_style_json)
 
         # If style exist
         if style_exist == 1:

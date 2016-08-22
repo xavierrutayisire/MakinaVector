@@ -126,7 +126,7 @@ sed -i "/INSTALLED_APPS = /a  \    \'map'," $working_dir_django/composite/compos
 # Extra variables
 upload_dir_django='upload/'
 queries_dir_django=$working_dir_utilery_django'/queries.yml'
-new_query_dir_django=$working_dir_utilery_django'/new_query.yml'
+new_query_dir_django=$working_dir_utilery_django'/new-query.yml'
 style_dir_django=$working_dir_django'/composite/map/templates/map/style.json'
 multiple_style_dir_django=$working_dir_django'/composite/map/templates/map/multiple-style.json'
 new_style_dir_django=$working_dir_django'/composite/map/templates/map/new-style.json'

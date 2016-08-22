@@ -35,7 +35,7 @@ def load_style():
     return style_data
 
 # Chek if layer exist in initial style
-def layer_exist_style(layer_name, style_data):
+def check_layer_exist_style(layer_name, style_data):
     layer_exist = 0
 
     for layer in style_data['layers']:
@@ -62,9 +62,7 @@ def database_connection():
     return conn, cursor
 
 # Add the geometry into the database
-def add_geometry_database(layer_name, geometry_data, cursor, conn):
-    table_name = 'custom_' + layer_name
-
+def add_geometry_database(table_name, geometry_data, cursor, conn):
     # Create table if not exist for the layer
     cursor.execute("CREATE TABLE IF NOT EXISTS %s (id serial PRIMARY KEY, geometry geometry(Geometry,3857) NOT NULL, geometry_type varchar(40) NOT NULL)" % (table_name))
 
@@ -95,7 +93,7 @@ def load_multiple_style():
     return multiple_style_data
 
 # Check if the style of this layer already exist in the multiple style file
-def layer_exist_multiple_style(layer_name, multiple_style_data):
+def check_layer_exist_multiple_style(layer_name, multiple_style_data):
     style_already_exist = 0
 
     # Check if style already exist for this layer
@@ -151,10 +149,10 @@ def load_queries():
     queries_yml_file = open(settings.QUERIES_DIR).read()
     queries_yml = yaml.load(queries_yml_file)
 
-    return queries_yml
+    return queries_yml, queries_yml_file
 
 # Check if the query of this layer exist in original queries files
-def query_exist(layer_name, queries_yml):
+def check_query_exist(layer_name, queries_yml):
     query_exist = 0
 
     # Check if the querie exist
@@ -165,18 +163,19 @@ def query_exist(layer_name, queries_yml):
     return query_exist
 
 # Load the new querie
-def load_new_query(layer_name):
+def load_new_query(layer_name, table_name):
     # Load the new query
     new_query = open(settings.NEW_QUERY_DIR).read()
-    new_query = new_queries.replace("{ layer_name }", layer_name)
-    new_query = new_queries.replace("{ table_name }", table_name)
+    new_query = new_query.replace("{ layer_name }", layer_name)
+    new_query = new_query.replace("{ table_name }", table_name)
 
     return new_query
 
 # Create the new queries with the new layer
-def create_new_queries(queries_yml, new_query):
+def create_new_queries(queries_yml, new_query, queries_yml_file):
     # Change the orginal queries file
-    old_queries_yml = del queries_yml['srid']
+    old_queries_yml = queries_yml
+    del old_queries_yml['srid']
 
     # Create the queries file without the sird
     with open(settings.QUERIES_DIR, "w") as queries_file:
@@ -191,7 +190,8 @@ def create_new_queries(queries_yml, new_query):
     new_queries_yml = yaml.load(new_queries_file)
 
     # Add the queries of the new queries file into the old one
-    old_queries_file_yml = queries_yml
+    queries_yml_old = yaml.load(queries_yml_file)
+    old_queries_file_yml = queries_yml_old
     old_queries_file_yml['layers'] = new_queries_yml['layers']
 
     # Create the new queries file with the old and the new query
@@ -200,9 +200,9 @@ def create_new_queries(queries_yml, new_query):
 
 # Ban all the tiles of this layer
 def ban_varnish_tiles(layer_name):
-    conn = HTTPConnection(settings.UTILERY_HOST + ':' + str(settings.UTILERY_PORT))
-    conn.request("BAN", "/" + layer_name + "/")
-    resp = conn.getresponse()
+    connHTTP = HTTPConnection(settings.UTILERY_HOST + ':' + str(settings.UTILERY_PORT))
+    connHTTP.request("BAN", "/" + layer_name + "/")
+    resp = connHTTP.getresponse()
 
     return resp
 
@@ -210,6 +210,9 @@ def ban_varnish_tiles(layer_name):
 def add_layer(request):
     # Get the layer_name from the form
     layer_name = request.POST['layerNameAdd']
+
+    # Set the table name of the layer
+    table_name = 'extra_' + layer_name
 
     # Get the geojson file
     file_geojson = request.FILES['fileGeoJSON']
@@ -221,7 +224,7 @@ def add_layer(request):
     style_data = load_style()
 
     # Chek if layer exist in initial style
-    layer_exist = layer_exist_style(layer_name, style_data)
+    layer_exist = check_layer_exist_style(layer_name, style_data)
 
     # Only if layer is not in initial map
     if layer_exist == 0:
@@ -232,13 +235,13 @@ def add_layer(request):
         conn, cursor = database_connection()
 
         # Add the geometry into the database
-        add_geometry_database(layer_name, geometry_data, cursor, conn)
+        add_geometry_database(table_name, geometry_data, cursor, conn)
 
         # Load the original multiple style file
         multiple_style_data = load_multiple_style()
 
         # Check if the style of this layer already exist in the multiple style file
-        style_already_exist = layer_exist_multiple_style(layer_name, multiple_style_data)
+        style_already_exist = check_layer_exist_multiple_style(layer_name, multiple_style_data)
 
         # if style not exist
         if style_already_exist == 0:
@@ -249,18 +252,18 @@ def add_layer(request):
             create_new_style(multiple_style_data, new_style_data)
 
         # Load the queries file
-        queries_yml = load_queries()
+        queries_yml, queries_yml_file = load_queries()
 
         # Check if the querie of this layer exist in  original queries files
-        query_exist = query_exist(layer_name, queries_yml)
+        query_exist = check_query_exist(layer_name, queries_yml)
 
         # if query not exist
-        if querie_exist == 0:
+        if query_exist == 0:
             # Load the new query
-            new_query = load_new_query(layer_name)
+            new_query = load_new_query(layer_name, table_name)
 
             # Create the new queries file with the new layer
-            create_new_queries(queries_yml, new_query)
+            create_new_queries(queries_yml, new_query, queries_yml_file)
 
         # Ban all the tiles of this layer
         resp = ban_varnish_tiles(layer_name)
