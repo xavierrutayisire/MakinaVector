@@ -2,7 +2,7 @@
 
 # SETUP USER
 
-# Directory where you want your composite project:
+# Directory where you want your django folder:
 WORKING_DIR_DJANGO='/srv/projects/vectortiles/project/osm-ireland'
 
 # Directory of utilery folder:
@@ -52,7 +52,7 @@ verif() {
     echo "
     The deployement will use this setup:
 
-    Directory where composite project will be created: $WORKING_DIR_DJANGO
+    Directory where django folder will be created: $WORKING_DIR_DJANGO
     Directory of utilery folder: $WORKING_DIR_UTILERY_DJANGO
     Django host: $DJANGO_HOST_DJANGO
     Django port: $DJANGO_PORT_DJANGO
@@ -80,11 +80,11 @@ verif() {
 
 # Delete composite if exist
 delete_composite_folder() {
-    if [ -d "$WORKING_DIR_DJANGO/composite" ]; then
+    if [ -d "$WORKING_DIR_DJANGO/django/composite" ]; then
         while true; do
             read -p "Project 'composite' already exist in $WORKING_DIR_DJANGO directory, yes will delete composite folder, no will end the script. Y/N?" yn
                 case $yn in
-                    [Yy]* ) rm -rf  "$WORKING_DIR_DJANGO/composite"; break;;
+                    [Yy]* ) rm -rf  "$WORKING_DIR_DJANGO/django/composite"; break;;
                     [Nn]* ) exit;;
                     * ) echo "Please answer yes or no.";;
             esac
@@ -98,6 +98,8 @@ config() {
     apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y python3.5 python3.5-dev python3-pip python-virtualenv virtualenvwrapper
+
+    mkdir -p $WORKING_DIR_DJANGO/django
 }
 
 # If django virtualenv already exist
@@ -121,41 +123,41 @@ install_django() {
 
 # Creation of a Django project named 'composite'
 create_django_project() {
-    cd $WORKING_DIR_DJANGO
+    cd $WORKING_DIR_DJANGO/django
     $WORKING_DIR_DJANGO/django-virtualenv/bin/django-admin startproject composite
     cd -
 }
 
 # Creation of a Django application named 'map'
 create_django_application() {
-    cd $WORKING_DIR_DJANGO/composite
+    cd $WORKING_DIR_DJANGO/django/composite
     $WORKING_DIR_DJANGO/django-virtualenv/bin/python manage.py startapp map
     cd -
 
     # Remove default views.py
-    rm $WORKING_DIR_DJANGO/composite/map/views.py
+    rm $WORKING_DIR_DJANGO/django/composite/map/views.py
 }
 
 # Folders structure
 folders_structure() {
-    mkdir -p $WORKING_DIR_DJANGO/composite/map/templates/map \
-             $WORKING_DIR_DJANGO/composite/map/static/map \
-             $WORKING_DIR_DJANGO/composite/map/views \
-             $WORKING_DIR_DJANGO/composite/upload
+    mkdir -p $WORKING_DIR_DJANGO/django/composite/map/templates/map \
+             $WORKING_DIR_DJANGO/django/composite/map/static/map \
+             $WORKING_DIR_DJANGO/django/composite/map/views \
+             $WORKING_DIR_DJANGO/django/composite/upload
 }
 
 # Import repository files into the Django application
 import_repository_files() {
-    cp ./django/composite/urls.py $WORKING_DIR_DJANGO/composite/composite
-    cp ./django/map/urls.py $WORKING_DIR_DJANGO/composite/map
-    cp ./django/map/views/* $WORKING_DIR_DJANGO/composite/map/views
-    cp ./django/map/static/map/* $WORKING_DIR_DJANGO/composite/map/static/map
-    cp ./django/map/templates/map/* $WORKING_DIR_DJANGO/composite/map/templates/map
+    cp ./django/composite/urls.py $WORKING_DIR_DJANGO/django/composite/composite
+    cp ./django/map/urls.py $WORKING_DIR_DJANGO/django/composite/map
+    cp ./django/map/views/* $WORKING_DIR_DJANGO/django/composite/map/views
+    cp ./django/map/static/map/* $WORKING_DIR_DJANGO/django/composite/map/static/map
+    cp ./django/map/templates/map/* $WORKING_DIR_DJANGO/django/composite/map/templates/map
 }
 
 # Add map application to INSTALLED_APPS in setttings.py file
 add_map_to_settings() {
-    sed -i "/INSTALLED_APPS = /a  \    \'map'," $WORKING_DIR_DJANGO/composite/composite/settings.py 
+    sed -i "/INSTALLED_APPS = /a  \    \'map'," $WORKING_DIR_DJANGO/django/composite/composite/settings.py 
 }
 
 # Extra variables
@@ -163,9 +165,9 @@ extra_variables() {
     UPLOAD_DIR_DJANGO='upload/'
     QUERIES_DIR_DJANGO=$WORKING_DIR_UTILERY_DJANGO'/queries.yml'
     NEW_QUERY_DIR_DJANGO=$WORKING_DIR_UTILERY_DJANGO'/new-query.yml'
-    STYLE_DIR_DJANGO=$WORKING_DIR_DJANGO'/composite/map/templates/map/style.json'
-    MULTIPLE_STYLE_DIR_DJANGO=$WORKING_DIR_DJANGO'/composite/map/templates/map/multiple-style.json'
-    NEW_STYLE_DIR_DJANGO=$WORKING_DIR_DJANGO'/composite/map/templates/map/new-style.json'
+    STYLE_DIR_DJANGO=$WORKING_DIR_DJANGO'/django/composite/map/templates/map/style.json'
+    MULTIPLE_STYLE_DIR_DJANGO=$WORKING_DIR_DJANGO'/django/composite/map/templates/map/multiple-style.json'
+    NEW_STYLE_DIR_DJANGO=$WORKING_DIR_DJANGO'/django/composite/map/templates/map/new-style.json'
 }
 
 # Add variables to settings.py file
@@ -199,12 +201,12 @@ NEW_QUERY_DIR = '$NEW_QUERY_DIR_DJANGO'
 STYLE_DIR = '$STYLE_DIR_DJANGO'
 MULTIPLE_STYLE_DIR = '$MULTIPLE_STYLE_DIR_DJANGO'
 NEW_STYLE_DIR = '$NEW_STYLE_DIR_DJANGO'
-UPLOAD_DIR = '$UPLOAD_DIR_DJANGO'" >> $WORKING_DIR_DJANGO/composite/composite/settings.py
+UPLOAD_DIR = '$UPLOAD_DIR_DJANGO'" >> $WORKING_DIR_DJANGO/django/composite/composite/settings.py
 }
 
 # Apply migrations
 apply_migrations() {
-    cd $WORKING_DIR_DJANGO/composite
+    cd $WORKING_DIR_DJANGO/django/composite
     $WORKING_DIR_DJANGO/django-virtualenv/bin/python manage.py migrate
     cd -
 }
