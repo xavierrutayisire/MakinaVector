@@ -232,7 +232,7 @@ echo "### \$(date) "
 
 echo "### Tiles generation "
 
-$WORKING_DIR_VARNISH/varnish-virtualenv/bin/python3.5 $WORKING_DIR_VARNISH/varnish/purge-diff.py \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8
+$WORKING_DIR_VARNISH/varnish-virtualenv/bin/python3.5 $WORKING_DIR_VARNISH/varnish/purge-diff.py \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8 >> $WORKING_DIR_VARNISH/varnish/purge-diff.log 2>&1
 EOF1
 
     # Set execute permission on the script
@@ -241,7 +241,7 @@ EOF1
     # Add a cron job to execute the purge-diff script every minute only if the cronjob doesn't exist
     crontab -l > $WORKING_DIR_VARNISH/varnish/crontab.txt
     crontab_diff=$(cat $WORKING_DIR_VARNISH/varnish/crontab.txt)
-    patternToFind_diff="*/5 * * * * /usr/bin/flock -n /tmp/fcj.lockfile $WORKING_DIR_VARNISH/varnish/purge-diff.sh $DATABASE_USER_VARNISH $DATABASE_USER_PASSWORD_VARNISH $DATABASE_NAME_VARNISH $DATABASE_HOST_VARNISH $MIN_ZOOM_VARNISH $MAX_ZOOM_VARNISH $VARNISH_HOST_VARNISH $VARNISH_PORT_VARNISH >> $WORKING_DIR_VARNISH/varnish/purge-diff.log 2>&1"
+    patternToFind_diff="*/5 * * * * /usr/bin/flock -n /tmp/fcj.lockfile $WORKING_DIR_VARNISH/varnish/purge-diff.sh $DATABASE_USER_VARNISH $DATABASE_USER_PASSWORD_VARNISH $DATABASE_NAME_VARNISH $DATABASE_HOST_VARNISH $MIN_ZOOM_VARNISH $MAX_ZOOM_VARNISH $VARNISH_HOST_VARNISH $VARNISH_PORT_VARNISH"
     if test "${crontab_diff#*$patternToFind_diff}" != "$crontab_diff"; then
     	echo "crontab job already exist:"
         crontab -l
@@ -265,7 +265,7 @@ echo "### \$(date) "
 
 echo "### Clean all generated geometry "
 
-$WORKING_DIR_VARNISH/varnish-virtualenv/bin/python3.5 $WORKING_DIR_VARNISH/varnish/clean-diff.py \$1 \$2 \$3 \$4
+$WORKING_DIR_VARNISH/varnish-virtualenv/bin/python3.5 $WORKING_DIR_VARNISH/varnish/clean-diff.py \$1 \$2 \$3 \$4   >> $WORKING_DIR_VARNISH/varnish/clean-diff.log 2>&1
 EOF1
 
     # Set execute permission on the script
@@ -274,7 +274,7 @@ EOF1
     # Add a cron job to execute the clean-diff script every minute only if the cronjob doesn't exist
     crontab -l > $WORKING_DIR_VARNISH/varnish/crontab.txt
     crontab_diff=$(cat $WORKING_DIR_VARNISH/varnish/crontab.txt)
-    patternToFind_diff="0 0 * * * /usr/bin/flock -n /tmp/fcj.lockfile $WORKING_DIR_VARNISH/varnish/clean-diff.sh $DATABASE_USER_VARNISH $DATABASE_USER_PASSWORD_VARNISH $DATABASE_NAME_VARNISH $DATABASE_HOST_VARNISH  >> $WORKING_DIR_VARNISH/varnish/clean-diff.log 2>&1"
+    patternToFind_diff="0 0 * * * /usr/bin/flock -n /tmp/fcj.lockfile $WORKING_DIR_VARNISH/varnish/clean-diff.sh $DATABASE_USER_VARNISH $DATABASE_USER_PASSWORD_VARNISH $DATABASE_NAME_VARNISH $DATABASE_HOST_VARNISH"
     if test "${crontab_diff#*$patternToFind_diff}" != "$crontab_diff"; then
     	echo "crontab job already exist:"
         crontab -l
