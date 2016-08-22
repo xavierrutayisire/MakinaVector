@@ -3,8 +3,11 @@ from django.template import loader, TemplateDoesNotExist
 from django.http import HttpResponse
 import ujson
 
-# Get all the layer name
+
 def get_layers_Names():
+    """
+    Get all the layer name
+    """
     style_file = open(settings.STYLE_DIR).read()
     style_json = ujson.loads(style_file)
     list_item = []
@@ -36,8 +39,11 @@ def get_layers_Names():
 
     return list_item
 
-# Render the index page
+
 def index(request):
+    """
+    Render the index page
+    """
     context = locals()
     context['django_host'] = settings.DJANGO_HOST
     context['django_port'] = settings.DJANGO_PORT

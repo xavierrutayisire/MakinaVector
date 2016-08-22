@@ -4,35 +4,50 @@ from django.http import HttpResponse
 from http.client import HTTPConnection
 import psycopg2, ujson, yaml, os
 
-# Database connection
+
 def database_connection():
+    """
+    Database connection
+    """
     conn = psycopg2.connect(host=settings.DATABASE_HOST, database=settings.DATABASE_NAME, user=settings.DATABASE_USER, password=settings.DATABASE_PASSWORD)
     cursor = conn.cursor()
 
     return conn, cursor
 
-# Check if the table exist
+
 def check_table_exist(table_name, cursor):
+    """
+    Check if the table exist
+    """
     cursor.execute("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE  table_schema = 'public' AND table_name = \'{0}\')".format(table_name))
     table_exist = cursor.fetchall()
     table_exist = table_exist[0][0]
 
     return table_exist
 
-# Drop the table
+
 def drop_table(table_name, cursor, conn):
+    """
+    Drop the table
+    """
     cursor.execute("DROP TABLE {0}".format(table_name))
     conn.commit()
 
-# Load the queries file
+
 def load_queries():
+    """
+    Load the queries file
+    """
     queries_yml_file = open(settings.QUERIES_DIR).read()
     queries_yml = yaml.load(queries_yml_file)
 
     return queries_yml
 
-# Check if the query exist
+
 def check_query_exist(layer_name, queries_yml):
+    """
+    Check if the query exist
+    """
     query_exist = 0
 
     for layer in queries_yml['layers']:
@@ -41,8 +56,11 @@ def check_query_exist(layer_name, queries_yml):
 
     return query_exist
 
-# Remove query
+
 def remove_query(queries_yml, layer_name):
+    """
+    Remove query
+    """
     new_layers = [layer for layer in queries_yml['layers'] if layer['name'] != layer_name]
     queries_yml['layers'] = new_layers
 
@@ -50,15 +68,20 @@ def remove_query(queries_yml, layer_name):
     with open(settings.QUERIES_DIR, "w") as new_queries_file:
         new_queries_file.write(yaml.dump((queries_yml)))
 
-# Load the multiple style file
+
 def load_multiple_style():
+    """
+    Load the multiple style file
+    """
     multiple_style_file = open(settings.MULTIPLE_STYLE_DIR).read()
     multiple_style_json = ujson.loads(multiple_style_file)
 
     return multiple_style_json
-
-# Check if the layer style exist in the multiple style file
+ 
 def check_layer_exist_multiple_style(layer_name, multiple_style_json):
+    """
+    Check if the layer style exist in the multiple style file
+    """
     style_exist = 0
 
     for layer in multiple_style_json['layers']:
@@ -70,8 +93,11 @@ def check_layer_exist_multiple_style(layer_name, multiple_style_json):
 
     return style_exist
 
-# Remove the layers of the multiple style file
+
 def create_new_multiple_style(layer_name, multiple_style_json):
+    """
+    Remove the layers of the multiple style file
+    """
     new_multiple_style_layers = []
 
     for layer in multiple_style_json['layers']:
@@ -96,59 +122,54 @@ def create_new_multiple_style(layer_name, multiple_style_json):
     with open(settings.MULTIPLE_STYLE_DIR, "w") as new_multiple_style_file:
         new_multiple_style_file.write(multiple_style_json[1:-1])
 
-# Ban all the tiles of this layer
+
 def ban_varnish_tiles(layer_name):
+    """
+    Ban all the tiles of this layer
+    """
     connHTTP = HTTPConnection(settings.UTILERY_HOST + ':' + str(settings.UTILERY_PORT))
     connHTTP.request("BAN", "/" + layer_name + "/")
     resp = connHTTP.getresponse()
 
     return resp
 
-# Delete a layer from the database, his style and querie
+
 def delete_layer(request):
+    """
+    Delete a layer from the database, his style and querie
+    """
     # Get the layer name
     layer_name = request.POST['layerNameDel']
 
     # Set the table name
     table_name = 'extra_' + layer_name
 
-    # Database connection
+    # Database
     conn, cursor = database_connection()
-
-    # Check if the table exist
     table_exist = check_table_exist(table_name,cursor)
 
     # Remove layer from database and delete his style and querie if table exist
     if table_exist == True:
-        # Drop the table
         drop_table(table_name, cursor, conn)
 
-        # Load the queries file
+        # Queries
         queries_yml = load_queries()
-
-        # Check if the query exist
         query_exist = check_query_exist(layer_name, queries_yml)
 
-        # If query exist
         if query_exist == 1:
-            # Remove query
             remove_query(queries_yml, layer_name)
 
-        # Load the multiple style file
+        # Style
         multiple_style_json = load_multiple_style()
-
-        # Check if the layer style exist
         style_exist = check_layer_exist_multiple_style(layer_name, multiple_style_json)
 
-        # If style exist
         if style_exist == 1:
-            # Remove the layers of the multiple style file
             create_new_multiple_style(layer_name, multiple_style_json)
 
-        # Ban all the tiles of this layer
+        # Varnish
         resp = ban_varnish_tiles(layer_name)
 
-        # Restart utilery to load the change of the queries file
+        # Utilery
         os.system('/bin/systemctl restart utilery.service')
 
         # Response if delete was done

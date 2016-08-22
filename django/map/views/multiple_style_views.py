@@ -2,8 +2,11 @@ from django.conf import settings
 from django.template import loader, TemplateDoesNotExist
 from django.http import HttpResponse
 
-# Return the multiple style file
+
 def multiple_style(request):
+    """
+    Return the multiple style file
+    """
     context = locals()
     context['dbname'] = settings.DATABASE_NAME
     context['utilery_host'] = settings.UTILERY_HOST

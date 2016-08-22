@@ -2,8 +2,11 @@ from django.conf import settings
 from django.template import loader, TemplateDoesNotExist
 from django.http import HttpResponse
 
-# Return the style file
+
 def style(request):
+    """
+    Return the style file
+    """
     context = locals()
     context['utilery_host'] = settings.UTILERY_HOST
     context['utilery_port'] = settings.UTILERY_PORT

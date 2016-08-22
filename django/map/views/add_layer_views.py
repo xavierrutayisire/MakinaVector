@@ -6,8 +6,11 @@ from http.client import HTTPConnection
 from jsonmerge import Merger
 import psycopg2, ujson, yaml, os
 
-# Save geoJSON file
+
 def save_geoJSON(file_geojson, layer_name):
+    """
+    Save geoJSON file
+    """
     path_geojson = settings.UPLOAD_DIR + 'geojson-' + layer_name + '-0.json'
     nb_file = 0
 
@@ -27,15 +30,21 @@ def save_geoJSON(file_geojson, layer_name):
 
     return path_geojson
 
-# Load the original style file
+
 def load_style():
+    """
+    Load the original style file
+    """
     style_file = open(settings.STYLE_DIR).read()
     style_data = ujson.loads(style_file)
 
     return style_data
 
-# Chek if layer exist in initial style
+
 def check_layer_exist_style(layer_name, style_data):
+    """
+    Chek if layer exist in initial style
+    """
     layer_exist = 0
 
     for layer in style_data['layers']:
@@ -47,22 +56,31 @@ def check_layer_exist_style(layer_name, style_data):
 
     return layer_exist
 
-# Decode geojson file
+
 def decode_geoJSON(path_geojson):
+    """
+    Decode geojson file
+    """
     with open(path_geojson) as file_stream:
         geometry_data = ujson.load(file_stream)
 
     return geometry_data
 
-# Database connection
+
 def database_connection():
+    """
+    Database connection
+    """
     conn = psycopg2.connect(host=settings.DATABASE_HOST, database=settings.DATABASE_NAME, user=settings.DATABASE_USER, password=settings.DATABASE_PASSWORD)
     cursor = conn.cursor()
 
     return conn, cursor
 
-# Add the geometry into the database
+
 def add_geometry_database(table_name, geometry_data, cursor, conn):
+    """
+    Add the geometry into the database
+    """
     # Create table if not exist for the layer
     cursor.execute("CREATE TABLE IF NOT EXISTS {0} (id serial PRIMARY KEY, geometry geometry(Geometry,3857) NOT NULL, geometry_type varchar(40) NOT NULL)".format(table_name))
 
@@ -85,15 +103,21 @@ def add_geometry_database(table_name, geometry_data, cursor, conn):
     # Save changes
     conn.commit()
 
-# Load the original multiple style file
+
 def load_multiple_style():
+    """
+    Load the original multiple style file
+    """
     multiple_style_json_data = open(settings.MULTIPLE_STYLE_DIR).read()
     multiple_style_data = ujson.loads(multiple_style_json_data)
 
     return multiple_style_data
 
-# Check if the style of this layer already exist in the multiple style file
+
 def check_layer_exist_multiple_style(layer_name, multiple_style_data):
+    """
+    Check if the style of this layer already exist in the multiple style file
+    """
     style_already_exist = 0
 
     # Check if style already exist for this layer
@@ -107,16 +131,22 @@ def check_layer_exist_multiple_style(layer_name, multiple_style_data):
 
     return style_already_exist
 
-# Load the new style file
+
 def load_new_style(layer_name):
+    """
+    Load the new style file
+    """
     new_style = open(settings.NEW_STYLE_DIR).read()
     new_style = new_style.replace("{ layer_name }", layer_name)
     new_style_data = ujson.loads(new_style)
 
     return new_style_data
 
-# Create the new style with the new layer
+
 def create_new_style(multiple_style_data, new_style_data):
+    """
+    Create the new style with the new layer
+    """
     # Merge the sources of the original style with the new style into the
     schema_sources = {
                "properties": {
@@ -144,15 +174,21 @@ def create_new_style(multiple_style_data, new_style_data):
     with open(settings.MULTIPLE_STYLE_DIR, "w") as new_style_file:
         new_style_file.write(multiple_style_data[1:-1])
 
-# Load the queries file
+
 def load_queries():
+    """
+    Load the queries file
+    """
     queries_yml_file = open(settings.QUERIES_DIR).read()
     queries_yml = yaml.load(queries_yml_file)
 
     return queries_yml, queries_yml_file
 
-# Check if the query of this layer exist in original queries files
+
 def check_query_exist(layer_name, queries_yml):
+    """
+    Check if the query of this layer exist in original queries files
+    """
     query_exist = 0
 
     # Check if the querie exist
@@ -162,17 +198,22 @@ def check_query_exist(layer_name, queries_yml):
 
     return query_exist
 
-# Load the new querie
+
 def load_new_query(layer_name, table_name):
-    # Load the new query
+    """
+    Load the new query
+    """
     new_query = open(settings.NEW_QUERY_DIR).read()
     new_query = new_query.replace("{ layer_name }", layer_name)
     new_query = new_query.replace("{ table_name }", table_name)
 
     return new_query
 
-# Create the new queries with the new layer
+ 
 def create_new_queries(queries_yml, new_query, queries_yml_file):
+    """
+    Create the new queries with the new layer
+    """
     # Change the orginal queries file
     old_queries_yml = queries_yml
     del old_queries_yml['srid']
@@ -198,77 +239,65 @@ def create_new_queries(queries_yml, new_query, queries_yml_file):
     with open(settings.QUERIES_DIR, "w") as queries_file:
         queries_file.write(yaml.dump(old_queries_file_yml))
 
-# Ban all the tiles of this layer
+
 def ban_varnish_tiles(layer_name):
+    """
+    Ban all the tiles of this layer
+    """
     connHTTP = HTTPConnection(settings.UTILERY_HOST + ':' + str(settings.UTILERY_PORT))
     connHTTP.request("BAN", "/" + layer_name + "/")
     resp = connHTTP.getresponse()
 
     return resp
 
-# Add a layer into the database, create a new style and querie
+
 def add_layer(request):
+    """
+    Add a layer into the database, create a new style and querie
+    """
     # Get the layer_name from the form
     layer_name = request.POST['layerNameAdd']
 
     # Set the table name of the layer
     table_name = 'extra_' + layer_name
 
-    # Get the geojson file
+    # geoJSON
     file_geojson = request.FILES['fileGeoJSON']
-
-    # Save geoJSON file
     path_geojson = save_geoJSON(file_geojson, layer_name)
 
-    # Load the original style file
+    # Style
     style_data = load_style()
-
-    # Chek if layer exist in initial style
     layer_exist = check_layer_exist_style(layer_name, style_data)
 
-    # Only if layer is not in initial map
     if layer_exist == 0:
-        # Decode geojson file
         geometry_data = decode_geoJSON(path_geojson)
 
-        # Database connection
+        # Database
         conn, cursor = database_connection()
-
-        # Add the geometry into the database
         add_geometry_database(table_name, geometry_data, cursor, conn)
 
-        # Load the original multiple style file
+        # Multiple style
         multiple_style_data = load_multiple_style()
-
-        # Check if the style of this layer already exist in the multiple style file
         style_already_exist = check_layer_exist_multiple_style(layer_name, multiple_style_data)
 
-        # if style not exist
         if style_already_exist == 0:
-            # Load the new style file
+            # New style
             new_style_data = load_new_style(layer_name)
-
-            # Create the new style file with the new layer
             create_new_style(multiple_style_data, new_style_data)
 
-        # Load the queries file
+        # Queries
         queries_yml, queries_yml_file = load_queries()
-
-        # Check if the querie of this layer exist in  original queries files
         query_exist = check_query_exist(layer_name, queries_yml)
 
-        # if query not exist
         if query_exist == 0:
-            # Load the new query
+            # New query
             new_query = load_new_query(layer_name, table_name)
-
-            # Create the new queries file with the new layer
             create_new_queries(queries_yml, new_query, queries_yml_file)
 
-        # Ban all the tiles of this layer
+        # Varnish
         resp = ban_varnish_tiles(layer_name)
 
-        # Restart utilery to load the change of the queries file
+        # Utilery
         os.system('/bin/systemctl restart utilery.service')
 
         # Response if add was done
