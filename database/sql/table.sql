@@ -96,10 +96,6 @@ SELECT UpdateGeometrySRID('osm_water_polygon_gen1','geometry',3857);
 -- Create Table and Index
 -- osm_water_point
 
-CREATE INDEX ON osm_water_point USING gist (geometry);
-CREATE INDEX ON osm_water_point
-USING btree (st_geohash(st_transform(st_setsrid(box2d(geometry)::geometry, 3857), 4326)));
-
 DROP TABLE IF EXISTS osm_water_point CASCADE;
 CREATE TABLE osm_water_point AS
 SELECT id,
@@ -108,6 +104,10 @@ SELECT id,
        name_es, name_ru, name_zh,
        area
 FROM osm_water_polygon;
+
+CREATE INDEX ON osm_water_point USING gist (geometry);
+CREATE INDEX ON osm_water_point
+USING btree (st_geohash(st_transform(st_setsrid(box2d(geometry)::geometry, 3857), 4326)));
 
 -- Update Table
 -- osm_place_point
