@@ -19,13 +19,13 @@ def add_layer_style(style_json, list_item):
     Add all the layers present in the style file
     """
     for layer in style_json['layers']:
-    try:
-        layer_already_exist = False
-        for context_layer in list_item:
-            if context_layer == layer['source-layer']:
-                layer_already_exist = True
-        if layer_already_exist is False:
-            list_item.append(layer['source-layer'])
+        try:
+            layer_already_exist = False
+            for context_layer in list_item:
+                if context_layer == layer['source-layer']:
+                    layer_already_exist = True
+            if layer_already_exist is False:
+                list_item.append(layer['source-layer'])
     except:
         pass
 
