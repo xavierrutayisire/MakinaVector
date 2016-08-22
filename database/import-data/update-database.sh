@@ -1,11 +1,11 @@
 #!/bin/bash
 
-working_dir_database="$1"
+WORKING_DIR_DATABASE="$1"
 
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$working_dir_database/imposm3/cron
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$WORKING_DIR_DATABASE/imposm3/cron
 
 # Setup of the environment variable osmosis will use
-export working_osmosis_database=$working_dir_database/imposm3/osmosis
+export WORKING_OSMOSIS_DATABASE=$WORKING_DIR_DATABASE/imposm3/osmosis
 
 # Start time
 print_start_time() {
@@ -20,7 +20,7 @@ recuperation() {
     echo "### RECUPERATION "
 
     # Update database will last changes
-    osmosis --read-replication-interval workingDirectory=$working_osmosis_database --simplify-change --write-xml-change $working_dir_database/imposm3/osmosis/changes.osc.gz
+    osmosis --read-replication-interval workingDirectory=$WORKING_OSMOSIS_DATABASE --simplify-change --write-xml-change $WORKING_DIR_DATABASE/imposm3/osmosis/changes.osc.gz
 }
 
 # Importation of changes
@@ -28,11 +28,11 @@ importation() {
     echo "### IMPORTATION "
 
     # Duplicate the state imposm3 will use
-    rm $working_dir_database/imposm3/osmosis/changes.state.txt
-    cp $working_dir_database/imposm3/osmosis/state.txt $working_dir_database/imposm3/osmosis/changes.state.txt
+    rm $WORKING_DIR_DATABASE/imposm3/osmosis/changes.state.txt
+    cp $WORKING_DIR_DATABASE/imposm3/osmosis/state.txt $WORKING_DIR_DATABASE/imposm3/osmosis/changes.state.txt
 
     # Import the update into the database
-    imposm3 diff -config $working_dir_database/imposm3/config/config.json $working_dir_database/imposm3/osmosis/changes.osc.gz
+    imposm3 diff -config $WORKING_DIR_DATABASE/imposm3/config/config.json $WORKING_DIR_DATABASE/imposm3/osmosis/changes.osc.gz
 }
 
 # Calculate the total import time
@@ -46,7 +46,7 @@ time_import() {
 
 # Print informations on importations
 print_info() {}
-    echo "### Importation file: $(ls -l $working_dir_database/imposm3/osmosis/changes.osc.gz)"
+    echo "### Importation file: $(ls -l $WORKING_DIR_DATABASE/imposm3/osmosis/changes.osc.gz)"
 
     echo "### Import took $DIFF secondes"
 

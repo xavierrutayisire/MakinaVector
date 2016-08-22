@@ -1,49 +1,49 @@
 #!/bin/bash
 
-working_dir_database="$1"
+WORKING_DIR_DATABASE="$1"
 
-database_user_database="$2"
+DATABASE_USER_DATABASE="$2"
 
-database_user_password_database="$3"
+DATABASE_USER_PASSWORD_DATABASE="$3"
 
-database_name_database="$4"
+DATABASE_NAME_DATABASE="$4"
 
-database_host_database="$5"
+DATABASE_HOST_DATABASE="$5"
 
-database_port_database="$6"
+DATABASE_PORT_DATABASE="$6"
 
 # Password support
 create_password() {
-    cat > $working_dir_database/imposm3/import-external/.pgpass << EOF1
-$database_host_database:$database_port_database:$database_name_database:$database_user_database:$database_user_password_database
+    cat > $WORKING_DIR_DATABASE/imposm3/import-external/.pgpass << EOF1
+$DATABASE_HOST_DATABASE:$DATABASE_PORT_DATABASE:$DATABASE_NAME_DATABASE:$DATABASE_USER_DATABASE:$DATABASE_USER_PASSWORD_DATABASE
 EOF1
 
-    chmod 0600 $working_dir_database/imposm3/import-external/.pgpass
+    chmod 0600 $WORKING_DIR_DATABASE/imposm3/import-external/.pgpass
 
-    export PGPASSFILE=$working_dir_database/imposm3/import-external/.pgpass
+    export PGPASSFILE=$WORKING_DIR_DATABASE/imposm3/import-external/.pgpass
 }
 
 # Downloads
 downloads() {
-    wget -P $working_dir_database/imposm3/import-external http://data.openstreetmapdata.com/water-polygons-split-3857.zip
-    unzip -oj $working_dir_database/imposm3/import-external/water-polygons-split-3857.zip -d $working_dir_database/imposm3/import-external
-    rm $working_dir_database/imposm3/import-external/water-polygons-split-3857.zip
+    wget -P $WORKING_DIR_DATABASE/imposm3/import-external http://data.openstreetmapdata.com/water-polygons-split-3857.zip
+    unzip -oj $WORKING_DIR_DATABASE/imposm3/import-external/water-polygons-split-3857.zip -d $WORKING_DIR_DATABASE/imposm3/import-external
+    rm $WORKING_DIR_DATABASE/imposm3/import-external/water-polygons-split-3857.zip
 
-    wget -P $working_dir_database/imposm3/import-external http://data.openstreetmapdata.com/simplified-water-polygons-complete-3857.zip
-    unzip -oj $working_dir_database/imposm3/import-external/simplified-water-polygons-complete-3857.zip -d $working_dir_database/imposm3/import-external
-    rm $working_dir_database/imposm3/import-external/simplified-water-polygons-complete-3857.zip
+    wget -P $WORKING_DIR_DATABASE/imposm3/import-external http://data.openstreetmapdata.com/simplified-water-polygons-complete-3857.zip
+    unzip -oj $WORKING_DIR_DATABASE/imposm3/import-external/simplified-water-polygons-complete-3857.zip -d $WORKING_DIR_DATABASE/imposm3/import-external
+    rm $WORKING_DIR_DATABASE/imposm3/import-external/simplified-water-polygons-complete-3857.zip
 
-    wget -P $working_dir_database/imposm3/import-external http://naciscdn.org/naturalearth/packages/natural_earth_vector.sqlite.zip
-    unzip -oj $working_dir_database/imposm3/import-external/natural_earth_vector.sqlite.zip -d $working_dir_database/imposm3/import-external
-    rm $working_dir_database/imposm3/import-external/natural_earth_vector.sqlite.zip
+    wget -P $WORKING_DIR_DATABASE/imposm3/import-external http://naciscdn.org/naturalearth/packages/natural_earth_vector.sqlite.zip
+    unzip -oj $WORKING_DIR_DATABASE/imposm3/import-external/natural_earth_vector.sqlite.zip -d $WORKING_DIR_DATABASE/imposm3/import-external
+    rm $WORKING_DIR_DATABASE/imposm3/import-external/natural_earth_vector.sqlite.zip
 }
 
 # Drop table natural earth
 drop_table_natural_earth() {
-    local table_name="$1"
-    echo "DROP TABLE $table_name;" | sqlite3 "$working_dir_database/imposm3/import-external/natural_earth_vector.sqlite"
-    echo "DELETE FROM geometry_columns WHERE f_table_name = '$table_name';" \
-         | sqlite3 "$working_dir_database/imposm3/import-external/natural_earth_vector.sqlite"
+    local TABLE_NAME="$1"
+    echo "DROP TABLE $TABLE_NAME;" | sqlite3 "$WORKING_DIR_DATABASE/imposm3/import-external/natural_earth_vector.sqlite"
+    echo "DELETE FROM geometry_columns WHERE f_table_name = '$TABLE_NAME';" \
+         | sqlite3 "$WORKING_DIR_DATABASE/imposm3/import-external/natural_earth_vector.sqlite"
 }
 
 # Clean natural earth
@@ -164,7 +164,7 @@ clean_natural_earth() {
     drop_table_natural_earth 'ne_50m_rivers_lake_centerlines_scale_rank'
     drop_table_natural_earth 'ne_50m_urban_areas'
 
-    echo "VACUUM;" | sqlite3 "$working_dir_database/imposm3/import-external/natural_earth_vector.sqlite"
+    echo "VACUUM;" | sqlite3 "$WORKING_DIR_DATABASE/imposm3/import-external/natural_earth_vector.sqlite"
 }
 
 # Import natural earth
@@ -175,30 +175,30 @@ import_natural_earth() {
         -s_srs EPSG:4326 \
         -t_srs EPSG:3857 \
         -clipsrc -180.1 -85.0511 180.1 85.0511 \
-        PG:"dbname=$database_name_database user=$database_user_database host=$database_host_database password=$database_user_password_database port=$database_port_database" \
+        PG:"dbname=$DATABASE_NAME_DATABASE user=$DATABASE_USER_DATABASE host=$DATABASE_HOST_DATABASE password=$DATABASE_USER_PASSWORD_DATABASE port=$DATABASE_PORT_DATABASE" \
         -lco GEOMETRY_NAME=geom \
         -lco DIM=2 \
         -nlt GEOMETRY \
         -overwrite \
-        "$working_dir_database/imposm3/import-external/natural_earth_vector.sqlite"
+        "$WORKING_DIR_DATABASE/imposm3/import-external/natural_earth_vector.sqlite"
 }
 
 # Exec psql
 exec_psql() {
-    psql --host="$database_host_database" --port=$database_port_database --dbname="$database_name_database" --username="$database_user_database"
+    psql --host="$DATABASE_HOST_DATABASE" --port=$DATABASE_PORT_DATABASE --dbname="$DATABASE_NAME_DATABASE" --username="$DATABASE_USER_DATABASE"
 }
 
 # Exec sql file
 exec_sql_file() {
-    local sql_file=$1
-    cat "$sql_file" | exec_psql
+    local SQL_FILE=$1
+    cat "$SQL_FILE" | exec_psql
 }
 
 # Drop table
 drop_table() {
-    local table=$1
-    local drop_command="DROP TABLE IF EXISTS $table;"
-    echo $drop_command | exec_psql
+    local TABLE=$1
+    local DROP_COMMAND="DROP TABLE IF EXISTS $TABLE;"
+    echo $DROP_COMMAND | exec_psql
 }
 
 # Hide insert
@@ -208,59 +208,59 @@ hide_inserts() {
 
 # Import shapefile
 import_shp() {
-    local shp_file=$1
-    local table_name=$2
-    shp2pgsql -s 3857 -I -g geometry "$shp_file" "$table_name" | exec_psql | hide_inserts
+    local SHP_FILE=$1
+    local TABLE_NAME=$2
+    shp2pgsql -s 3857 -I -g geometry "$SHP_FILE" "$TABLE_NAME" | exec_psql | hide_inserts
 }
 
 # Import water
 import_water() {
-    local table_name="osm_ocean_polygon"
-    local simplified_table_name="osm_ocean_polygon_gen0"
+    local TABLE_NAME="osm_ocean_polygon"
+    local SIMPLIFIED_TABLE_NAME="osm_ocean_polygon_gen0"
 
-    drop_table "$table_name"
-    import_shp "$working_dir_database/imposm3/import-external/water_polygons.shp" "$table_name"
+    drop_table "$TABLE_NAME"
+    import_shp "$WORKING_DIR_DATABASE/imposm3/import-external/water_polygons.shp" "$TABLE_NAME"
 
-    drop_table "$simplified_table_name"
-    import_shp "$working_dir_database/imposm3/import-external/simplified_water_polygons.shp" "$simplified_table_name"
+    drop_table "$SIMPLIFIED_TABLE_NAME"
+    import_shp "$WORKING_DIR_DATABASE/imposm3/import-external/simplified_water_polygons.shp" "$SIMPLIFIED_TABLE_NAME"
 }
 
 # Copy files from repository
 copy_files() {
-    cp ./database/import-external/labels/countries.geojson $working_dir_database/imposm3/import-external
-    cp ./database/import-external/labels/states.geojson $working_dir_database/imposm3/import-external
-    cp ./database/import-external/labels/seas.geojson $working_dir_database/imposm3/import-external
+    cp ./database/import-external/labels/countries.geojson $WORKING_DIR_DATABASE/imposm3/import-external
+    cp ./database/import-external/labels/states.geojson $WORKING_DIR_DATABASE/imposm3/import-external
+    cp ./database/import-external/labels/seas.geojson $WORKING_DIR_DATABASE/imposm3/import-external
 }
 
 # Import geoJSON
 import_geojson() {
-    local geojson_file=$1
-    local table_name=$2
+    local GEOJSON_FILE=$1
+    local TABLE_NAME=$2
 
-    drop_table "$table_name"
-    echo "$geojson_file"
+    drop_table "$TABLE_NAME"
+    echo "$GEOJSON_FILE"
 
     PGCLIENTENCODING=UTF8 ogr2ogr \
         -f Postgresql \
         -s_srs EPSG:4326 \
         -t_srs EPSG:3857 \
-        PG:"dbname=$database_name_database user=$database_user_database host=$database_host_database password=$database_user_password_database port=$database_port_database" \
-        "$geojson_file" \
-        -nln "$table_name"
+        PG:"dbname=$DATABASE_NAME_DATABASE user=$DATABASE_USER_DATABASE host=$DATABASE_HOST_DATABASE password=$DATABASE_USER_PASSWORD_DATABASE port=$DATABASE_PORT_DATABASE" \
+        "$GEOJSON_FILE" \
+        -nln "$TABLE_NAME"
 }
 
 # Import labels
 import_labels() {
     echo "Inserting labels into $OSM_DB"
 
-    import_geojson "$working_dir_database/imposm3/import-external/seas.geojson" "custom_seas"
-    import_geojson "$working_dir_database/imposm3/import-external/states.geojson" "custom_states"
-    import_geojson "$working_dir_database/imposm3/import-external/countries.geojson" "custom_countries"
+    import_geojson "$WORKING_DIR_DATABASE/imposm3/import-external/seas.geojson" "custom_seas"
+    import_geojson "$WORKING_DIR_DATABASE/imposm3/import-external/states.geojson" "custom_states"
+    import_geojson "$WORKING_DIR_DATABASE/imposm3/import-external/countries.geojson" "custom_countries"
 }
 
 # Password support
 remove_password() {
-    rm $working_dir_database/imposm3/import-external/.pgpass
+    rm $WORKING_DIR_DATABASE/imposm3/import-external/.pgpass
 }
 
 main() {

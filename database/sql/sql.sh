@@ -1,51 +1,51 @@
 #!/bin/bash
 
-working_dir_database="$1"
+WORKING_DIR_DATABASE="$1"
 
-database_user_database="$2"
+DATABASE_USER_DATABASE="$2"
 
-database_user_password_database="$3"
+DATABASE_USER_PASSWORD_DATABASE="$3"
 
-database_name_database="$4"
+DATABASE_NAME_DATABASE="$4"
 
-database_host_database="$5"
+DATABASE_HOST_DATABASE="$5"
 
-database_port_database="$6"
+DATABASE_PORT_DATABASE="$6"
 
 # Create functions
 create_functions() {
-    sudo -n -u postgres -s -- psql $database_name_database -f ./database/sql/function.sql
+    sudo -n -u postgres -s -- psql $DATABASE_NAME_DATABASE -f ./database/sql/function.sql
 }
 
 # Create tables and index
 create_tables_index() {
-    sudo -n -u postgres -s -- psql $database_name_database -f ./database/sql/table.sql
+    sudo -n -u postgres -s -- psql $DATABASE_NAME_DATABASE -f ./database/sql/table.sql
 }
 
 # Grant privileges
 grant_privileges() {
-    sudo -n -u postgres -s -- psql $database_name_database -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $database_user_database;"
-    sudo -n -u postgres -s -- psql $database_name_database -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO $database_user_database;"
+    sudo -n -u postgres -s -- psql $DATABASE_NAME_DATABASE -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $DATABASE_USER_DATABASE;"
+    sudo -n -u postgres -s -- psql $DATABASE_NAME_DATABASE -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO $DATABASE_USER_DATABASE;"
 }
 
 # Triggers for import and update
 create_triggers_import_update() {
-    sudo -n -u postgres -s -- psql $database_name_database -f ./database/sql/generate-trigger-I-U.sql > $working_dir_database/imposm3/sql/trigger-I-U-temp.sql
-    tail -n +3 $working_dir_database/imposm3/sql/trigger-I-U-temp.sql > $working_dir_database/imposm3/sql/trigger-I-U-temp2.sql
-    rm $working_dir_database/imposm3/sql/trigger-I-U-temp.sql
-    head -n -2 $working_dir_database/imposm3/sql/trigger-I-U-temp2.sql > $working_dir_database/imposm3/sql/trigger-I-U.sql
-    rm $working_dir_database/imposm3/sql/trigger-I-U-temp2.sql
-    sudo -n -u postgres -s -- psql $database_name_database -f $working_dir_database/imposm3/sql/trigger-I-U.sql
+    sudo -n -u postgres -s -- psql $DATABASE_NAME_DATABASE -f ./database/sql/generate-trigger-I-U.sql > $WORKING_DIR_DATABASE/imposm3/sql/trigger-I-U-temp.sql
+    tail -n +3 $WORKING_DIR_DATABASE/imposm3/sql/trigger-I-U-temp.sql > $WORKING_DIR_DATABASE/imposm3/sql/trigger-I-U-temp2.sql
+    rm $WORKING_DIR_DATABASE/imposm3/sql/trigger-I-U-temp.sql
+    head -n -2 $WORKING_DIR_DATABASE/imposm3/sql/trigger-I-U-temp2.sql > $WORKING_DIR_DATABASE/imposm3/sql/trigger-I-U.sql
+    rm $WORKING_DIR_DATABASE/imposm3/sql/trigger-I-U-temp2.sql
+    sudo -n -u postgres -s -- psql $DATABASE_NAME_DATABASE -f $WORKING_DIR_DATABASE/imposm3/sql/trigger-I-U.sql
 }
 
 # Triggers for deleting
 create_triggers_delete() {
-    sudo -n -u postgres -s -- psql $database_name_database -f ./database/sql/generate-trigger-D.sql > $working_dir_database/imposm3/sql/trigger-D-temp.sql
-    tail -n +3 $working_dir_database/imposm3/sql/trigger-D-temp.sql > $working_dir_database/imposm3/sql/trigger-D-temp2.sql
-    rm $working_dir_database/imposm3/sql/trigger-D-temp.sql
-    head -n -2 $working_dir_database/imposm3/sql/trigger-D-temp2.sql > $working_dir_database/imposm3/sql/trigger-D.sql
-    rm $working_dir_database/imposm3/sql/trigger-D-temp2.sql
-    sudo -n -u postgres -s -- psql $database_name_database -f $working_dir_database/imposm3/sql/trigger-D.sql
+    sudo -n -u postgres -s -- psql $DATABASE_NAME_DATABASE -f ./database/sql/generate-trigger-D.sql > $WORKING_DIR_DATABASE/imposm3/sql/trigger-D-temp.sql
+    tail -n +3 $WORKING_DIR_DATABASE/imposm3/sql/trigger-D-temp.sql > $WORKING_DIR_DATABASE/imposm3/sql/trigger-D-temp2.sql
+    rm $WORKING_DIR_DATABASE/imposm3/sql/trigger-D-temp.sql
+    head -n -2 $WORKING_DIR_DATABASE/imposm3/sql/trigger-D-temp2.sql > $WORKING_DIR_DATABASE/imposm3/sql/trigger-D.sql
+    rm $WORKING_DIR_DATABASE/imposm3/sql/trigger-D-temp2.sql
+    sudo -n -u postgres -s -- psql $DATABASE_NAME_DATABASE -f $WORKING_DIR_DATABASE/imposm3/sql/trigger-D.sql
 }
 
 main() {

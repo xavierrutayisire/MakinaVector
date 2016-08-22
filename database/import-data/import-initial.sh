@@ -1,57 +1,57 @@
 #!/bin/bash
 
-working_dir_database="$1"
+WORKING_DIR_DATABASE="$1"
 
-database_user_database="$2"
+DATABASE_USER_DATABASE="$2"
 
-database_user_password_database="$3"
+DATABASE_USER_PASSWORD_DATABASE="$3"
 
-database_name_database="$4"
+DATABASE_NAME_DATABASE="$4"
 
-database_host_database="$5"
+DATABASE_HOST_DATABASE="$5"
 
-url_pbf_database="$6"
+URL_PBF_DATABASE="$6"
 
-url_pbf_state_database="$7"
+URL_PBF_STATE_DATABASE="$7"
 
-pbf_name_database=$(basename $url_pbf_database)
+PBF_NAME_DATABASE=$(basename $URL_PBF_DATABASE)
 
-pbf_state_name_database=$(basename $url_pbf_state_database)
+PBF_STATE_NAME_DATABASE=$(basename $URL_PBF_STATE_DATABASE)
 
 # Download of the PBF
 download_pbf() {
-    wget -P $working_dir_database/imposm3/import $url_pbf_database
+    wget -P $WORKING_DIR_DATABASE/imposm3/import $URL_PBF_DATABASE
 }
 
 # Download of the state.txt file
 download_state() {
-    wget -P $working_dir_database/imposm3/osmosis $url_pbf_state_database
-    mv $working_dir_database/imposm3/osmosis/$pbf_state_name_database $working_dir_database/imposm3/osmosis/state.txt
-    cp $working_dir_database/imposm3/osmosis/state.txt $working_dir_database/imposm3/osmosis/changes.state.txt
+    wget -P $WORKING_DIR_DATABASE/imposm3/osmosis $URL_PBF_STATE_DATABASE
+    mv $WORKING_DIR_DATABASE/imposm3/osmosis/$PBF_STATE_NAME_DATABASE $WORKING_DIR_DATABASE/imposm3/osmosis/state.txt
+    cp $WORKING_DIR_DATABASE/imposm3/osmosis/state.txt $WORKING_DIR_DATABASE/imposm3/osmosis/changes.state.txt
 }
 
 # Creation of the json configuration file
 create_config() {
-    export cachedir_database="$working_dir_database/imposm3/cache"
-    export connection_database="postgis://$database_user_database:$database_user_password_database@$database_host_database/$database_name_database"
-    export mapping_database="$working_dir_database/imposm3/config/mapping.yml"
-    cat > $working_dir_database/imposm3/config/config.json << EOF1
+    export CACHEDIR_DATABASE="$WORKING_DIR_DATABASE/imposm3/cache"
+    export CONNECTION_DATABASE="postgis://$DATABASE_USER_DATABASE:$DATABASE_USER_PASSWORD_DATABASE@$DATABASE_HOST_DATABASE/$DATABASE_NAME_DATABASE"
+    export MAPPING_DATABASE="$WORKING_DIR_DATABASE/imposm3/config/mapping.yml"
+    cat > $WORKING_DIR_DATABASE/imposm3/config/config.json << EOF1
 {
-    "cachedir": "$cachedir_database",
-    "connection": "$connection_database",
-    "mapping": "$mapping_database"
+    "cachedir": "$CACHEDIR_DATABASE",
+    "connection": "$CONNECTION_DATABASE",
+    "mapping": "$MAPPING_DATABASE"
 }
 EOF1
 }
 
 # Import of the PBF into the database
 import_pbf() {
-    imposm3 import -diff -config $working_dir_database/imposm3/config/config.json -read $working_dir_database/imposm3/import/$pbf_name_database -write
+    imposm3 import -diff -config $WORKING_DIR_DATABASE/imposm3/config/config.json -read $WORKING_DIR_DATABASE/imposm3/import/$PBF_NAME_DATABASE -write
 }
 
 # Deployment of the import
 deploy_production() {
-    imposm3 import -config $working_dir_database/imposm3/config/config.json -deployproduction
+    imposm3 import -config $WORKING_DIR_DATABASE/imposm3/config/config.json -deployproduction
 }
 
 main() {

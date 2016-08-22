@@ -3,37 +3,37 @@
 # SETUP USER
 
 # Directory where you want the imposm3 folder to be created (ex: "/project/osm")
-working_dir_database="/srv/projects/vectortiles/project/osm-ireland"
+WORKING_DIR_DATABASE="/srv/projects/vectortiles/project/osm-ireland"
 
 # Database user name
-database_user_database="imposm3_user_ir"
+DATABASE_USER_DATABASE="imposm3_user_ir"
 
 # Database user password
-database_user_password_database="makina"
+DATABASE_USER_PASSWORD_DATABASE="makina"
 
 # Database name
-database_name_database="imposm3_db_ir"
+DATABASE_NAME_DATABASE="imposm3_db_ir"
 
 # Database host
-database_host_database="localhost"
+DATABASE_HOST_DATABASE="localhost"
 
 # Url of the PBF you wanna import
-url_pbf_database="http://download.openstreetmap.fr/extracts/europe/ireland-latest.osm.pbf"
+URL_PBF_DATABASE="http://download.openstreetmap.fr/extracts/europe/ireland-latest.osm.pbf"
 
 # Url of the PBF state
-url_pbf_state_database="http://download.openstreetmap.fr/extracts/europe/ireland.state.txt"
+URL_PBF_STATE_DATABASE="http://download.openstreetmap.fr/extracts/europe/ireland.state.txt"
 
 # Url for the minute replication (ex: "http://download.openstreetmap.fr/replication/europe/france/minute")
-url_changes_database="http://download.openstreetmap.fr/replication/europe/ireland/minute"
+URL_CHANGES_DATABASE="http://download.openstreetmap.fr/replication/europe/ireland/minute"
 
 # Version of postgresql (ex: "9.5")
-postgresql_version_database="9.5"
+POSTGRESQL_VERSION_DATABASE="9.5"
 
 # Version of postgis (ex: "2.2")
-postgis_version_database="2.2"
+POSTGIS_VERSION_DATABASE="2.2"
 
 # Url of the binary of imposm3
-url_binary_database="http://imposm.org/static/rel/imposm3-0.2.0dev-20160517-3c27127-linux-x86-64.tar.gz"
+URL_BINARY_DATABASE="http://imposm.org/static/rel/imposm3-0.2.0dev-20160517-3c27127-linux-x86-64.tar.gz"
 
 # END SETUP USER
 
@@ -43,17 +43,17 @@ verif() {
     echo "
     The deployement will use this setup:
 
-    Directory where the imposm3 and the utilery folder will be created: $working_dir_database
-    Database user name: $database_user_database
-    Database user password: $database_user_password_database
-    Database name: $database_name_database
-    Database host: $database_host_database
-    Url of the PBF you wanna import: $url_pbf_database
-    Url of the PBF state: $url_pbf_state_database
-    Url for the minute replication: $url_changes_database
-    Version of postgresql: $postgresql_version_database
-    Version of postgis: $postgis_version_database
-    Url of the binary of imposm3: $url_binary_database
+    Directory where the imposm3 and the utilery folder will be created: $WORKING_DIR_DATABASE
+    Database user name: $DATABASE_USER_DATABASE
+    Database user password: $DATABASE_USER_PASSWORD_DATABASE
+    Database name: $DATABASE_NAME_DATABASE
+    Database host: $DATABASE_HOST_DATABASE
+    Url of the PBF you wanna import: $URL_PBF_DATABASE
+    Url of the PBF state: $URL_PBF_STATE_DATABASE
+    Url for the minute replication: $URL_CHANGES_DATABASE
+    Version of postgresql: $POSTGRESQL_VERSION_DATABASE
+    Version of postgis: $POSTGIS_VERSION_DATABASE
+    Url of the binary of imposm3: $URL_BINARY_DATABASE
 
     "
     while true; do
@@ -69,28 +69,28 @@ verif() {
 # Configuration
 config() {
     # Name of the binary tar.gz
-    binary_tar_name_database=$(basename $url_binary_database)
+    BINARY_TAR_NAME_DATABASE=$(basename $URL_BINARY_DATABASE)
 
     # Name of the binary folder
-    binary_name_database=$(basename $url_binary_database .tar.gz)
+    BINARY_NAME_DATABASE=$(basename $URL_BINARY_DATABASE .tar.gz)
 
     # Database port (default: 5432)
-    database_port_database="5432"
+    DATABASE_PORT_DATABASE="5432"
 
     # Update of the repositories and install of postgresql, postgis and osmosis
     apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y postgresql-$postgresql_version_database postgresql-contrib-$postgresql_version_database \
-    postgis postgresql-$postgresql_version_database-postgis-$postgis_version_database \
+    apt-get install -y postgresql-$POSTGRESQL_VERSION_DATABASE postgresql-contrib-$POSTGRESQL_VERSION_DATABASE \
+    postgis postgresql-$POSTGRESQL_VERSION_DATABASE-postgis-$POSTGIS_VERSION_DATABASE \
     osmosis wget unzip gdal-bin sqlite3
 }
 
 # Create user
 create_user() {
-    user_exist_database=$(sudo -n -u postgres -s -- psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='$database_user_database'")
+    user_exist_database=$(sudo -n -u postgres -s -- psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='$DATABASE_USER_DATABASE'")
     if [ "$user_exist_database" = "1" ]; then
         while true; do
-            read -p "User already exist, check if you wrote the right password on the setup for $database_user_database. Do you want to continue? [Y/N]" yn
+            read -p "User already exist, check if you wrote the right password on the setup for $DATABASE_USER_DATABASE. Do you want to continue? [Y/N]" yn
                 case $yn in
                     [Yy]* ) break;;
                     [Nn]* ) exit;;
@@ -98,43 +98,43 @@ create_user() {
             esac
         done
     else
-        sudo -n -u postgres -s -- psql -c "CREATE USER $database_user_database WITH PASSWORD '$database_user_password_database';"
+        sudo -n -u postgres -s -- psql -c "CREATE USER $DATABASE_USER_DATABASE WITH PASSWORD '$DATABASE_USER_PASSWORD_DATABASE';"
     fi
 }
 
 # Check if database exist
 create_database() {
-    if sudo -n -u postgres -s -- psql -lqt | cut -d \| -f 1 | grep -qw $database_name_database; then
+    if sudo -n -u postgres -s -- psql -lqt | cut -d \| -f 1 | grep -qw $DATABASE_NAME_DATABASE; then
         while true; do
             read -p "Database already exist, yes will remove everything from it, no will end the script. Y/N?" yn
                 case $yn in
-                    [Yy]* ) echo "revoke connect on database $database_name_database from public;" |sudo -n -u postgres -s -- psql -d $database_name_database > /dev/null;
+                    [Yy]* ) echo "revoke connect on database $DATABASE_NAME_DATABASE from public;" |sudo -n -u postgres -s -- psql -d $DATABASE_NAME_DATABASE > /dev/null;
                             echo "SELECT pg_terminate_backend(pid)
                                   FROM pg_stat_activity
                                   WHERE pid <> pg_backend_pid()
-                                  AND datname = '$database_name_database'
-                                  ;"|sudo -n -u postgres -s -- psql -d $database_name_database > /dev/null;
-                            sudo -n -u postgres -s -- psql -c "DROP DATABASE $database_name_database;";
-                            sudo -n -u postgres -s -- psql -c "CREATE DATABASE $database_name_database OWNER $database_user_database;"; break;;
+                                  AND datname = '$DATABASE_NAME_DATABASE'
+                                  ;"|sudo -n -u postgres -s -- psql -d $DATABASE_NAME_DATABASE > /dev/null;
+                            sudo -n -u postgres -s -- psql -c "DROP DATABASE $DATABASE_NAME_DATABASE;";
+                            sudo -n -u postgres -s -- psql -c "CREATE DATABASE $DATABASE_NAME_DATABASE OWNER $DATABASE_USER_DATABASE;"; break;;
                     [Nn]* ) exit;;
                     * ) echo "Please answer yes or no.";;
             esac
         done
     else
-        sudo -n -u postgres -s -- psql -c "CREATE DATABASE $database_name_database OWNER $database_user_database;"
+        sudo -n -u postgres -s -- psql -c "CREATE DATABASE $DATABASE_NAME_DATABASE OWNER $DATABASE_USER_DATABASE;"
     fi
 }
 
 # Add extensions postgis and hstore to the database
 add_extensions() {
-    sudo -n -u postgres -s -- psql -c "CREATE EXTENSION postgis; CREATE EXTENSION postgis_topology; CREATE EXTENSION hstore;" $database_name_database
+    sudo -n -u postgres -s -- psql -c "CREATE EXTENSION postgis; CREATE EXTENSION postgis_topology; CREATE EXTENSION hstore;" $DATABASE_NAME_DATABASE
 
     # Delete folder imposm3 if exist
-    if [ -d "$working_dir_database/imposm3" ]; then
+    if [ -d "$WORKING_DIR_DATABASE/imposm3" ]; then
         while true; do
-            read -p "A imposm3 folder already exist in $working_dir_database directory, yes will delete imposm3 folder, no will end the script. Y/N?" yn
+            read -p "A imposm3 folder already exist in $WORKING_DIR_DATABASE directory, yes will delete imposm3 folder, no will end the script. Y/N?" yn
                 case $yn in
-                    [Yy]* ) rm -rf "$working_dir_database/imposm3"; break;;
+                    [Yy]* ) rm -rf "$WORKING_DIR_DATABASE/imposm3"; break;;
                     [Nn]* ) exit;;
                     * ) echo "Please answer yes or no.";;
             esac
@@ -144,46 +144,46 @@ add_extensions() {
 
 # Folders structure
 folder_structure() {
-    mkdir -p $working_dir_database/imposm3/binary \
-        $working_dir_database/imposm3/cache \
-        $working_dir_database/imposm3/config \
-        $working_dir_database/imposm3/cron \
-        $working_dir_database/imposm3/import \
-        $working_dir_database/imposm3/osmosis \
-        $working_dir_database/imposm3/import-external \
-        $working_dir_database/imposm3/sql
+    mkdir -p $WORKING_DIR_DATABASE/imposm3/binary \
+        $WORKING_DIR_DATABASE/imposm3/cache \
+        $WORKING_DIR_DATABASE/imposm3/config \
+        $WORKING_DIR_DATABASE/imposm3/cron \
+        $WORKING_DIR_DATABASE/imposm3/import \
+        $WORKING_DIR_DATABASE/imposm3/osmosis \
+        $WORKING_DIR_DATABASE/imposm3/import-external \
+        $WORKING_DIR_DATABASE/imposm3/sql
 }
 
 # Installation of imposm3
 install_imposm3() {
-    wget -P $working_dir_database/imposm3/binary $url_binary_database
-    tar -zxvf $working_dir_database/imposm3/binary/$binary_tar_name_database -C $working_dir_database/imposm3/binary
-    mv $working_dir_database/imposm3/binary/$binary_name_database/* $working_dir_database/imposm3/binary
-    rmdir $working_dir_database/imposm3/binary/$binary_name_database
-    rm $working_dir_database/imposm3/binary/$binary_tar_name_database
-    rm $working_dir_database/imposm3/binary/mapping.json
-    cp -r $working_dir_database/imposm3/binary/* /usr/local/bin
-    cp ./database/import-data/mapping.yml $working_dir_database/imposm3/config
+    wget -P $WORKING_DIR_DATABASE/imposm3/binary $URL_BINARY_DATABASE
+    tar -zxvf $WORKING_DIR_DATABASE/imposm3/binary/$BINARY_TAR_NAME_DATABASE -C $WORKING_DIR_DATABASE/imposm3/binary
+    mv $WORKING_DIR_DATABASE/imposm3/binary/$BINARY_NAME_DATABASE/* $WORKING_DIR_DATABASE/imposm3/binary
+    rmdir $WORKING_DIR_DATABASE/imposm3/binary/$BINARY_NAME_DATABASE
+    rm $WORKING_DIR_DATABASE/imposm3/binary/$BINARY_TAR_NAME_DATABASE
+    rm $WORKING_DIR_DATABASE/imposm3/binary/mapping.json
+    cp -r $WORKING_DIR_DATABASE/imposm3/binary/* /usr/local/bin
+    cp ./database/import-data/mapping.yml $WORKING_DIR_DATABASE/imposm3/config
 }
 
 # Initial import of the PBF into the PostGIS database
 script_initial_import() {
-    sh ./database/import-data/import-initial.sh $working_dir_database $database_user_database $database_user_password_database $database_name_database $database_host_database $url_pbf_database $url_pbf_state_database
+    sh ./database/import-data/import-initial.sh $WORKING_DIR_DATABASE $DATABASE_USER_DATABASE $DATABASE_USER_PASSWORD_DATABASE $DATABASE_NAME_DATABASE $DATABASE_HOST_DATABASE $URL_PBF_DATABASE $URL_PBF_STATE_DATABASE
 }
 
 # Import all data that is not mapped directly from OSM (import-external)
 script_import_external() {
-    sh ./database/import-external/import-external.sh $working_dir_database $database_user_database $database_user_password_database $database_name_database $database_host_database $database_port_database
+    sh ./database/import-external/import-external.sh $WORKING_DIR_DATABASE $DATABASE_USER_DATABASE $DATABASE_USER_PASSWORD_DATABASE $DATABASE_NAME_DATABASE $DATABASE_HOST_DATABASE $DATABASE_PORT_DATABASE
 }
 
 # Create all the slq functions, tables, index and triggers
 script_sql() {
-    sh ./database/sql/sql.sh $working_dir_database $database_user_database $database_user_password_database $database_name_database $database_host_database $database_port_database
+    sh ./database/sql/sql.sh $WORKING_DIR_DATABASE $DATABASE_USER_DATABASE $DATABASE_USER_PASSWORD_DATABASE $DATABASE_NAME_DATABASE $DATABASE_HOST_DATABASE $DATABASE_PORT_DATABASE
 }
 
 # Automatic update of the PostGIS database every minute
 script_diff() {
-    sh ./database/import-data/import-diff.sh $working_dir_database $database_user_database $database_user_password_database $database_name_database $database_host_database $url_changes_database
+    sh ./database/import-data/import-diff.sh $WORKING_DIR_DATABASE $DATABASE_USER_DATABASE $DATABASE_USER_PASSWORD_DATABASE $DATABASE_NAME_DATABASE $DATABASE_HOST_DATABASE $URL_CHANGES_DATABASE
 }
 
 main() {

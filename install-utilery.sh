@@ -3,22 +3,22 @@
 # SETUP USER
 
 # Directory where you want the utilery folder to be created (ex: "/project/osm")
-working_dir_utilery="/srv/projects/vectortiles/project/osm-ireland"
+WORKING_DIR_UTILERY="/srv/projects/vectortiles/project/osm-ireland"
 
 # Database user name
-database_user_utilery="imposm3_user_ir"
+DATABASE_USER_UTILERY="imposm3_user_ir"
 
 # Database user password
-database_user_password_utilery="makina"
+DATABASE_USER_PASSWORD_UTILERY="makina"
 
 # Database name
-database_name_utilery="imposm3_db_ir"
+DATABASE_NAME_UTILERY="imposm3_db_ir"
 
 # Database host
-database_host_utilery="localhost"
+DATABASE_HOST_UTILERY="localhost"
 
 # Utilery port
-utilery_port_utilery=3579
+UTILERY_PORT_UTILERY=3579
 
 # END SETUP USER
 
@@ -28,12 +28,12 @@ verif() {
     echo "
     The deployement will use this setup:
 
-    Directory where the utilery folder will be created: $working_dir_utilery
-    Database user name: $database_user_utilery
-    Database user password: $database_user_password_utilery
-    Database name: $database_name_utilery
-    Database host: $database_host_utilery
-    Utilery port: $utilery_port_utilery
+    Directory where the utilery folder will be created: $WORKING_DIR_UTILERY
+    Database user name: $DATABASE_USER_UTILERY
+    Database user password: $DATABASE_USER_PASSWORD_UTILERY
+    Database name: $DATABASE_NAME_UTILERY
+    Database host: $DATABASE_HOST_UTILERY
+    Utilery port: $UTILERY_PORT_UTILERY
 
     "
     while true; do
@@ -48,11 +48,11 @@ verif() {
 
 # If utilery already exist
 check_utilery_exist() {
-    if [ -d "$working_dir_utilery/utilery" ]; then
+    if [ -d "$WORKING_DIR_UTILERY/utilery" ]; then
         while true; do
-            read -p "Utilery folder already exist in $working_dir_utilery directory, yes will delete utilery folder, no will end the script. Y/N?" yn
+            read -p "Utilery folder already exist in $WORKING_DIR_UTILERY directory, yes will delete utilery folder, no will end the script. Y/N?" yn
                 case $yn in
-                    [Yy]* ) rm -rf  "$working_dir_utilery/utilery"; break;;
+                    [Yy]* ) rm -rf  "$WORKING_DIR_UTILERY/utilery"; break;;
                     [Nn]* ) exit;;
                     * ) echo "Please answer yes or no.";;
             esac
@@ -68,39 +68,39 @@ config() {
     apt-get install -y python3.5 python3.5-dev python3-pip python-virtualenv virtualenvwrapper git libpq-dev gdal-bin
 
     # Creation of directory
-    mkdir -p $working_dir_utilery
+    mkdir -p $WORKING_DIR_UTILERY
 
     # Database port (default: 5432)
-    database_port_utilery="5432"
+    DATABASE_PORT_UTILERY="5432"
 }
 
 # Clone utilery
 clone_utilery() {
-    cd $working_dir_utilery
+    cd $WORKING_DIR_UTILERY
     git clone https://github.com/etalab/utilery
     cd -
 }
 
 # Add the support of multicores
 add_support_multicores() {
-    rm $working_dir_utilery/utilery/utilery/serve.py
-    cat > $working_dir_utilery/utilery/utilery/serve.py << EOF1
+    rm $WORKING_DIR_UTILERY/utilery/utilery/serve.py
+    cat > $WORKING_DIR_UTILERY/utilery/utilery/serve.py << EOF1
 from utilery.views import app
 from werkzeug.serving import run_simple
 from multiprocessing import cpu_count
 
-run_simple('0.0.0.0', $utilery_port_utilery, app, use_debugger=True, use_reloader=True, processes=cpu_count())
+run_simple('0.0.0.0', $UTILERY_PORT_UTILERY, app, use_debugger=True, use_reloader=True, processes=cpu_count())
 EOF1
 }
 
 # Change the database connection
 change_database_connection() {
-    rm $working_dir_utilery/utilery/utilery/config/default.py
-    cat > $working_dir_utilery/utilery/utilery/config/default.py << EOF1
+    rm $WORKING_DIR_UTILERY/utilery/utilery/config/default.py
+    cat > $WORKING_DIR_UTILERY/utilery/utilery/config/default.py << EOF1
 DATABASES = {
-    "default": "dbname=$database_name_utilery user=$database_user_utilery password=$database_user_password_utilery host=$database_host_utilery"
+    "default": "dbname=$DATABASE_NAME_UTILERY user=$DATABASE_USER_UTILERY password=$DATABASE_USER_PASSWORD_UTILERY host=$DATABASE_HOST_UTILERY"
 }
-RECIPES = ['$working_dir_utilery/utilery/queries.yml']
+RECIPES = ['$WORKING_DIR_UTILERY/utilery/queries.yml']
 TILEJSON = {
     "tilejson": "2.1.0",
     "name": "utilery",
@@ -124,35 +124,35 @@ EOF1
 
 # Import of the queries you wanna use
 import_queries() {
-    cp ./utilery/queries.yml $working_dir_utilery/utilery
-    cp ./utilery/new-query.yml $working_dir_utilery/utilery
+    cp ./utilery/queries.yml $WORKING_DIR_UTILERY/utilery
+    cp ./utilery/new-query.yml $WORKING_DIR_UTILERY/utilery
 }
 
 # If utilery virtualenv already exist
 delete_utilery_virtualenv() {
-    if [ -d "$working_dir_utilery/utilery-virtualenv" ]; then
-        rm -rf $working_dir_utilery/utilery-virtualenv
+    if [ -d "$WORKING_DIR_UTILERY/utilery-virtualenv" ]; then
+        rm -rf $WORKING_DIR_UTILERY/utilery-virtualenv
     fi
 }
 
 # Create the virtualenv
 create_utilery_virtualenv() {
-    cd $working_dir_utilery
+    cd $WORKING_DIR_UTILERY
     virtualenv utilery-virtualenv --python=/usr/bin/python3.5
     cd -
 }
 
 # Setup utilery
 setup_utilery() {
-    cd $working_dir_utilery/utilery
-    $working_dir_utilery/utilery-virtualenv/bin/pip3 install --upgrade pip
-    $working_dir_utilery/utilery-virtualenv/bin/pip3 install .
+    cd $WORKING_DIR_UTILERY/utilery
+    $WORKING_DIR_UTILERY/utilery-virtualenv/bin/pip3 install --upgrade pip
+    $WORKING_DIR_UTILERY/utilery-virtualenv/bin/pip3 install .
     cd -
 }
 
 # Install unstable python dependencies
 install_python_dependencies() {
-    $working_dir_utilery/utilery-virtualenv/bin/pip3 install -r $working_dir_utilery/utilery/requirements.txt
+    $WORKING_DIR_UTILERY/utilery-virtualenv/bin/pip3 install -r $WORKING_DIR_UTILERY/utilery/requirements.txt
 }
 
 # Delete utilery service if exist
@@ -170,7 +170,7 @@ Description=Utilery
 
 [Service]
 Type=forking
-ExecStart=/bin/sh $working_dir_utilery/utilery/utilery-service.sh
+ExecStart=/bin/sh $WORKING_DIR_UTILERY/utilery/utilery-service.sh
 
 [Install]
 WantedBy=multi-user.target
@@ -179,16 +179,16 @@ EOF1
 
 # Create utilery-service.sh
 create_utilery_service_script() {
-    cat > $working_dir_utilery/utilery/utilery-service.sh << EOF1
+    cat > $WORKING_DIR_UTILERY/utilery/utilery-service.sh << EOF1
 #!/bin/bash
 
-nohup $working_dir_utilery/utilery-virtualenv/bin/python $working_dir_utilery/utilery/utilery/serve.py &
+nohup $WORKING_DIR_UTILERY/utilery-virtualenv/bin/python $WORKING_DIR_UTILERY/utilery/utilery/serve.py &
 EOF1
 }
 
 # Set execute permission on the script
 set_permission() {
-    chmod +x $working_dir_utilery/utilery/utilery-service.sh
+    chmod +x $WORKING_DIR_UTILERY/utilery/utilery-service.sh
 }
 
 # Add the UTILERY_SETTINGS into the environements variables
@@ -197,9 +197,9 @@ add_utilery_settings() {
   then
       echo "UTILERY_SETTINGS ALREADY FOUND ! DELETING OLD ONE in /etc/environment"
       sed -i '/UTILERY_SETTINGS/d' /etc/environment
-      echo "UTILERY_SETTINGS=$working_dir_utilery/utilery/utilery/config/default.py" >> /etc/environment
+      echo "UTILERY_SETTINGS=$WORKING_DIR_UTILERY/utilery/utilery/config/default.py" >> /etc/environment
   else
-      echo "UTILERY_SETTINGS=$working_dir_utilery/utilery/utilery/config/default.py" >> /etc/environment
+      echo "UTILERY_SETTINGS=$WORKING_DIR_UTILERY/utilery/utilery/config/default.py" >> /etc/environment
   fi
 }
 
