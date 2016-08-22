@@ -2,7 +2,7 @@
 
 # SETUP USER
 
-# Directory where you want the imposm3 folder to be created (ex: "/project/osm")
+# Directory where you want the database folder to be created (ex: "/project/osm")
 WORKING_DIR_DATABASE="/srv/projects/vectortiles/project/osm-ireland"
 
 # Database user name
@@ -43,7 +43,7 @@ verif() {
     echo "
     The deployement will use this setup:
 
-    Directory where the imposm3 and the utilery folder will be created: $WORKING_DIR_DATABASE
+    Directory where the database and the utilery folder will be created: $WORKING_DIR_DATABASE
     Database user name: $DATABASE_USER_DATABASE
     Database user password: $DATABASE_USER_PASSWORD_DATABASE
     Database name: $DATABASE_NAME_DATABASE
@@ -129,12 +129,12 @@ create_database() {
 add_extensions() {
     sudo -n -u postgres -s -- psql -c "CREATE EXTENSION postgis; CREATE EXTENSION postgis_topology; CREATE EXTENSION hstore;" $DATABASE_NAME_DATABASE
 
-    # Delete folder imposm3 if exist
-    if [ -d "$WORKING_DIR_DATABASE/imposm3" ]; then
+    # Delete folder database if exist
+    if [ -d "$WORKING_DIR_DATABASE/database" ]; then
         while true; do
-            read -p "A imposm3 folder already exist in $WORKING_DIR_DATABASE directory, yes will delete imposm3 folder, no will end the script. Y/N?" yn
+            read -p "A database folder already exist in $WORKING_DIR_DATABASE directory, yes will delete database folder, no will end the script. Y/N?" yn
                 case $yn in
-                    [Yy]* ) rm -rf "$WORKING_DIR_DATABASE/imposm3"; break;;
+                    [Yy]* ) rm -rf "$WORKING_DIR_DATABASE/database"; break;;
                     [Nn]* ) exit;;
                     * ) echo "Please answer yes or no.";;
             esac
@@ -144,26 +144,26 @@ add_extensions() {
 
 # Folders structure
 folder_structure() {
-    mkdir -p $WORKING_DIR_DATABASE/imposm3/binary \
-        $WORKING_DIR_DATABASE/imposm3/cache \
-        $WORKING_DIR_DATABASE/imposm3/config \
-        $WORKING_DIR_DATABASE/imposm3/cron \
-        $WORKING_DIR_DATABASE/imposm3/import \
-        $WORKING_DIR_DATABASE/imposm3/osmosis \
-        $WORKING_DIR_DATABASE/imposm3/import-external \
-        $WORKING_DIR_DATABASE/imposm3/sql
+    mkdir -p $WORKING_DIR_DATABASE/database/binary \
+        $WORKING_DIR_DATABASE/database/cache \
+        $WORKING_DIR_DATABASE/database/config \
+        $WORKING_DIR_DATABASE/database/cron \
+        $WORKING_DIR_DATABASE/database/import \
+        $WORKING_DIR_DATABASE/database/osmosis \
+        $WORKING_DIR_DATABASE/database/import-external \
+        $WORKING_DIR_DATABASE/database/sql
 }
 
 # Installation of imposm3
 install_imposm3() {
-    wget -P $WORKING_DIR_DATABASE/imposm3/binary $URL_BINARY_DATABASE
-    tar -zxvf $WORKING_DIR_DATABASE/imposm3/binary/$BINARY_TAR_NAME_DATABASE -C $WORKING_DIR_DATABASE/imposm3/binary
-    mv $WORKING_DIR_DATABASE/imposm3/binary/$BINARY_NAME_DATABASE/* $WORKING_DIR_DATABASE/imposm3/binary
-    rmdir $WORKING_DIR_DATABASE/imposm3/binary/$BINARY_NAME_DATABASE
-    rm $WORKING_DIR_DATABASE/imposm3/binary/$BINARY_TAR_NAME_DATABASE
-    rm $WORKING_DIR_DATABASE/imposm3/binary/mapping.json
-    cp -r $WORKING_DIR_DATABASE/imposm3/binary/* /usr/local/bin
-    cp ./database/import-data/mapping.yml $WORKING_DIR_DATABASE/imposm3/config
+    wget -P $WORKING_DIR_DATABASE/database/binary $URL_BINARY_DATABASE
+    tar -zxvf $WORKING_DIR_DATABASE/database/binary/$BINARY_TAR_NAME_DATABASE -C $WORKING_DIR_DATABASE/database/binary
+    mv $WORKING_DIR_DATABASE/database/binary/$BINARY_NAME_DATABASE/* $WORKING_DIR_DATABASE/database/binary
+    rmdir $WORKING_DIR_DATABASE/database/binary/$BINARY_NAME_DATABASE
+    rm $WORKING_DIR_DATABASE/database/binary/$BINARY_TAR_NAME_DATABASE
+    rm $WORKING_DIR_DATABASE/database/binary/mapping.json
+    cp -r $WORKING_DIR_DATABASE/database/binary/* /usr/local/bin
+    cp ./database/import-data/mapping.yml $WORKING_DIR_DATABASE/database/config
 }
 
 # Initial import of the PBF into the PostGIS database
