@@ -13,5 +13,5 @@ FROM (
     WHERE
         table_schema NOT IN ('pg_catalog', 'information_schema', 'topology')
         AND table_schema NOT LIKE 'pg_toast%'
-        AND table_name NOT IN ('diff', 'raster_columns', 'raster_overviews', 'spatial_ref_sys', 'geography_columns', 'geometry_columns')
+        AND table_name LIKE 'osm_%'
 ) as triggers_tables;
