@@ -82,13 +82,32 @@ delete_varnish_folder() {
 
 # Configuration
 config() {
-    # Update of the repositories and install of python curl and wget
+    # Update of the repositories and install of python virtualenv curl and wget
     apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y python3.5 python3.5-dev curl wget
+    apt-get install -y python3.5 python3.5-dev python3-pip python-virtualenv virtualenvwrapper curl wget
 
     #  Create varnish folder
     mkdir -p $WORKING_DIR_VARNISH/varnish
+}
+
+# If varnish virtualenv already exist
+delete_varnish_virtualenv() {
+    if [ -d "$WORKING_DIR_VARNISH/varnish-virtualenv" ]; then
+        rm -rf $WORKING_DIR_VARNISH/varnish-virtualenv
+    fi
+}
+
+# Create the virtualenv
+create_varnish_virtualenv() {
+    cd $WORKING_DIR_VARNISH
+    virtualenv varnish-virtualenv --python=/usr/bin/python3.5
+    cd -
+}
+
+# Install dependencies
+install_dependencies() {
+    $WORKING_DIR_VARNISH/varnish-virtualenv/bin/pip3 install psycopg2 ujson mercantile
 }
 
 
@@ -213,7 +232,7 @@ echo "### \$(date) "
 
 echo "### Tiles generation "
 
-/usr/bin/python3.5 $WORKING_DIR_VARNISH/varnish/purge-diff.py \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8
+$WORKING_DIR_VARNISH/varnish-virtualenv/bin/python3.5 $WORKING_DIR_VARNISH/varnish/purge-diff.py \$1 \$2 \$3 \$4 \$5 \$6 \$7 \$8
 EOF1
 
     # Set execute permission on the script
@@ -246,7 +265,7 @@ echo "### \$(date) "
 
 echo "### Clean all generated geometry "
 
-/usr/bin/python3.5 $WORKING_DIR_VARNISH/varnish/clean-diff.py \$1 \$2 \$3 \$4
+$WORKING_DIR_VARNISH/varnish-virtualenv/bin/python3.5 $WORKING_DIR_VARNISH/varnish/clean-diff.py \$1 \$2 \$3 \$4
 EOF1
 
     # Set execute permission on the script
@@ -270,6 +289,9 @@ main() {
     verif
     delete_varnish_folder
     config
+    delete_varnish_virtualenv
+    create_varnish_virtualenv
+    install_dependencies
     delete_vcl_varnish_service
     install_varnish
     create_vcl_varnish_service
