@@ -35,7 +35,7 @@ DATABASE_HOST_DJANGO='127.0.0.1'
 # Database user
 DATABASE_USER_DJANGO='imposm3_user_ir'
 
-# Datanase password
+# Database password
 DATABASE_PASSWORD_DJANGO='makina'
 
 # Utilery host (by varnish)
