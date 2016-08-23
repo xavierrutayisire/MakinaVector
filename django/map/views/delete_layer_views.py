@@ -106,10 +106,11 @@ def check_layer_exist_multiple_style(layer_name, multiple_style_json):
 
 def create_new_multiple_style(layer_name, multiple_style_json):
     """
-    Remove the layers of the multiple style file
+    Remove the layers and sources of the multiple style file
     """
     new_multiple_style_layers = []
 
+    # Layers
     for layer in multiple_style_json['layers']:
         try:
             if layer['source-layer'] != layer_name:
@@ -120,13 +121,17 @@ def create_new_multiple_style(layer_name, multiple_style_json):
 
     multiple_style_json['layers'] = new_multiple_style_layers
 
-    # Remove the source of the style
+    # Sources
     new_multiple_style_sources = {name: source for name, source in multiple_style_json['sources'].items() if name != '{{ dbname }}_' + layer_name}
     multiple_style_json['sources'] = new_multiple_style_sources
 
     # Clean the new style
     multiple_style_json = repr(multiple_style_json).replace("'", '"')
-    multiple_style_json = repr(multiple_style_json).replace("True", "true")
+
+    if not new_multiple_style_sources:
+        multiple_style_json = repr(multiple_style_json).replace("True", "false")
+    else:
+        multiple_style_json = repr(multiple_style_json).replace("True", "true")
 
     # Create a new multiple style file without the old styles
     with open(settings.MULTIPLE_STYLE_DIR, "w") as new_multiple_style_file:

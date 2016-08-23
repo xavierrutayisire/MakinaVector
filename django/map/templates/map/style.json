@@ -128,7 +128,7 @@
         "{{ dbname }}": {
             "type": "vector",
             "tiles": [
-                "http://{{ utilery_host }}:{{ utilery_port }}/all/{z}/{x}/{y}.pbf"
+                "http://{{ utilery_host }}:{{ utilery_port }}/{{ names }}/{z}/{x}/{y}.pbf"
             ],
             "maxzoom": 14,
             "minzoom": 0

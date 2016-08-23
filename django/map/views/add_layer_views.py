@@ -155,7 +155,7 @@ def load_new_style(layer_name):
     return new_style_data
 
 
-def create_new_style(multiple_style_data, new_style_data):
+def create_new_style(multiple_style_data, new_style_data, multiple_style_state):
     """
     Create the new style with the new layer
     """
@@ -177,7 +177,11 @@ def create_new_style(multiple_style_data, new_style_data):
         multiple_style_data['layers'].append(new_style_data['layers'][i])
 
     # Clean the json file
-    multiple_style_data = repr(multiple_style_data).replace("True", "true")
+    if multiple_style_state:
+        multiple_style_data = repr(multiple_style_data).replace("True", "true")
+    else:
+        multiple_style_data = repr(multiple_style_data).replace("False", "true")
+
     remove_char = "'"
 
     for char in remove_char:
@@ -294,7 +298,8 @@ def add_layer(request):
         if style_already_exist is False:
             # New style
             new_style_data = load_new_style(layer_name)
-            create_new_style(multiple_style_data, new_style_data)
+            multiple_style_state = multiple_style_data['multiple_style']
+            create_new_style(multiple_style_data, new_style_data, multiple_style_state)
 
         # Queries
         queries_yml, queries_yml_file = load_queries()
