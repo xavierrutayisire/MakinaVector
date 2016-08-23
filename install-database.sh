@@ -2,7 +2,7 @@
 
 # SETUP USER
 
-# Directory where you want the database folder to be created (ex: "/project/osm")
+# Directory where you want the database folder to be created
 WORKING_DIR_DATABASE="/srv/projects/vectortiles/project/osm-ireland"
 
 # Database user name
@@ -23,13 +23,13 @@ URL_PBF_DATABASE="http://download.openstreetmap.fr/extracts/europe/ireland-lates
 # Url of the PBF state
 URL_PBF_STATE_DATABASE="http://download.openstreetmap.fr/extracts/europe/ireland.state.txt"
 
-# Url for the minute replication (ex: "http://download.openstreetmap.fr/replication/europe/france/minute")
+# Url for the minute replication
 URL_CHANGES_DATABASE="http://download.openstreetmap.fr/replication/europe/ireland/minute"
 
-# Version of postgresql (ex: "9.5")
+# Version of postgresql
 POSTGRESQL_VERSION_DATABASE="9.5"
 
-# Version of postgis (ex: "2.2")
+# Version of postgis
 POSTGIS_VERSION_DATABASE="2.2"
 
 # Url of the binary of imposm3
