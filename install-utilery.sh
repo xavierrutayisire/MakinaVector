@@ -2,7 +2,7 @@
 
 # SETUP USER
 
-# Directory where you want the utilery folder to be created (ex: "/project/osm")
+# Directory where you want the utilery folder to be created
 WORKING_DIR_UTILERY="/srv/projects/vectortiles/project/osm-ireland"
 
 # Database user name
