@@ -74,7 +74,10 @@ def database_connection():
     """
     Database connection
     """
-    conn = psycopg2.connect(host=settings.DATABASE_HOST, database=settings.DATABASE_NAME, user=settings.DATABASE_USER, password=settings.DATABASE_PASSWORD)
+    conn = psycopg2.connect(host=settings.DATABASE_HOST,
+                            database=settings.DATABASE_NAME,
+                            user=settings.DATABASE_USER,
+                            password=settings.DATABASE_PASSWORD)
     cursor = conn.cursor()
 
     return conn, cursor
@@ -85,7 +88,9 @@ def add_geometry_database(table_name, geometry_data, cursor, conn):
     Add the geometry into the database
     """
     # Create table if not exist for the layer
-    cursor.execute("CREATE TABLE IF NOT EXISTS {0} (id serial PRIMARY KEY, geometry geometry(Geometry,3857) NOT NULL, geometry_type varchar(40) NOT NULL)".format(table_name))
+    cursor.execute("""CREATE TABLE IF NOT EXISTS {0} (id serial PRIMARY KEY,
+                      geometry geometry(Geometry,3857) NOT NULL,
+                      geometry_type varchar(40) NOT NULL)""".format(table_name))
 
     # Add geometry and geometry type of the geojson into the database
     for feature in range(len(geometry_data['features'])):
@@ -99,9 +104,13 @@ def add_geometry_database(table_name, geometry_data, cursor, conn):
 
         # Add the geometry into the table if the geometry doesn't already exist
         cursor.execute("""INSERT INTO {0}(geometry, geometry_type)
-        SELECT ST_SetSRID(\'{1}\'::geometry, 3857) as geometry, \'{2}\' as geometry_type
-        WHERE NOT EXISTS (SELECT geometry FROM {0} WHERE geometry = ST_SetSRID(\'{1}\'::geometry, 3857))
-        """.format(table_name, geom, geometry_type))
+                          SELECT ST_SetSRID(\'{1}\'::geometry, 3857) AS geometry,
+                                 \'{2}\' AS geometry_typ
+                          WHERE NOT EXISTS
+                              (SELECT geometry
+                               FROM {0}
+                               WHERE geometry = ST_SetSRID(\'{1}\'::geometry, 3857))
+                       """.format(table_name, geom, geometry_type))
 
     # Save changes
     conn.commit()

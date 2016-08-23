@@ -11,7 +11,10 @@ def database_connection():
     """
     Database connection
     """
-    conn = psycopg2.connect(host=settings.DATABASE_HOST, database=settings.DATABASE_NAME, user=settings.DATABASE_USER, password=settings.DATABASE_PASSWORD)
+    conn = psycopg2.connect(host=settings.DATABASE_HOST,
+                            database=settings.DATABASE_NAME,
+                            user=settings.DATABASE_USER,
+                            password=settings.DATABASE_PASSWORD)
     cursor = conn.cursor()
 
     return conn, cursor
@@ -21,7 +24,9 @@ def check_table_exist(table_name, cursor):
     """
     Check if the table exist
     """
-    cursor.execute("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE  table_schema = 'public' AND table_name = \'{0}\')".format(table_name))
+    cursor.execute("""SELECT EXISTS (SELECT 1 FROM information_schema.tables
+                      WHERE  table_schema = 'public'
+                      AND table_name = \'{0}\')""".format(table_name))
     table_exist = cursor.fetchall()
     table_exist = table_exist[0][0]
 
