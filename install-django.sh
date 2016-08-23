@@ -38,11 +38,11 @@ DATABASE_USER_DJANGO='imposm3_user_ir'
 # Database password
 DATABASE_PASSWORD_DJANGO='makina'
 
-# Utilery host (by varnish)
-UTILERY_HOST_DJANGO='127.0.0.1'
+# Varnish host
+VARNISH_HOST_DJANGO='127.0.0.1'
 
-# Utilery port (by varnish)
-UTILERY_PORT_DJANGO=6081
+# Varnish port
+VARNISH_PORT_DJANGO=6081
 
 # END SETUP USER
 
@@ -64,8 +64,8 @@ verif() {
     Database host: $DATABASE_HOST_DJANGO
     Database user: $DATABASE_USER_DJANGO
     Datanase password: $DATABASE_PASSWORD_DJANGO
-    Utilery host (by varnish): $UTILERY_HOST_DJANGO
-    Utilery port (by varnish): $UTILERY_PORT_DJANGO
+    Varnish host: $VARNISH_HOST_DJANGO
+    Varnish port: $VARNISH_PORT_DJANGO
 
     "
     while true; do
@@ -191,9 +191,9 @@ DATABASE_HOST = '$DATABASE_HOST_DJANGO'
 DATABASE_USER = '$DATABASE_USER_DJANGO'
 DATABASE_PASSWORD = '$DATABASE_PASSWORD_DJANGO'
 
-# Utilery (by the varnish cache)
-UTILERY_HOST = '$UTILERY_HOST_DJANGO'
-UTILERY_PORT = $UTILERY_PORT_DJANGO
+# Varnish
+VARNISH_HOST = '$VARNISH_HOST_DJANGO'
+VARNISH_PORT = $VARNISH_PORT_DJANGO
 
 # Directories
 QUERIES_DIR = '$QUERIES_DIR_DJANGO'

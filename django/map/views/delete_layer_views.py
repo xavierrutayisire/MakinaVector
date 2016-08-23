@@ -142,7 +142,7 @@ def ban_varnish_tiles(layer_name):
     """
     Ban all the tiles of this layer
     """
-    connHTTP = HTTPConnection(settings.UTILERY_HOST + ':' + str(settings.UTILERY_PORT))
+    connHTTP = HTTPConnection(settings.VARNISH_HOST + ':' + str(settings.VARNISH_PORT))
     connHTTP.request("BAN", "/" + layer_name + "/")
 
 

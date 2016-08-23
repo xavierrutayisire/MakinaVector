@@ -57,9 +57,9 @@ def style(request):
     Return the style file
     """
     context = locals()
-    context['utilery_host'] = settings.UTILERY_HOST
-    context['utilery_port'] = settings.UTILERY_PORT
     context['dbname'] = settings.DATABASE_NAME
+    context['varnish_host'] = settings.VARNISH_HOST
+    context['varnish_port'] = settings.VARNISH_PORT
     context['names'] = get_names()
     # Load the template
     try:

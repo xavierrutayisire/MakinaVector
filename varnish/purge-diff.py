@@ -58,7 +58,7 @@ def purge_record(bbox, tiles_generate):
     east = bbox["bbox"][2]
     north = bbox["bbox"][3]
 
-    # Utilery host (by varnish)
+    # Varnish connection
     host = sys.argv[7]
     port = sys.argv[8]
 

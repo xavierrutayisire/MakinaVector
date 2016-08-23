@@ -9,8 +9,8 @@ def multiple_style(request):
     """
     context = locals()
     context['dbname'] = settings.DATABASE_NAME
-    context['utilery_host'] = settings.UTILERY_HOST
-    context['utilery_port'] = settings.UTILERY_PORT
+    context['varnish_host'] = settings.VARNISH_HOST
+    context['varnish_port'] = settings.VARNISH_PORT
 
     # Load the template
     try:

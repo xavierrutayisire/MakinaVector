@@ -3,7 +3,7 @@
         "{{ dbname }}_{ layer_name }": {
             "type": "vector",
             "tiles": [
-                "http://{{ utilery_host }}:{{ utilery_port }}/{ layer_name }/{z}/{x}/{y}.pbf"
+                "http://{{ varnish_host }}:{{ varnish_port }}/{ layer_name }/{z}/{x}/{y}.pbf"
             ],
             "maxzoom": 14,
             "minzoom": 0

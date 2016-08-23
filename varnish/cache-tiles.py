@@ -15,7 +15,7 @@ south = 51.122
 east = -5.5582362
 north = 55.736
 
-# Utilery connection (by Varnish)
+# Varnish connection
 host = '127.0.0.1'
 port = 6081
 
