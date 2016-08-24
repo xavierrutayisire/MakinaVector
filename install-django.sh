@@ -78,13 +78,13 @@ verif() {
     done
 }
 
-# Delete composite if exist
-delete_composite_folder() {
-    if [ -d "$WORKING_DIR_DJANGO/django/composite" ]; then
+# Delete django folder if exist
+delete_django_folder() {
+    if [ -d "$WORKING_DIR_DJANGO/django" ]; then
         while true; do
-            read -p "Project 'composite' already exist in $WORKING_DIR_DJANGO directory, yes will delete composite folder, no will end the script. Y/N?" yn
+            read -p "Django folder exist in $WORKING_DIR_DJANGO directory, yes will delete django folder, no will end the script. Y/N?" yn
                 case $yn in
-                    [Yy]* ) rm -rf  "$WORKING_DIR_DJANGO/django/composite"; break;;
+                    [Yy]* ) rm -rf  "$WORKING_DIR_DJANGO/django"; break;;
                     [Nn]* ) exit;;
                     * ) echo "Please answer yes or no.";;
             esac
@@ -99,7 +99,8 @@ config() {
     apt-get upgrade -y && \
     apt-get install -y python3.5 python3.5-dev python3-pip python-virtualenv virtualenvwrapper
 
-    mkdir -p $WORKING_DIR_DJANGO/django
+    mkdir -p $WORKING_DIR_DJANGO/django \
+             $WORKING_DIR_DJANGO/django/service
 }
 
 # If django virtualenv already exist
@@ -162,7 +163,7 @@ add_map_to_settings() {
 
 # Extra variables
 extra_variables() {
-    UPLOAD_DIR_DJANGO='upload/'
+    UPLOAD_DIR_DJANGO=$WORKING_DIR_DJANGO'/django/composite/upload/'
     QUERIES_DIR_DJANGO=$WORKING_DIR_UTILERY_DJANGO'/queries.yml'
     NEW_QUERY_DIR_DJANGO=$WORKING_DIR_UTILERY_DJANGO'/new-query.yml'
     STYLE_DIR_DJANGO=$WORKING_DIR_DJANGO'/django/composite/map/templates/map/style.json'
@@ -211,9 +212,55 @@ apply_migrations() {
     cd -
 }
 
+# Delete django service if exist
+delete_django_service() {
+    if [ -d "/etc/systemd/system/django.service" ]; then
+        rm /etc/systemd/system/django.service
+    fi
+}
+
+# Create django service with systemd
+create_django_service() {
+    cat > /etc/systemd/system/django.service << EOF1
+[Unit]
+Description=Django
+
+[Service]
+Type=forking
+ExecStart=/bin/sh $WORKING_DIR_DJANGO/django/service/django-service.sh
+
+[Install]
+WantedBy=multi-user.target
+EOF1
+}
+
+# Create django-service.sh
+create_django_service_script() {
+    cat > $WORKING_DIR_DJANGO/django/service/django-service.sh << EOF1
+#!/bin/bash
+
+nohup sudo $WORKING_DIR_DJANGO/django-virtualenv/bin/python $WORKING_DIR_DJANGO/django/composite/manage.py runserver $DJANGO_PORT_DJANGO &
+EOF1
+}
+
+# Set execute permission on the script
+set_permission() {
+    chmod +x $WORKING_DIR_DJANGO/django/service/django-service.sh
+}
+
+# Reload systemctl
+systemctl_reload() {
+    systemctl daemon-reload
+}
+
+# Start django service
+systemctl_start_django() {
+    systemctl start django.service
+}
+
 main() {
     verif
-    delete_composite_folder
+    delete_django_folder
     config
     delete_django_virtualenv
     create_django_virtualenv
@@ -226,5 +273,11 @@ main() {
     extra_variables
     add_variables_to_settings
     apply_migrations
+    delete_django_service
+    create_django_service
+    create_django_service_script
+    set_permission
+    systemctl_reload
+    systemctl_start_django
 }
 main
