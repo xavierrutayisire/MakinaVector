@@ -146,7 +146,7 @@ layers:
         SELECT
             osm_ids2mbid(0, true) AS osm_id, geom AS way
         FROM
-            ne_110m_ocean_subdivided
+            osm_ocean_polygon_gen0
         WHERE
             geom && !bbox!
         UNION ALL
@@ -162,7 +162,7 @@ layers:
         SELECT
             osm_ids2mbid(0, true) AS osm_id, geom AS way
         FROM
-            ne_50m_ocean_subdivided
+            osm_ocean_polygon_gen0
         WHERE
             geom && !bbox!
         UNION ALL
@@ -178,7 +178,7 @@ layers:
         SELECT
             osm_ids2mbid(0, true) AS osm_id, geom AS way
         FROM
-            ne_10m_ocean_subdivided
+            osm_ocean_polygon_gen1
         WHERE
             geom && !bbox!
         UNION ALL
@@ -194,7 +194,7 @@ layers:
         SELECT
             osm_ids2mbid(0, true) AS osm_id, geometry AS way
         FROM
-            osm_ocean_polygon_subdivided_gen0
+            osm_ocean_polygon_gen1
         WHERE
             geometry && !bbox!
         UNION ALL
@@ -210,7 +210,7 @@ layers:
         SELECT
             osm_ids2mbid(0, true) AS osm_id, geometry AS way
         FROM
-            osm_ocean_polygon_subdivided_gen0
+            osm_ocean_polygon_gen1
         WHERE
             geometry && !bbox!
         UNION ALL
@@ -221,7 +221,7 @@ layers:
                  ELSE geometry
             END AS way
         FROM
-            osm_water_polygon_gen1
+            osm_water_polygon_gen0
         WHERE
             geometry && !bbox!
     - minzoom: 8
@@ -230,7 +230,7 @@ layers:
         SELECT
             osm_ids2mbid(0, true) AS osm_id, geometry AS way
         FROM
-            osm_ocean_polygon_subdivided
+            osm_ocean_polygon
         WHERE
             geometry && !bbox!
         UNION ALL
@@ -241,7 +241,7 @@ layers:
                  ELSE geometry
             END AS way
         FROM
-            osm_water_polygon_gen1
+            osm_water_polygon_gen0
         WHERE
             geometry && !bbox!
     - minzoom: 11
@@ -250,7 +250,7 @@ layers:
         SELECT
             osm_ids2mbid(0, true) AS osm_id, geometry AS way, 0 AS area
         FROM
-            osm_ocean_polygon_subdivided
+            osm_ocean_polygon
         WHERE
             geometry && !bbox!
         UNION ALL
@@ -273,7 +273,7 @@ layers:
         SELECT
             osm_ids2mbid(0, true) AS osm_id, geometry AS way
         FROM
-            osm_ocean_polygon_subdivided
+            osm_ocean_polygon
         WHERE
             geometry && !bbox!
         UNION ALL
@@ -669,12 +669,12 @@ layers:
         WHERE
             geom && !bbox!
     - minzoom: 1
-      maxzoom: 1
+      maxzoom: 2
       sql: |-
         SELECT
             osm_ids2mbid(0, false) AS osm_id, geom as way, 2 AS admin_level, 0 AS disputed, 0 AS maritime
         FROM
-            ne_110m_admin_0_boundary_lines_land
+            ne_50m_admin_0_boundary_lines_land
         WHERE
             geom && !bbox!
         UNION ALL
@@ -686,35 +686,6 @@ layers:
             scalerank = 2
         AND
             geom && !bbox!
-    - minzoom: 2
-      maxzoom: 2
-      sql: |-
-        SELECT
-            osm_ids2mbid(0, false) AS osm_id, geom as way, 2 AS admin_level, 0 AS disputed, 0 AS maritime
-        FROM
-            ne_110m_admin_0_boundary_lines_land
-        WHERE
-            geom && !bbox!
-        UNION ALL
-        SELECT
-            osm_ids2mbid(0, false) AS osm_id, geom as way, 4 AS admin_level, 0 AS disputed, 0 AS maritime
-        FROM
-            ne_10m_admin_1_states_provinces_lines_shp
-        WHERE
-            scalerank = 2
-        AND
-            geom && !bbox!
-        UNION ALL
-        SELECT
-            osm_ids2mbid(id, false) AS osm_id, geometry as way, admin_level, maritime, 0 AS disputed
-        FROM
-            osm_admin_linestring
-        WHERE
-            (maritime = 1
-        OR
-            admin_level = 2)
-        AND
-            geometry && !bbox!
     - minzoom: 3
       maxzoom: 3
       sql: |-
@@ -843,7 +814,7 @@ layers:
         FROM
             custom_countries
         WHERE
-            rank <= 1
+            rank <= 2
         AND
             wkb_geometry && !bbox!
     - minzoom: 2
@@ -864,7 +835,7 @@ layers:
         FROM
             custom_countries
         WHERE
-            rank <= 2
+            rank <= 3
         AND
             wkb_geometry && !bbox!
     - minzoom: 3

@@ -48,6 +48,7 @@ drop_table_natural_earth() {
 
 # Clean natural earth
 clean_natural_earth() {
+    drop_table_natural_earth 'ne_10m_ocean'
     drop_table_natural_earth 'ne_10m_admin_0_antarctic_claim_limit_lines'
     drop_table_natural_earth 'ne_10m_admin_0_antarctic_claims'
     drop_table_natural_earth 'ne_10m_admin_0_map_subunits'
@@ -101,6 +102,7 @@ clean_natural_earth() {
     drop_table_natural_earth 'ne_10m_urban_areas_landscan'
     drop_table_natural_earth 'ne_10m_admin_1_states_provinces_lakes_shp'
     drop_table_natural_earth 'ne_10m_admin_1_states_provinces_shp'
+    drop_table_natural_earth 'ne_50m_ocean'
     drop_table_natural_earth 'ne_50m_admin_0_boundary_lines_disputed_areas'
     drop_table_natural_earth 'ne_50m_admin_1_states_provinces_shp'
     drop_table_natural_earth 'ne_50m_admin_0_countries_lakes'
@@ -139,6 +141,7 @@ clean_natural_earth() {
     drop_table_natural_earth 'ne_10m_admin_1_seams'
     drop_table_natural_earth 'ne_10m_land'
     drop_table_natural_earth 'ne_10m_ocean_scale_rank'
+    drop_table_natural_earth 'ne_110m_ocean'
     drop_table_natural_earth 'ne_110m_admin_0_sovereignty'
     drop_table_natural_earth 'ne_110m_admin_0_tiny_countries'
     drop_table_natural_earth 'ne_110m_admin_1_states_provinces_lakes_shp'
@@ -213,16 +216,24 @@ import_shp() {
     shp2pgsql -s 3857 -I -g geometry "$SHP_FILE" "$TABLE_NAME" | exec_psql | hide_inserts
 }
 
+generalize_water() {
+    echo 'CREATE TABLE osm_ocean_polygon_gen0 AS SELECT ST_Simplify(geometry, 30000) AS geometry FROM osm_ocean_polygon_gen1' | exec_psql
+    echo 'CREATE INDEX ON osm_ocean_polygon_gen0 USING gist (geometry)' | exec_psql
+    echo 'ANALYZE osm_ocean_polygon_gen0' | exec_psql
+}
+
 # Import water
 import_water() {
     local TABLE_NAME="osm_ocean_polygon"
-    local SIMPLIFIED_TABLE_NAME="osm_ocean_polygon_gen0"
+    local SIMPLIFIED_TABLE_NAME="osm_ocean_polygon_gen1"
 
     drop_table "$TABLE_NAME"
     import_shp "$WORKING_DIR_DATABASE/database/import-external/water_polygons.shp" "$TABLE_NAME"
 
     drop_table "$SIMPLIFIED_TABLE_NAME"
     import_shp "$WORKING_DIR_DATABASE/database/import-external/simplified_water_polygons.shp" "$SIMPLIFIED_TABLE_NAME"
+
+    generalize_water
 }
 
 # Copy files from repository
