@@ -79,6 +79,11 @@ clone_utilery() {
     cd $WORKING_DIR_UTILERY
     git clone https://github.com/etalab/utilery
     cd -
+
+    # Get a version of utilery we know it will work
+    cd $WORKING_DIR_UTILERY/utilery
+    git checkout 55a392f25305d410d18dc1ee54e6ddf5c3eb7906
+    cd -
 }
 
 # Add the support of multicores
