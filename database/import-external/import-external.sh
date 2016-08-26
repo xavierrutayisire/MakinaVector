@@ -277,9 +277,8 @@ remove_password() {
 
 main() {
     create_password
-    #downloads
+    downloads
     clean_natural_earth
-    cp /srv/projects/vectortiles/project/osm-algeria/imposm3/import-external/* $WORKING_DIR_DATABASE/database/import-external
     import_natural_earth
     import_water
     copy_files
