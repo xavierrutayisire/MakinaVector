@@ -11,7 +11,9 @@ layers:
         FROM
             osm_landuse_polygon_subdivided_gen0
         WHERE
-            type = 'wood'
+            landuse_class(type) = 'wood'
+        AND 
+            area > 10000000
         AND
             geometry && !bbox!
         GROUP BY
@@ -24,7 +26,7 @@ layers:
         FROM
             osm_landuse_polygon_subdivided_gen0
         WHERE
-            type IN ('wood', 'residential')
+            landuse_class(type) IN ('wood', 'residential')
         AND
             area > 1000000
         AND
@@ -39,7 +41,7 @@ layers:
         FROM
             osm_landuse_polygon_subdivided_gen0
         WHERE
-            type IN ('wood', 'residential', 'grass', 'cemetery', 'park', 'school')
+            landuse_class(type) IN ('wood', 'residential', 'grass', 'cemetery', 'park', 'school')
         AND
             geometry && !bbox!
         GROUP BY
@@ -52,7 +54,7 @@ layers:
         FROM
             osm_landuse_polygon_subdivided_gen0
         WHERE
-            type IN ('wood', 'residential', 'commercial', 'retail', 'railway', 'industrial', 'grass', 'cemetery', 'park', 'school')
+            landuse_class(type) IN ('wood', 'residential', 'commercial', 'retail', 'railway', 'industrial', 'grass', 'cemetery', 'park', 'school')
         AND
             area >  99000
         AND
@@ -65,7 +67,7 @@ layers:
         FROM
             osm_landuse_polygon_subdivided_gen1
         WHERE
-            type IN ('wood', 'residential','commercial', 'retail', 'railway', 'industrial', 'military', 'grass', 'cemetery', 'park', 'school', 'hospital')
+            landuse_class(type) IN ('wood', 'residential','commercial', 'retail', 'railway', 'industrial', 'military', 'grass', 'cemetery', 'park', 'school', 'hospital')
         AND
             geometry && !bbox!
     - minzoom: 12
@@ -76,7 +78,7 @@ layers:
         FROM
             osm_landuse_polygon_subdivided
         WHERE
-            type IN ('wood', 'residential', 'grass','retail', 'railway', 'industrial', 'military', 'cemetery', 'park', 'school', 'hospital')
+            landuse_class(type) IN ('wood', 'residential', 'grass','retail', 'railway', 'industrial', 'military', 'cemetery', 'park', 'school', 'hospital')
         AND
             area > 10000
         AND

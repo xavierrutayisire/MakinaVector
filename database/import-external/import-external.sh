@@ -216,6 +216,7 @@ import_shp() {
     shp2pgsql -s 3857 -I -g geometry "$SHP_FILE" "$TABLE_NAME" | exec_psql | hide_inserts
 }
 
+# Create table osm_ocean_polygon_gen0
 generalize_water() {
     echo 'CREATE TABLE osm_ocean_polygon_gen0 AS SELECT ST_Simplify(geometry, 30000) AS geometry FROM osm_ocean_polygon_gen1' | exec_psql
     echo 'CREATE INDEX ON osm_ocean_polygon_gen0 USING gist (geometry)' | exec_psql
@@ -276,8 +277,9 @@ remove_password() {
 
 main() {
     create_password
-    downloads
+    #downloads
     clean_natural_earth
+    cp /srv/projects/vectortiles/project/osm-algeria/imposm3/import-external/* $WORKING_DIR_DATABASE/database/import-external
     import_natural_earth
     import_water
     copy_files
