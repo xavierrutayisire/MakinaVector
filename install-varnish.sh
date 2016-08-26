@@ -35,6 +35,26 @@ MIN_ZOOM_VARNISH=0
 # Max zoom tiles
 MAX_ZOOM_VARNISH=14
 
+# Max zoom tiles
+MAX_ZOOM_VARNISH=14
+
+# Max zoom tiles
+MAX_ZOOM_VARNISH=14
+
+# Maximum number of open files (for ulimit -n), for django service
+LIMIT_NO_FILE_VARNISH=infinity
+
+# Locked shared memory (for ulimit -l), for django service
+# Default log size is 82MB + header
+LIMIT_MEM_LOCK_VARNISH=infinity
+
+# Maximum size of the corefile, for django service
+LIMIT_CORE_VARNISH=infinity
+
+# Size of the varnish_storage.bin cache file
+VARNISH_STORAGE_BIN_SIZE_VARNISH=20G
+
+
 # END SETUP USER
 
 
@@ -54,6 +74,10 @@ verif() {
     Database host: $DATABASE_HOST_VARNISH
     Min zoom tiles: $MIN_ZOOM_VARNISH
     Max zoom tiles: $MAX_ZOOM_VARNISH
+    Maximum number of open files, for django service: $LIMIT_NO_FILE_VARNISH
+    Locked shared memory, for django service: $LIMIT_MEM_LOCK_VARNISH
+    Maximum size of the corefile, for django service: $LIMIT_CORE_VARNISH
+    Size of the varnish_storage.bin cache file: $VARNISH_STORAGE_BIN_SIZE_VARNISH
 
     "
     while true; do
@@ -189,19 +213,19 @@ Description=Varnish Cache, a high-performance HTTP accelerator
 Type=forking
 
 # Maximum number of open files (for ulimit -n)
-LimitNOFILE=infinity
+LimitNOFILE=$LIMIT_NO_FILE_VARNISH
 
 # Locked shared memory (for ulimit -l)
 # Default log size is 82MB + header
-LimitMEMLOCK=infinity
+LimitMEMLOCK=$LIMIT_MEM_LOCK_VARNISH
 
 # On systemd >= 228 enable this to avoid "fork failed" on reload.
 #TasksMax=infinity
 
 # Maximum size of the corefile.
-LimitCORE=infinity
+LimitCORE=$LIMIT_CORE_VARNISH
 
-ExecStart=/usr/sbin/varnishd -a :$VARNISH_PORT_VARNISH -T $VARNISH_HOST_VARNISH:6082 -f /etc/varnish/default.vcl -S /etc/varnish/secret -s "file,$WORKING_DIR_VARNISH/varnish/varnish_storage.bin,20G"
+ExecStart=/usr/sbin/varnishd -a :$VARNISH_PORT_VARNISH -T $VARNISH_HOST_VARNISH:6082 -f /etc/varnish/default.vcl -S /etc/varnish/secret -s "file,$WORKING_DIR_VARNISH/varnish/varnish_storage.bin,$VARNISH_STORAGE_BIN_SIZE_VARNISH"
 ExecReload=/usr/share/varnish/reload-vcl
 
 [Install]
