@@ -98,7 +98,7 @@ def check_layer_exist_multiple_style(layer_name, multiple_style_json):
             if layer['source-layer'] == layer_name:
                 style_exist = True
                 break
-        except:
+        except KeyError:
             pass
 
     return style_exist
@@ -115,7 +115,7 @@ def create_new_multiple_style(layer_name, multiple_style_json):
         try:
             if layer['source-layer'] != layer_name:
                 new_multiple_style_layers.append(layer)
-        except:
+        except KeyError:
             new_multiple_style_layers.append(layer)
             pass
 

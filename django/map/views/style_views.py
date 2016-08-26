@@ -28,7 +28,7 @@ def get_layers_names(style_json):
                     layer_already_exist = True
             if layer_already_exist is False:
                 list_names.append(layer['source-layer'])
-        except:
+        except KeyError:
             pass
 
     return list_names

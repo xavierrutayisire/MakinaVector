@@ -54,7 +54,7 @@ def check_layer_exist_style(layer_name, style_data):
             if layer_name == layer['source-layer']:
                 layer_exist = True
                 break
-        except:
+        except KeyError:
             pass
 
     return layer_exist
@@ -138,7 +138,7 @@ def check_layer_exist_multiple_style(layer_name, multiple_style_data):
             if multiple_style_data['layers'][source_layer]['source-layer'] == layer_name:
                 style_already_exist = True
                 break
-        except:
+        except KeyError:
             pass
 
     return style_already_exist
@@ -187,9 +187,11 @@ def create_new_style(multiple_style_data, new_style_data, multiple_style_state):
     for char in remove_char:
         multiple_style_data = repr(multiple_style_data).replace(char, '"')
 
+    multiple_style_json = ujson.loads(multiple_style_data[1:-1])
+
     # Create the new multiple style file
     with open(settings.MULTIPLE_STYLE_DIR, "w") as new_style_file:
-        new_style_file.write(multiple_style_data[1:-1])
+        new_style_file.write(ujson.dumps(multiple_style_json, indent=4))
 
 
 def load_queries():
@@ -255,7 +257,7 @@ def create_new_queries(queries_yml, new_query, queries_yml_file):
 
     # Create the new queries file with the old and the new query
     with open(settings.QUERIES_DIR, "w") as queries_file:
-        queries_file.write(yaml.dump(old_queries_file_yml))
+        queries_file.write(yaml.dump(old_queries_file_yml, default_flow_style=False))
 
 
 def ban_varnish_tiles(layer_name):

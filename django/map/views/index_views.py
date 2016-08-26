@@ -26,7 +26,7 @@ def add_layer_style(style_json, list_item):
                     layer_already_exist = True
             if layer_already_exist is False:
                 list_item.append(layer['source-layer'])
-        except:
+        except KeyError:
             pass
 
     return list_item
@@ -54,7 +54,7 @@ def add_layer_multiple_style(multiple_style_json, list_item):
                     layer_already_exist = True
             if layer_already_exist is False:
                 list_item.append(layer['source-layer'])
-        except:
+        except KeyError:
             pass
 
     return list_item
