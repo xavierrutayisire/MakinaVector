@@ -26,12 +26,6 @@ URL_PBF_STATE_DATABASE="http://download.openstreetmap.fr/extracts/europe/ireland
 # Url for the minute replication
 URL_CHANGES_DATABASE="http://download.openstreetmap.fr/replication/europe/ireland/minute"
 
-# Version of postgresql
-POSTGRESQL_VERSION_DATABASE="9.5"
-
-# Version of postgis
-POSTGIS_VERSION_DATABASE="2.2"
-
 # Url of the binary of imposm3
 URL_BINARY_DATABASE="http://imposm.org/static/rel/imposm3-0.2.0dev-20160517-3c27127-linux-x86-64.tar.gz"
 
@@ -76,6 +70,12 @@ config() {
 
     # Database port (default: 5432)
     DATABASE_PORT_DATABASE="5432"
+
+    # Version of postgresql
+    POSTGRESQL_VERSION_DATABASE="9.5"
+
+    # Version of postgis
+    POSTGIS_VERSION_DATABASE="2.2"
 
     # Update of the repositories and install of postgresql, postgis and osmosis
     apt-get update && \
@@ -128,8 +128,10 @@ create_database() {
 # Add extensions postgis and hstore to the database
 add_extensions() {
     sudo -n -u postgres -s -- psql -c "CREATE EXTENSION postgis; CREATE EXTENSION postgis_topology; CREATE EXTENSION hstore;" $DATABASE_NAME_DATABASE
+}
 
-    # Delete folder database if exist
+# Delete database folder if exist
+delete_folder_database() {
     if [ -d "$WORKING_DIR_DATABASE/database" ]; then
         while true; do
             read -p "A database folder already exist in $WORKING_DIR_DATABASE directory, yes will delete database folder, no will end the script. Y/N?" yn
@@ -192,6 +194,7 @@ main() {
     create_user
     create_database
     add_extensions
+    delete_folder_database
     folder_structure
     install_imposm3
     script_initial_import
