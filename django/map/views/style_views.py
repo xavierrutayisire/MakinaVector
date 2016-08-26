@@ -61,6 +61,7 @@ def style(request):
     context['varnish_host'] = settings.VARNISH_HOST
     context['varnish_port'] = settings.VARNISH_PORT
     context['names'] = get_names()
+    
     # Load the template
     try:
         template = loader.get_template('map/style.json')
