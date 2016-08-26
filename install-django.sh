@@ -156,11 +156,6 @@ import_repository_files() {
     cp ./django/map/templates/map/* $WORKING_DIR_DJANGO/django/composite/map/templates/map
 }
 
-# Add map application to INSTALLED_APPS in setttings.py file
-add_map_to_settings() {
-    sed -i "/INSTALLED_APPS = /a  \    \'map'," $WORKING_DIR_DJANGO/django/composite/composite/settings.py 
-}
-
 # Extra variables
 extra_variables() {
     UPLOAD_DIR_DJANGO=$WORKING_DIR_DJANGO'/django/composite/upload/'
@@ -171,10 +166,13 @@ extra_variables() {
     NEW_STYLE_DIR_DJANGO=$WORKING_DIR_DJANGO'/django/composite/map/templates/map/new-style.json'
 }
 
-# Add variables to settings.py file
-add_variables_to_settings() {
-    echo "
-# Map variables
+# Create variables in local_settings.py file
+create_variables_local_settings() {
+    cat > $WORKING_DIR_DJANGO/django/composite/local_settings.py << EOF1   
+# Add map to the installed appss
+EXTRA_INSTALLED_APPS = ( 
+    'map',
+)
 
 # Django
 DJANGO_HOST = '$DJANGO_HOST_DJANGO'
@@ -202,7 +200,39 @@ NEW_QUERY_DIR = '$NEW_QUERY_DIR_DJANGO'
 STYLE_DIR = '$STYLE_DIR_DJANGO'
 MULTIPLE_STYLE_DIR = '$MULTIPLE_STYLE_DIR_DJANGO'
 NEW_STYLE_DIR = '$NEW_STYLE_DIR_DJANGO'
-UPLOAD_DIR = '$UPLOAD_DIR_DJANGO'" >> $WORKING_DIR_DJANGO/django/composite/composite/settings.py
+UPLOAD_DIR = '$UPLOAD_DIR_DJANGO'
+EOF1
+}
+
+# Add import to settings.py file
+add_import_to_settings() {
+    echo "
+# Import settings from local_settings.py, if it exists.
+try:
+  import local_settings
+except ImportError:
+  print(\"\"\" 
+    -------------------------------------------------------------------------
+    You need to create a local_settings.py file.
+    -------------------------------------------------------------------------
+    \"\"\")
+  import sys 
+  sys.exit(1)
+else:
+  # Import any symbols that begin with A-Z. Append to lists any symbols that
+  # begin with \"EXTRA_\".
+  import re
+  for attr in dir(local_settings):
+    match = re.search('^EXTRA_(\w+)', attr)
+    if match:
+      name = match.group(1)
+      value = getattr(local_settings, attr)
+      try:
+        globals()[name] += value
+      except KeyError:
+        globals()[name] = value
+    elif re.search('^[A-Z]', attr):
+      globals()[attr] = getattr(local_settings, attr)" >> $WORKING_DIR_DJANGO/django/composite/composite/settings.py
 }
 
 # Apply migrations
@@ -269,9 +299,9 @@ main() {
     create_django_application
     folders_structure
     import_repository_files
-    add_map_to_settings
     extra_variables
-    add_variables_to_settings
+    create_variables_local_settings
+    add_import_to_settings
     apply_migrations
     delete_django_service
     create_django_service
