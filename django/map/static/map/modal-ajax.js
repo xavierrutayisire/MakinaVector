@@ -42,7 +42,7 @@ function toggle(displayState){
 function handleFormRequest(request) {
     if (request.readyState === 4) {
         if (request.status === 200) {
-            window.location = 'http://' + window.vtParameters.djangoHost + ':' + window.vtParameters.djangoPort;
+            window.location = '/';
         } else if (request.status === 202) {
             toggle('block');
         }

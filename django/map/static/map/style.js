@@ -1,6 +1,6 @@
 // Ajax request to get the style file
 var xhr = new XMLHttpRequest();
-xhr.open('GET', 'http://' + window.vtParameters.djangoHost + ':' + window.vtParameters.djangoPort + '/style');
+xhr.open('GET', '/style');
 xhr.send(null);
 xhr.onreadystatechange = function() {
     var DONE = 4;
@@ -38,7 +38,7 @@ xhr.onreadystatechange = function() {
 
             // Ajax request for the multiple-style file
             xhrMultipleStyle = new XMLHttpRequest();
-            xhrMultipleStyle.open('GET', 'http://' + window.vtParameters.djangoHost + ':' + window.vtParameters.djangoPort + '/multiple-style');
+            xhrMultipleStyle.open('GET', '/multiple-style');
             xhrMultipleStyle.send(null);
             xhrMultipleStyle.onreadystatechange = function() {
                 var DONEMultipleStyle = 4;
