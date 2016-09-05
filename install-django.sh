@@ -97,7 +97,7 @@ config() {
     # Update of the repositories and install of python, pip, virtualenv, virtualenvwrapper
     apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y python3.5 python3.5-dev python3-pip python-virtualenv virtualenvwrapper
+    apt-get install -y python3.5 python3.5-dev python3-pip python-virtualenv virtualenvwrapper nginx
 
     mkdir -p $WORKING_DIR_DJANGO/django \
              $WORKING_DIR_DJANGO/django/service
@@ -119,7 +119,7 @@ create_django_virtualenv() {
 
 # Installation
 install_django() {
-    $WORKING_DIR_DJANGO/django-virtualenv/bin/pip3 install Django jsonmerge ujson psycopg2 pyyaml
+    $WORKING_DIR_DJANGO/django-virtualenv/bin/pip3 install django jsonmerge ujson psycopg2 pyyaml gunicorn
 }
 
 # Creation of a Django project named 'composite'
@@ -204,9 +204,11 @@ UPLOAD_DIR = '$UPLOAD_DIR_DJANGO'
 EOF1
 }
 
-# Add import to settings.py file
-add_import_to_settings() {
+# Add extra to settings.py file
+add_extra_to_settings() {
     echo "
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
 # Import settings from local_settings.py, if it exists.
 try:
   import local_settings
@@ -237,45 +239,36 @@ else:
 
 # Apply migrations
 apply_migrations() {
-    cd $WORKING_DIR_DJANGO/django/composite
-    $WORKING_DIR_DJANGO/django-virtualenv/bin/python manage.py migrate
-    cd -
+    $WORKING_DIR_DJANGO/django-virtualenv/bin/python $WORKING_DIR_DJANGO/django/composite/manage.py migrate
 }
 
-# Delete django service if exist
-delete_django_service() {
-    if [ -d "/etc/systemd/system/django.service" ]; then
-        rm /etc/systemd/system/django.service
+# Collect static
+collect_static() {
+    $WORKING_DIR_DJANGO/django-virtualenv/bin/python $WORKING_DIR_DJANGO/django/composite/manage.py collectstatic --noinput
+}
+
+# Delete gunicorn service if exist
+delete_gunicorn_service() {
+    if [ -d "/etc/systemd/system/gunicorn.service" ]; then
+        rm /etc/systemd/system/gunicorn.service
     fi
 }
 
-# Create django service with systemd
-create_django_service() {
-    cat > /etc/systemd/system/django.service << EOF1
+# Create gunicorn service with systemd
+create_gunicorn_service() {
+    cat > /etc/systemd/system/gunicorn.service << EOF1
 [Unit]
-Description=Django
+Description=gunicorn daemon
+After=network.target
 
 [Service]
-Type=forking
-ExecStart=/bin/sh $WORKING_DIR_DJANGO/django/service/django-service.sh
+User=root
+WorkingDirectory=$WORKING_DIR_DJANGO/django/composite
+ExecStart=$WORKING_DIR_DJANGO/django-virtualenv/bin/gunicorn --workers 3 --bind unix:$WORKING_DIR_DJANGO/django/composite/composite.sock composite.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
 EOF1
-}
-
-# Create django-service.sh
-create_django_service_script() {
-    cat > $WORKING_DIR_DJANGO/django/service/django-service.sh << EOF1
-#!/bin/bash
-
-nohup sudo $WORKING_DIR_DJANGO/django-virtualenv/bin/python $WORKING_DIR_DJANGO/django/composite/manage.py runserver $DJANGO_PORT_DJANGO &
-EOF1
-}
-
-# Set execute permission on the script
-set_permission() {
-    chmod +x $WORKING_DIR_DJANGO/django/service/django-service.sh
 }
 
 # Reload systemctl
@@ -283,9 +276,57 @@ systemctl_reload() {
     systemctl daemon-reload
 }
 
-# Start django service
-systemctl_start_django() {
-    systemctl start django.service
+# Start gunicorn service
+systemctl_start_gunicorn() {
+    systemctl start gunicorn.service
+    systemctl enable gunicorn.service
+}
+
+# Delete nginx proxy pass if exist
+delete_nginx_file() {
+    if [ -f "/etc/nginx/sites-available/composite" ]; then
+        rm /etc/nginx/sites-available/composite
+    fi
+}
+
+# Create nginx proxy pass
+create_nginx_file() {
+    cat > /etc/nginx/sites-available/composite << EOF1
+server {
+    listen $DJANGO_PORT_DJANGO;
+    server_name $DJANGO_HOST_DJANGO;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root $WORKING_DIR_DJANGO/django/composite;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:$WORKING_DIR_DJANGO/django/composite/composite.sock;
+    }
+}
+EOF1
+}
+
+# Linking site-enabled
+linking_site_enabled() {
+    ln -s /etc/nginx/sites-available/composite /etc/nginx/sites-enabled
+}
+
+# Restart nginx
+restart_nginx() {
+    systemctl restart nginx.service
+}
+
+# Open firewall
+open_firewall() {
+    ufw allow 'Nginx Full'
+}
+
+# Restart gunicorn
+restart_gunicorn() {
+    systemctl restart gunicorn.service
 }
 
 main() {
@@ -301,13 +342,17 @@ main() {
     import_repository_files
     extra_variables
     create_variables_local_settings
-    add_import_to_settings
+    add_extra_to_settings
     apply_migrations
-    delete_django_service
-    create_django_service
-    create_django_service_script
-    set_permission
+    collect_static
+    delete_gunicorn_service
+    create_gunicorn_service
     systemctl_reload
-    systemctl_start_django
+    systemctl_start_gunicorn
+    create_nginx_file
+    linking_site_enabled
+    restart_nginx
+    open_firewall
+    restart_gunicorn
 }
 main
