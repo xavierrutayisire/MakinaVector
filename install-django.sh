@@ -94,10 +94,10 @@ delete_django_folder() {
 
 # Configuration
 config() {
-    # Update of the repositories and install of python, pip, virtualenv, virtualenvwrapper
+    # Update of the repositories and install of python, pip, virtualenv, virtualenvwrapper, nginx, ufw
     apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y python3.5 python3.5-dev python3-pip python-virtualenv virtualenvwrapper nginx
+    apt-get install -y python3.5 python3.5-dev python3-pip python-virtualenv virtualenvwrapper nginx ufw
 
     mkdir -p $WORKING_DIR_DJANGO/django \
              $WORKING_DIR_DJANGO/django/service
