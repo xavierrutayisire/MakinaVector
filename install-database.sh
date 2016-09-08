@@ -3,31 +3,28 @@
 # SETUP USER
 
 # Directory where you want the database folder to be created
-WORKING_DIR_DATABASE="/srv/projects/vectortiles/project/osm-ireland"
+WORKING_DIR_DATABASE="/srv/projects/vectortiles/project/osm-france"
 
 # Database user name
-DATABASE_USER_DATABASE="imposm3_user_ir"
+DATABASE_USER_DATABASE="db_user_fr"
 
 # Database user password
 DATABASE_USER_PASSWORD_DATABASE="makina"
 
 # Database name
-DATABASE_NAME_DATABASE="imposm3_db_ir"
+DATABASE_NAME_DATABASE="db_name_fr"
 
 # Database host
 DATABASE_HOST_DATABASE="localhost"
 
 # Url of the PBF you wanna import
-URL_PBF_DATABASE="http://download.openstreetmap.fr/extracts/europe/ireland-latest.osm.pbf"
+URL_PBF_DATABASE="http://download.openstreetmap.fr/extracts/europe/france-latest.osm.pbf"
 
 # Url of the PBF state
-URL_PBF_STATE_DATABASE="http://download.openstreetmap.fr/extracts/europe/ireland.state.txt"
+URL_PBF_STATE_DATABASE="http://download.openstreetmap.fr/extracts/europe/france.state.txt"
 
 # Url for the minute replication
-URL_CHANGES_DATABASE="http://download.openstreetmap.fr/replication/europe/ireland/minute"
-
-# Url of the binary of imposm3
-URL_BINARY_DATABASE="http://imposm.org/static/rel/imposm3-0.2.0dev-20160517-3c27127-linux-x86-64.tar.gz"
+URL_CHANGES_DATABASE="http://download.openstreetmap.fr/replication/europe/france/minute"
 
 # END SETUP USER
 
@@ -62,6 +59,9 @@ verif() {
 
 # Configuration
 config() {
+    # Url of the binary of imposm3
+    URL_BINARY_DATABASE="http://imposm.org/static/rel/imposm3-0.2.0dev-20160517-3c27127-linux-x86-64.tar.gz"
+
     # Name of the binary tar.gz
     BINARY_TAR_NAME_DATABASE=$(basename $URL_BINARY_DATABASE)
 

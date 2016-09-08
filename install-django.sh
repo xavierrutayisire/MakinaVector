@@ -3,10 +3,10 @@
 # SETUP USER
 
 # Directory where you want your django folder:
-WORKING_DIR_DJANGO='/srv/projects/vectortiles/project/osm-ireland'
+WORKING_DIR_DJANGO='/srv/projects/vectortiles/project/osm-france'
 
 # Directory of utilery folder:
-WORKING_DIR_UTILERY_DJANGO='/srv/projects/vectortiles/project/osm-ireland/utilery'
+WORKING_DIR_UTILERY_DJANGO='/srv/projects/vectortiles/project/osm-france/utilery'
 
 # Django host
 DJANGO_HOST_DJANGO='127.0.0.1'
@@ -24,22 +24,22 @@ MAPBOX_ACCESS_TOKEN_DJANGO='pk.eyJ1IjoieGFxYXgiLCJhIjoiNm1xWjFPWSJ9.skMPG8gbuHxv
 MAPBOX_STARTING_ZOOM_DJANGO=10
 
 # Mapxbo starting position
-MAPBOX_STARTING_POSITION_DJANGO='[-6.3316, 53.3478]'
+MAPBOX_STARTING_POSITION_DJANGO='[2.3490, 48.8557]'
 
 # Database name
-DATABASE_NAME_DJANGO='imposm3_db_ir'
+DATABASE_NAME_DJANGO='db_name_fr'
 
 # Database host
-DATABASE_HOST_DJANGO='127.0.0.1'
+DATABASE_HOST_DJANGO='localhost'
 
 # Database user
-DATABASE_USER_DJANGO='imposm3_user_ir'
+DATABASE_USER_DJANGO='db_user_fr'
 
 # Database password
 DATABASE_PASSWORD_DJANGO='makina'
 
 # Varnish host
-VARNISH_HOST_DJANGO='127.0.0.1'
+VARNISH_HOST_DJANGO='localhost'
 
 # Varnish port
 VARNISH_PORT_DJANGO=6081

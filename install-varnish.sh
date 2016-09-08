@@ -3,7 +3,7 @@
 # SETUP USER
 
 # Directory where you want your varnish folder:
-WORKING_DIR_VARNISH="/srv/projects/vectortiles/project/osm-ireland"
+WORKING_DIR_VARNISH="/srv/projects/vectortiles/project/osm-france"
 
 # Varnish host
 VARNISH_HOST_VARNISH="localhost"
@@ -12,19 +12,19 @@ VARNISH_HOST_VARNISH="localhost"
 VARNISH_PORT_VARNISH=6081
 
 # Utilery host
-UTILERY_HOST_VARNISH="127.0.0.1"
+UTILERY_HOST_VARNISH="localhost"
 
 # Utilery port
 UTILERY_PORT_VARNISH=3579
 
 # Database user name
-DATABASE_USER_VARNISH="imposm3_user_ir"
+DATABASE_USER_VARNISH="db_user_fr"
 
 # Database user password
 DATABASE_USER_PASSWORD_VARNISH="makina"
 
 # Database name
-DATABASE_NAME_VARNISH="imposm3_db_ir"
+DATABASE_NAME_VARNISH="db_name_fr"
 
 # Database host
 DATABASE_HOST_VARNISH="localhost"
@@ -53,7 +53,6 @@ LIMIT_CORE_VARNISH=infinity
 
 # Size of the varnish_storage.bin cache file
 VARNISH_STORAGE_BIN_SIZE_VARNISH=20G
-
 
 # END SETUP USER
 

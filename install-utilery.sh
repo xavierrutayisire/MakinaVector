@@ -3,16 +3,16 @@
 # SETUP USER
 
 # Directory where you want the utilery folder to be created
-WORKING_DIR_UTILERY="/srv/projects/vectortiles/project/osm-ireland"
+WORKING_DIR_UTILERY="/srv/projects/vectortiles/project/osm-france"
 
 # Database user name
-DATABASE_USER_UTILERY="imposm3_user_ir"
+DATABASE_USER_UTILERY="db_user_fr"
 
 # Database user password
 DATABASE_USER_PASSWORD_UTILERY="makina"
 
 # Database name
-DATABASE_NAME_UTILERY="imposm3_db_ir"
+DATABASE_NAME_UTILERY="db_name_fr"
 
 # Database host
 DATABASE_HOST_UTILERY="localhost"
