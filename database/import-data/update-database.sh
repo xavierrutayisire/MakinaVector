@@ -45,7 +45,7 @@ time_import() {
 }
 
 # Print informations on importations
-print_info() {}
+print_info() {
     echo "### Importation file: $(ls -l $WORKING_DIR_DATABASE/database/osmosis/changes.osc.gz)"
 
     echo "### Import took $DIFF secondes"
