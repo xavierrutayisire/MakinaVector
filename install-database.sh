@@ -42,9 +42,6 @@ verif() {
     Url of the PBF you wanna import: $URL_PBF_DATABASE
     Url of the PBF state: $URL_PBF_STATE_DATABASE
     Url for the minute replication: $URL_CHANGES_DATABASE
-    Version of postgresql: $POSTGRESQL_VERSION_DATABASE
-    Version of postgis: $POSTGIS_VERSION_DATABASE
-    Url of the binary of imposm3: $URL_BINARY_DATABASE
 
     "
     while true; do
