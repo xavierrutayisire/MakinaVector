@@ -11,17 +11,17 @@ minzoom = 0
 maxzoom = 14
 
 # Delimited zone to cache
-west = -11.1133787
-south = 51.122
-east = -5.5582362
-north = 55.736
+west = 1.062
+south = 43.327
+east = 1.779
+north = 43.838
 
 # Varnish connection
-host = '127.0.0.1'
+host = 'localhost'
 port = 6081
 
 # Style 
-style_dir = '/srv/projects/vectortiles/project/osm-ireland/django/composite/map/templates/map/style.json'
+style_dir = '/srv/projects/vectortiles/project/osm-france/django/composite/map/templates/map/style.json'
 
 # END SETUP USER
 

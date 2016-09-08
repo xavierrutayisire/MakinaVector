@@ -213,9 +213,9 @@ systemctl_reload() {
     systemctl daemon-reload
 }
 
-# Start utilery service
-systemctl_start_utilery() {
-    systemctl start utilery.service
+# Lauch utilery service
+restart_utilery_service() {
+    systemctl restart utilery.service
 }
 
 main() {
@@ -236,6 +236,6 @@ main() {
     set_permission
     add_utilery_settings
     systemctl_reload
-    systemctl_start_utilery
+    restart_utilery_service
 }
 main
