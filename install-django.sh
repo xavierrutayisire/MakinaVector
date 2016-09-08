@@ -9,7 +9,7 @@ WORKING_DIR_DJANGO='/srv/projects/vectortiles/project/osm-france'
 WORKING_DIR_UTILERY_DJANGO='/srv/projects/vectortiles/project/osm-france/utilery'
 
 # Django host
-DJANGO_HOST_DJANGO='127.0.0.1'
+DJANGO_HOST_DJANGO='localhost'
 
 # Django port
 DJANGO_PORT_DJANGO=8080
@@ -56,7 +56,7 @@ verif() {
     Directory of utilery folder: $WORKING_DIR_UTILERY_DJANGO
     Django host: $DJANGO_HOST_DJANGO
     Django port: $DJANGO_PORT_DJANGO
-    Title of the index page: TITLE_INDEX_DJANGO
+    Title of the index page: $TITLE_INDEX_DJANGO
     Mapxbox access token: $MAPBOX_ACCESS_TOKEN_DJANGO
     Mapxbox starting zoom: $MAPBOX_STARTING_ZOOM_DJANGO
     Mapxbox starting position: $MAPBOX_STARTING_POSITION_DJANGO
