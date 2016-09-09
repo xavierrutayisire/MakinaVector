@@ -221,8 +221,7 @@ except ImportError:
   import sys 
   sys.exit(1)
 else:
-  # Import any symbols that begin with A-Z. Append to lists any symbols that
-  # begin with \"EXTRA_\".
+  # Import any symbols that begin with A-Z. Append to lists any symbols that begin with \"EXTRA_\".
   import re
   for attr in dir(local_settings):
     match = re.search('^EXTRA_(\w+)', attr)
